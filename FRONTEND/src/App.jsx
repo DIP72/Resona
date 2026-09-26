@@ -8,6 +8,7 @@ import Stage4VisualVersion from './components/stages/Stage4VisualVersion';
 import Stage5SimulatedDelivery from './components/stages/Stage5SimulatedDelivery';
 import Stage6Acknowledgement from './components/stages/Stage6Acknowledgement';
 import DevicePreviewModal from './components/DevicePreviewModal';
+import AuthModal from './components/AuthModal';
 import { sound } from './utils/audioSynth';
 
 const API_BASE = '/api';
@@ -17,8 +18,15 @@ export default function App() {
   const [completedStages, setCompletedStages] = useState([1]);
   const [isRunningPipeline, setIsRunningPipeline] = useState(false);
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState('login');
   const [dbStatus, setDbStatus] = useState('CHECKING');
   const [loading, setLoading] = useState(true);
+
+  const handleOpenAuthModal = (mode = 'login') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
 
   // Core Alert Data
   const [alertData, setAlertData] = useState({
@@ -260,11 +268,46 @@ ALL MARITIME TRAFFIC ORDERED TO VACATE. MANDATORY RELOCATION PROTOCOLS COMMENCED
         dbStatus={dbStatus}
         currentStage={activeStage}
         severity={alertData.severity}
+        onOpenAuthModal={handleOpenAuthModal}
       />
 
       {/* Main Mission Control Canvas */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
         
+        {/* MongoDB Live Connection & Auth Banner */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/20 text-xs font-mono shadow-[0_0_15px_rgba(0,242,254,0.06)]">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="text-slate-400">Database Storage:</span>
+            <span className="text-emerald-300 font-semibold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
+              mongodb://localhost:27017/resona_db
+            </span>
+            <span className="hidden sm:inline text-slate-500">• users collection active</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => handleOpenAuthModal('login')} 
+              className="text-cyan-400 hover:text-cyan-200 transition-colors font-medium flex items-center gap-1"
+            >
+              Sign In
+            </button>
+            <span className="text-slate-700">|</span>
+            <button 
+              onClick={() => handleOpenAuthModal('register')} 
+              className="text-emerald-400 hover:text-emerald-200 transition-colors font-medium flex items-center gap-1"
+            >
+              + Register Account
+            </button>
+            <span className="text-slate-700">|</span>
+            <button 
+              onClick={() => handleOpenAuthModal('database')} 
+              className="text-amber-400 hover:text-amber-200 transition-colors font-medium flex items-center gap-1"
+            >
+              Inspect MongoDB Users
+            </button>
+          </div>
+        </div>
+
         {/* 2. Interactive Process Flow Chart (6 Stages matching slide) */}
         <section className="cyber-card p-5 rounded-2xl border border-cyan-500/25">
           <ProcessFlowChart
@@ -343,6 +386,13 @@ ALL MARITIME TRAFFIC ORDERED TO VACATE. MANDATORY RELOCATION PROTOCOLS COMMENCED
         onClose={() => setIsDeviceModalOpen(false)}
         alertData={alertData}
         onSendCitizenAck={handleSendCitizenAck}
+      />
+
+      {/* 5. Personnel Authentication & MongoDB Access Portal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authModalMode}
       />
 
       {/* Footer */}

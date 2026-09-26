@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShieldAlert, 
   Radio, 
@@ -10,9 +10,16 @@ import {
   Clock, 
   BellRing,
   Activity,
-  Layers
+  Layers,
+  User,
+  LogIn,
+  LogOut,
+  ChevronDown,
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import { sound } from '../utils/audioSynth';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header({ 
   onRunFullPipeline, 
@@ -21,12 +28,16 @@ export default function Header({
   isDeviceModalOpen,
   dbStatus,
   currentStage,
-  severity = 'Extreme'
+  severity = 'Extreme',
+  onOpenAuthModal
 }) {
+  const { currentUser, isAuthenticated, logout, usersCount, mongoUri } = useAuth();
   const [timeUtc, setTimeUtc] = useState('');
   const [timeLocal, setTimeLocal] = useState('');
   const [isMuted, setIsMuted] = useState(false);
   const [sirenActive, setSirenActive] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const updateClocks = () => {
@@ -37,6 +48,17 @@ export default function Header({
     updateClocks();
     const interval = setInterval(updateClocks, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const toggleSound = () => {
@@ -53,14 +75,14 @@ export default function Header({
   };
 
   return (
-    <header className="border-b border-cyber-border bg-[#070B19]/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3 transition-all">
+    <header className="border-b border-cyan-500/20 bg-[#070B19]/95 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3 transition-all">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
         
         {/* Left: Branding & Mission Control Badge */}
         <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00F2FE] via-[#0077FE] to-[#FF0055] p-[1.5px] shadow-neon-cyan animate-pulse-glow">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00F2FE] via-[#0077FE] to-[#FF0055] p-[1.5px] shadow-[0_0_15px_rgba(0,242,254,0.3)] animate-pulse-glow">
                 <div className="w-full h-full bg-[#070B19] rounded-[10px] flex items-center justify-center">
                   <ShieldAlert className="w-5 h-5 text-[#00F2FE]" />
                 </div>
@@ -88,23 +110,42 @@ export default function Header({
           </div>
 
           {/* Quick mobile trigger button */}
-          <button
-            onClick={onToggleDeviceModal}
-            className="lg:hidden p-2 rounded-lg border border-slate-700 bg-slate-800 text-cyan-400"
-            title="Preview Mobile Device"
-          >
-            <Smartphone className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={() => {
+                sound.playBlip();
+                onOpenAuthModal && onOpenAuthModal();
+              }}
+              className="p-2 rounded-lg border border-cyan-500/40 bg-cyan-950/40 text-cyan-300"
+              title="Auth"
+            >
+              <User className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onToggleDeviceModal}
+              className="p-2 rounded-lg border border-slate-700 bg-slate-800 text-cyan-400"
+              title="Preview Mobile Device"
+            >
+              <Smartphone className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Center: Real-time System Telemetry Badges */}
         <div className="hidden md:flex items-center gap-2 lg:gap-3 font-mono text-xs">
-          {/* MongoDB Status */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-400">
+          {/* MongoDB Status (Clickable to inspect) */}
+          <button
+            onClick={() => {
+              sound.playBlip();
+              onOpenAuthModal && onOpenAuthModal('database');
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 hover:border-emerald-400 transition-colors"
+            title="Inspect MongoDB Database at mongodb://localhost:27017/"
+          >
             <Database className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
             <span>MongoDB:</span>
-            <span className="font-semibold text-emerald-300">{dbStatus === 'CONNECTED' ? 'ONLINE (27017)' : 'ONLINE'}</span>
-          </div>
+            <span className="font-semibold text-emerald-300">ONLINE (27017)</span>
+          </button>
 
           {/* LoRa Mesh Radio */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950/40 border border-cyan-500/30 text-cyan-400">
@@ -122,9 +163,99 @@ export default function Header({
           </div>
         </div>
 
-        {/* Right: Interactive Global Action Triggers */}
+        {/* Right: User Authentication & Interactive Action Triggers */}
         <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
           
+          {/* USER AUTH STATUS / LOGIN BUTTON */}
+          {isAuthenticated && currentUser ? (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => {
+                  sound.playBlip();
+                  setUserMenuOpen(!userMenuOpen);
+                }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-950/70 border border-cyan-500/40 text-xs font-mono text-cyan-200 hover:border-cyan-400 hover:bg-cyan-900/60 transition-all shadow-[0_0_10px_rgba(0,242,254,0.15)]"
+              >
+                <div className="w-5 h-5 rounded-full bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-[#00F2FE]">
+                  <User className="w-3 h-3" />
+                </div>
+                <div className="text-left hidden sm:block">
+                  <span className="font-semibold text-white block leading-tight">{currentUser.name}</span>
+                  <span className="text-[10px] text-cyan-400 block leading-none">{currentUser.badgeNumber || currentUser.role}</span>
+                </div>
+                <ChevronDown className={`w-3.5 h-3.5 text-cyan-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Profile Dropdown */}
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-[#0A122C] border border-cyan-500/30 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.6)] p-3 text-xs font-mono z-50 animate-fadeIn">
+                  <div className="border-b border-slate-800 pb-2.5 mb-2">
+                    <p className="text-white font-bold">{currentUser.name}</p>
+                    <p className="text-slate-400 text-[11px]">{currentUser.email}</p>
+                    <span className="mt-1 inline-block text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                      {currentUser.role}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 text-[11px] text-slate-300 mb-3">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Agency:</span>
+                      <span className="text-right text-slate-300 truncate max-w-[150px]">{currentUser.organization || 'ODRAF'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Badge ID:</span>
+                      <span className="text-cyan-400 font-bold">{currentUser.badgeNumber || 'CMD-1011'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Database:</span>
+                      <span className="text-emerald-400 font-semibold truncate max-w-[140px]">localhost:27017</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-800 flex flex-col gap-1.5">
+                    <button
+                      onClick={() => {
+                        sound.playBlip();
+                        setUserMenuOpen(false);
+                        onOpenAuthModal && onOpenAuthModal('database');
+                      }}
+                      className="w-full py-1.5 px-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 flex items-center justify-between text-[11px]"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Database className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Inspect MongoDB Users</span>
+                      </span>
+                      <span className="text-emerald-400">({usersCount})</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        sound.playBlip();
+                        logout();
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full py-1.5 px-2.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 text-[11px] justify-center"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out / Disconnect</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                sound.playBlip();
+                onOpenAuthModal && onOpenAuthModal('login');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-semibold rounded-xl bg-gradient-to-r from-cyan-950 to-blue-950 border border-cyan-400 text-[#00F2FE] hover:shadow-[0_0_15px_rgba(0,242,254,0.4)] transition-all"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>LOGIN / REGISTER</span>
+            </button>
+          )}
+
           {/* Audio EAS Siren Button */}
           <button
             onClick={handleTriggerSiren}
