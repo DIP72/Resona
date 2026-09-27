@@ -143,20 +143,28 @@ class SoundFX {
     // Map langCode to BCP-47
     const langMap = {
       hi: 'hi-IN',
-      or: 'hi-IN', // fallback to hi-IN if Odia not present in OS
+      or: 'or-IN',
       bn: 'bn-IN',
       te: 'te-IN',
       ta: 'ta-IN',
       mr: 'mr-IN',
+      gu: 'gu-IN',
+      kn: 'kn-IN',
+      ml: 'ml-IN',
+      as: 'as-IN',
+      pa: 'pa-IN',
       es: 'es-ES',
-      en: 'en-US',
+      en: 'en-IN',
     };
 
-    utterance.lang = langMap[langCode] || 'en-US';
+    const targetCode = langMap[langCode] || 'hi-IN';
+    utterance.lang = targetCode;
 
     // Try finding matching voice
     const voices = window.speechSynthesis.getVoices();
-    const match = voices.find(v => v.lang.startsWith(langCode) || v.lang === utterance.lang);
+    const match = voices.find(v => v.lang === targetCode || v.lang.startsWith(langCode)) ||
+                  voices.find(v => v.lang === 'hi-IN') ||
+                  voices.find(v => v.lang.startsWith('en'));
     if (match) utterance.voice = match;
 
     window.speechSynthesis.speak(utterance);

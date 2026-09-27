@@ -1,0 +1,21 @@
+# --- Core API stack (required for both DEMO and REAL MODEL mode) ---
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+python-dotenv==1.0.1
+
+# --- Language detection (lightweight, pure python) ---
+langdetect==1.0.9
+
+# --- Testing ---
+pytest==8.3.3
+httpx==0.27.2
+
+# --- REAL MODEL mode only (heavy, optional) ---
+# Uncomment these to enable REAL_MODEL mode (DEMO_MODE=false in .env).
+# Not required for the hackathon demo / DEMO mode / test suite.
+# torch==2.4.1
+# transformers==4.45.1
+# sentencepiece==0.2.0
+# accelerate==0.34.2
+# IndicTransToolkit @ git+https://github.com/VarunGumma/IndicTransToolkit.git

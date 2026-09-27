@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const alertRoutes = require('./routes/alertRoutes');
 const authRoutes = require('./routes/authRoutes');
+const weatherRoutes = require('./routes/weatherRoutes');
 const { PRESETS } = require('./data/presets');
 const Alert = require('./models/Alert');
 const Telemetry = require('./models/Telemetry');
@@ -29,6 +30,7 @@ app.use(express.json());
 // Routes
 app.use('/api', alertRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/weather', weatherRoutes);
 
 // Seed initial default alert into MongoDB
 async function seedDefaultAlert() {
