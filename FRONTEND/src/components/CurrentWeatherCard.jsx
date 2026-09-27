@@ -16,6 +16,7 @@ import {
   CloudOff
 } from 'lucide-react';
 import { useWeather } from '../context/WeatherContext';
+import AnimatedCounter from './AnimatedCounter';
 
 // Map OpenWeatherMap main condition -> icon component
 function getWeatherIcon(condition) {
@@ -66,9 +67,9 @@ export default function CurrentWeatherCard({ location }) {
   // Loading state
   if (loading && !current) {
     return (
-      <div className="weather-card rounded-2xl border border-[#1E2C4F] p-4 flex flex-col items-center justify-center min-h-[200px]">
+      <div className="weather-card rounded-2xl border border-[#1E2C4F] p-5 flex flex-col items-center justify-center min-h-[200px]">
         <Loader2 className="w-8 h-8 text-[#38BDF8] animate-spin mb-2" />
-        <p className="text-xs text-slate-400 font-mono">Fetching live weather...</p>
+        <p className="text-xs text-slate-400 font-mono">Fetching live telemetry...</p>
         <p className="text-[10px] text-slate-500 mt-1">{location.city}, {location.state}</p>
       </div>
     );
@@ -77,15 +78,15 @@ export default function CurrentWeatherCard({ location }) {
   // Error / fallback state
   if (error && !current) {
     return (
-      <div className="weather-card rounded-2xl border border-red-900/40 p-4 flex flex-col items-center justify-center min-h-[200px]">
+      <div className="weather-card rounded-2xl border border-red-900/40 p-5 flex flex-col items-center justify-center min-h-[200px]">
         <CloudOff className="w-8 h-8 text-red-400 mb-2" />
-        <p className="text-xs text-red-300 font-mono text-center">Weather data unavailable</p>
+        <p className="text-xs text-red-300 font-mono text-center">Telemetry feed unavailable</p>
         <p className="text-[10px] text-slate-500 mt-1">{error}</p>
         <button
           onClick={refresh}
-          className="mt-3 text-[10px] text-[#38BDF8] hover:underline flex items-center gap-1"
+          className="mt-3 text-[10px] text-[#38BDF8] hover:underline flex items-center gap-1 font-mono"
         >
-          <RefreshCw className="w-3 h-3" /> Retry
+          <RefreshCw className="w-3 h-3" /> Retry Stream
         </button>
       </div>
     );
@@ -106,13 +107,13 @@ export default function CurrentWeatherCard({ location }) {
   const iconColor = getIconColor(condition);
 
   return (
-    <div className="weather-card rounded-2xl border border-[#1E2C4F] p-4 flex flex-col justify-between">
+    <div className="weather-card rounded-2xl border border-[#1E2C4F] p-4.5 sm:p-5 flex flex-col justify-between shadow-2xl relative overflow-hidden">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-[#1E2C4F]">
+      <div className="flex items-center justify-between pb-2.5 border-b border-[#1E2C4F]/80">
         <div>
-          <h3 className="text-xs font-bold text-white tracking-wide">
-            Current Weather
+          <h3 className="text-xs font-bold text-white tracking-wide uppercase font-mono">
+            Ground Station Telemetry
           </h3>
           <p className="text-[11px] text-slate-400 mt-0.5">
             {cityName}, {location.state}
@@ -121,80 +122,86 @@ export default function CurrentWeatherCard({ location }) {
         <div className="flex items-center gap-2">
           <button
             onClick={refresh}
-            className="text-slate-500 hover:text-[#38BDF8] transition-colors"
+            className="text-slate-400 hover:text-[#38BDF8] transition-colors p-1"
             title="Refresh weather"
           >
-            <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950/80 border border-emerald-500/40 text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Live
+          <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
+            <span>Live Stream</span>
           </span>
         </div>
       </div>
 
       {/* Main Temperature and Icon display */}
-      <div className="my-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center`}>
+      <div className="my-3.5 flex items-center justify-between">
+        <div className="flex items-center gap-3.5">
+          <div className={`w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center transition-transform hover:scale-105 shadow-md shadow-blue-950/30`}>
             <WeatherIcon className={`w-8 h-8 ${iconColor} ${condition === 'Clear' ? 'animate-spin-slow' : ''}`} />
           </div>
           <div>
-            <div className="text-3xl font-extrabold text-white tracking-tight font-display">
-              {temp}°C
+            <div className="text-3xl font-extrabold text-white tracking-tight font-mono">
+              <AnimatedCounter value={temp} suffix="°C" />
             </div>
             <p className="text-xs font-semibold text-slate-200 capitalize">
               {description || condition}
             </p>
-            <p className="text-[10px] text-slate-400">
-              Feels like: {feelsLike}°C
+            <p className="text-[10px] text-slate-400 font-mono">
+              Feels like: <AnimatedCounter value={feelsLike} suffix="°C" />
             </p>
           </div>
         </div>
       </div>
 
-      {/* 4-Metric Grid */}
-      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#1E2C4F] text-xs">
-        <div className="p-2 rounded-xl bg-[#0D162E] flex items-center gap-2">
+      {/* 4-Metric Grid with Monospace Telemetry and Hover Lift */}
+      <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-[#1E2C4F]/80 text-xs">
+        <div className="p-2.5 rounded-xl bg-[#0D162E]/80 border border-[#1E2C4F]/60 flex items-center gap-2.5 card-hover-lift">
           <Droplets className="w-4 h-4 text-blue-400 shrink-0" />
           <div>
-            <span className="text-[10px] text-slate-400 block">Humidity</span>
-            <span className="font-semibold text-white font-mono">{humidity}%</span>
+            <span className="text-[10px] text-slate-400 block font-sans">Humidity</span>
+            <span className="font-semibold text-white font-mono text-xs">
+              <AnimatedCounter value={humidity} suffix="%" />
+            </span>
           </div>
         </div>
 
-        <div className="p-2 rounded-xl bg-[#0D162E] flex items-center gap-2">
-          <Wind className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="p-2.5 rounded-xl bg-[#0D162E]/80 border border-[#1E2C4F]/60 flex items-center gap-2.5 card-hover-lift">
+          <Wind className="w-4 h-4 text-teal-400 shrink-0" />
           <div>
-            <span className="text-[10px] text-slate-400 block">Wind</span>
-            <span className="font-semibold text-white font-mono">{windSpeed} km/h</span>
+            <span className="text-[10px] text-slate-400 block font-sans">Wind</span>
+            <span className="font-semibold text-white font-mono text-xs">
+              <AnimatedCounter value={windSpeed} suffix=" km/h" />
+            </span>
           </div>
         </div>
 
-        <div className="p-2 rounded-xl bg-[#0D162E] flex items-center gap-2">
+        <div className="p-2.5 rounded-xl bg-[#0D162E]/80 border border-[#1E2C4F]/60 flex items-center gap-2.5 card-hover-lift">
           <Gauge className="w-4 h-4 text-amber-400 shrink-0" />
           <div>
-            <span className="text-[10px] text-slate-400 block">Pressure</span>
-            <span className="font-semibold text-white font-mono">{pressure} hPa</span>
+            <span className="text-[10px] text-slate-400 block font-sans">Pressure</span>
+            <span className="font-semibold text-white font-mono text-xs">
+              <AnimatedCounter value={pressure} suffix=" hPa" />
+            </span>
           </div>
         </div>
 
-        <div className="p-2 rounded-xl bg-[#0D162E] flex items-center gap-2">
+        <div className="p-2.5 rounded-xl bg-[#0D162E]/80 border border-[#1E2C4F]/60 flex items-center gap-2.5 card-hover-lift">
           <Eye className="w-4 h-4 text-cyan-400 shrink-0" />
           <div>
-            <span className="text-[10px] text-slate-400 block">Visibility</span>
-            <span className="font-semibold text-white font-mono">{visibility} km</span>
+            <span className="text-[10px] text-slate-400 block font-sans">Visibility</span>
+            <span className="font-semibold text-white font-mono text-xs">
+              <AnimatedCounter value={visibility} suffix=" km" />
+            </span>
           </div>
         </div>
       </div>
 
       {/* Last updated footer */}
-      <div className="mt-2 pt-1.5 border-t border-[#1E2C4F] flex items-center justify-between">
-        <span className="text-[9px] text-slate-500 font-mono">
-          Updated: {updatedStr}
-        </span>
-        <span className="text-[9px] text-slate-600 font-mono">
-          {current?.source === 'cache' ? '(cached)' : 'OpenWeatherMap'}
+      <div className="mt-2.5 pt-2 border-t border-[#1E2C4F]/80 flex items-center justify-between text-[10px] font-mono text-slate-400">
+        <span>Station Sync: {cityName}</span>
+        <span className="text-slate-500">
+          Telemetry: {updatedStr}
         </span>
       </div>
 

@@ -24,6 +24,7 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
 import { ALL_INDIA_CITIES } from '../data/indiaCities';
 import { useWeather } from '../context/WeatherContext';
+import AnimatedCounter from './AnimatedCounter';
 
 /**
  * Build hazard zones GeoJSON dynamically from live city weather data.
@@ -391,18 +392,18 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
       }
 
       const el = document.createElement('div');
-      el.className = 'flex flex-col items-center cursor-pointer group z-30';
+      el.className = 'flex flex-col items-center cursor-pointer group z-30 card-hover-lift';
       el.innerHTML = `
         <div class="relative flex items-center justify-center">
           <span class="absolute w-10 h-10 rounded-full ${pulseColor} animate-ping"></span>
-          <div class="w-9 h-9 rounded-full ${ringColor} border-2 flex items-center justify-center text-base shadow-xl backdrop-blur transition-transform group-hover:scale-125">
+          <div class="w-9 h-9 rounded-full ${ringColor} border-2 flex items-center justify-center text-base shadow-xl backdrop-blur transition-transform group-hover:scale-125 ${isSevereStorm ? 'animate-cyclone-bob' : ''}">
             ${icon}
           </div>
           <span class="absolute -top-2.5 -right-2.5 text-[8px] font-mono px-1 rounded bg-black/90 text-cyan-300 border border-cyan-500/40">
             NASA
           </span>
         </div>
-        <span class="text-[9px] font-bold text-white bg-black/85 px-1.5 py-0.5 rounded shadow mt-1 max-w-[130px] truncate text-center border border-white/10">
+        <span class="text-[9px] font-bold text-white bg-black/85 px-1.5 py-0.5 rounded shadow mt-1 max-w-[130px] truncate text-center border border-white/10 font-mono">
           ${event.title}
         </span>
       `;
@@ -496,14 +497,14 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
     <div className="weather-card rounded-2xl border border-[#1E2C4F] overflow-hidden flex flex-col relative h-[500px]">
       
       {/* Top Map Header Controls */}
-      <div className="px-4 py-3 bg-[#0E1730]/95 backdrop-blur-md border-b border-[#1E2C4F] flex flex-wrap items-center justify-between gap-2 z-10">
+      <div className="px-4 py-3 bg-[#0E1730]/90 backdrop-blur-xl border-b border-[#1E2C4F]/80 flex flex-wrap items-center justify-between gap-2 z-10 shadow-lg">
         <div className="flex items-center gap-2.5">
           <h3 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
             India Live Disaster & Weather Map
           </h3>
-          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950/80 border border-emerald-500/40 text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Mapbox GL Live
+          <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
+            <span>Mapbox GL Live</span>
           </span>
           {isLoadingLiveWeather && (
             <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
@@ -516,7 +517,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         {/* Region Quick Selectors & Layer Filter */}
         <div className="flex items-center gap-2">
           {/* Region Jump Pills */}
-          <div className="hidden md:flex items-center gap-1 bg-[#111C38] p-0.5 rounded-lg border border-[#1E2C4F] text-[10px] font-medium">
+          <div className="hidden md:flex items-center gap-1 bg-[#111C38]/80 backdrop-blur-md p-1 rounded-xl border border-[#1E2C4F] text-[10px] font-medium">
             {[
               { id: 'all', label: 'All India' },
               { id: 'east', label: 'East/Odisha' },
@@ -528,8 +529,8 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
               <button
                 key={r.id}
                 onClick={() => handleFlyToRegion(r.id)}
-                className={`px-2 py-0.5 rounded transition-colors ${
-                  activeRegion === r.id ? 'bg-[#38BDF8] text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+                className={`px-2.5 py-1 rounded-lg tab-transition ${
+                  activeRegion === r.id ? 'bg-[#38BDF8] text-slate-950 font-bold shadow-md shadow-sky-950/40' : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {r.label}
@@ -538,22 +539,22 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
           </div>
 
           {/* Layer Filter Buttons */}
-          <div className="flex items-center gap-1 bg-[#111C38] p-0.5 rounded-lg border border-[#1E2C4F] text-[10px] font-medium">
+          <div className="flex items-center gap-1 bg-[#111C38]/80 backdrop-blur-md p-1 rounded-xl border border-[#1E2C4F] text-[10px] font-medium">
             <button
               onClick={() => handleToggleLayer('all')}
-              className={`px-2 py-0.5 rounded ${activeLayer === 'all' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2.5 py-1 rounded-lg tab-transition ${activeLayer === 'all' ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-950/40' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
             >
               All
             </button>
             <button
               onClick={() => handleToggleLayer('cyclone')}
-              className={`px-2 py-0.5 rounded ${activeLayer === 'cyclone' ? 'bg-rose-600 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2.5 py-1 rounded-lg tab-transition ${activeLayer === 'cyclone' ? 'bg-rose-600 text-white font-bold shadow-md shadow-rose-950/40' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
             >
               Cyclone
             </button>
             <button
               onClick={() => handleToggleLayer('flood')}
-              className={`px-2 py-0.5 rounded ${activeLayer === 'flood' ? 'bg-orange-600 text-white' : 'text-slate-400 hover:text-white'}`}
+              className={`px-2.5 py-1 rounded-lg tab-transition ${activeLayer === 'flood' ? 'bg-orange-600 text-white font-bold shadow-md shadow-orange-950/40' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
             >
               Flood
             </button>
@@ -574,19 +575,19 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
                   }
                 }
               }}
-              className={`px-2 py-0.5 rounded flex items-center gap-1 transition-all ${
-                showNasaLayer ? 'bg-rose-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+              className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 tab-transition ${
+                showNasaLayer ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold shadow-md shadow-rose-950/40' : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
               title="Toggle NASA EONET Live Natural Events"
             >
-              <Satellite className="w-3 h-3" />
-              <span>NASA ({eonetEvents?.length || 0})</span>
+              <Satellite className="w-3 h-3 text-rose-400" />
+              <span>NASA (<AnimatedCounter value={eonetEvents?.length || 0} />)</span>
             </button>
           </div>
 
           <button
             onClick={() => handleFlyToRegion('all')}
-            className="p-1.5 rounded-lg bg-[#111C38] border border-[#1E2C4F] text-slate-300 hover:text-white hover:border-[#38BDF8] transition-colors"
+            className="p-2 rounded-xl bg-[#111C38]/80 border border-[#1E2C4F] text-slate-300 hover:text-white hover:border-[#38BDF8] tab-transition"
             title="Reset Map to All India"
           >
             <Crosshair className="w-3.5 h-3.5" />
@@ -643,21 +644,21 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
             <span>Heatwave Zone</span>
           </div>
           <div className="flex items-center gap-2 text-slate-300">
-            <span className="w-3.5 h-3.5 rounded-full bg-rose-600/80 border border-rose-400 flex items-center justify-center text-[8px] animate-pulse">🛰️</span>
-            <span>NASA EONET Live Events ({eonetEvents?.length || 0})</span>
+            <span className="w-3.5 h-3.5 rounded-full bg-rose-600/80 border border-rose-400 flex items-center justify-center text-[8px] live-pulse-dot-red">🛰️</span>
+            <span>NASA EONET Live Events (<AnimatedCounter value={eonetEvents?.length || 0} />)</span>
           </div>
         </div>
 
         {/* Live Stations Count Badge (Bottom Right) */}
-        <div className="absolute bottom-4 right-3 z-10 bg-[#0E1730]/90 backdrop-blur-md border border-[#1E2C4F] rounded-xl px-2.5 py-1 text-[10px] font-mono text-slate-400 shadow-lg flex items-center gap-2">
-          <span><strong className="text-emerald-400">{liveCities.length || ALL_INDIA_CITIES.length}</strong> Cities Online</span>
+        <div className="absolute bottom-4 right-3 z-10 bg-[#0E1730]/90 backdrop-blur-md border border-[#1E2C4F] rounded-xl px-3 py-1.5 text-[10px] font-mono text-slate-400 shadow-xl flex items-center gap-2">
+          <span><strong className="text-emerald-400 font-bold"><AnimatedCounter value={liveCities.length || ALL_INDIA_CITIES.length} /></strong> Cities Online</span>
           <span>•</span>
-          <span className="text-cyan-400 font-bold">{eonetEvents?.length || 0} NASA Disasters</span>
+          <span className="text-cyan-400 font-bold"><AnimatedCounter value={eonetEvents?.length || 0} /> NASA Events</span>
         </div>
       </div>
 
       {/* Bottom Status Bar */}
-      <div className="px-4 py-2.5 bg-[#0E1730]/95 backdrop-blur-md border-t border-[#1E2C4F] flex flex-wrap items-center justify-between gap-3 z-10">
+      <div className="px-4 py-2.5 bg-[#0E1730]/90 backdrop-blur-xl border-t border-[#1E2C4F]/80 flex flex-wrap items-center justify-between gap-3 z-10 shadow-lg">
         
         <div className="flex items-center gap-3">
           <div className="flex flex-col">
@@ -667,14 +668,18 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
             </div>
             <div className="text-[10px] text-slate-400 font-mono flex items-center gap-2 flex-wrap">
               <span>
-                {activeAlertCount > 0 
-                  ? `${activeAlertCount} active regional hazard zone${activeAlertCount !== 1 ? 's' : ''}`
-                  : 'Regional stations reporting normal conditions'}
+                {activeAlertCount > 0 ? (
+                  <>
+                    <strong className="text-amber-400"><AnimatedCounter value={activeAlertCount} /></strong> active regional hazard zone{activeAlertCount !== 1 ? 's' : ''}
+                  </>
+                ) : (
+                  'Regional stations reporting normal conditions'
+                )}
               </span>
               <span>•</span>
               <span className="text-rose-400 flex items-center gap-1">
-                <Satellite className="w-3 h-3" />
-                NASA EONET: {eonetEvents?.length || 0} real-time active global disasters
+                <Satellite className="w-3 h-3 animate-pulse" />
+                <span>NASA EONET: <strong className="text-rose-300"><AnimatedCounter value={eonetEvents?.length || 0} /></strong> real-time active global disasters</span>
               </span>
             </div>
           </div>

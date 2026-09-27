@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import { useWeather } from '../context/WeatherContext';
+import AnimatedCounter from './AnimatedCounter';
 
 export default function RiskLevelCard({ riskScore: propScore, riskLevel: propLevel }) {
   const { current } = useWeather();
@@ -23,12 +24,13 @@ export default function RiskLevelCard({ riskScore: propScore, riskLevel: propLev
   const pThunder = Math.round((thunderWeight / total) * 100);
   const pCyclone = 100 - (pRain + pWind + pHeat + pThunder);
 
+  // Exact color-coded hazard system matching prompt
   const hazards = [
-    { name: 'Rain / Flood', color: '#38BDF8', percent: pRain },
-    { name: 'High Wind', color: '#10B981', percent: pWind },
-    { name: 'Thermal Stress', color: '#EC4899', percent: pHeat },
+    { name: 'Cyclone / Storm', color: '#EF4444', percent: pCyclone },
+    { name: 'Flood & Rain', color: '#3B82F6', percent: pRain },
+    { name: 'Squally Wind', color: '#14B8A6', percent: pWind },
+    { name: 'Heat Stress', color: '#F97316', percent: pHeat },
     { name: 'Thunderstorm', color: '#FACC15', percent: pThunder },
-    { name: 'Storm Threat', color: '#EF4444', percent: pCyclone },
   ];
 
   const badgeColor = level === 'Very High' 
@@ -36,35 +38,35 @@ export default function RiskLevelCard({ riskScore: propScore, riskLevel: propLev
     : level === 'High' 
     ? 'text-orange-400 bg-orange-950/60 border-orange-600/40' 
     : level === 'Moderate'
-    ? 'text-amber-400 bg-amber-950/60 border-amber-500/40'
+    ? 'text-amber-400 bg-amber-950/60 border-amber-500/40' 
     : 'text-emerald-400 bg-emerald-950/60 border-emerald-500/40';
 
   return (
-    <div className="weather-card rounded-2xl border border-[#1E2C4F] p-4 flex flex-col justify-between">
+    <div className="weather-card rounded-2xl border border-[#1E2C4F] p-4.5 sm:p-5 flex flex-col justify-between shadow-2xl relative overflow-hidden">
       
       {/* Header */}
-      <div className="pb-2 border-b border-[#1E2C4F] mb-2 flex items-center justify-between">
-        <h3 className="text-xs font-bold text-white tracking-wide">
-          Real-Time Risk Index
+      <div className="pb-2.5 border-b border-[#1E2C4F]/80 mb-2 flex items-center justify-between">
+        <h3 className="text-xs font-bold text-white tracking-wide uppercase font-mono">
+          Composite Threat Index
         </h3>
         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border font-mono ${badgeColor}`}>
-          Score: {score}/100
+          Score: <AnimatedCounter value={score} />/100
         </span>
       </div>
 
       {/* Donut Gauge & Legend Display */}
-      <div className="flex items-center justify-around gap-2 my-1">
+      <div className="flex items-center justify-around gap-2 my-2">
         
         {/* SVG Circular Donut Chart */}
         <div className="relative w-28 h-28 flex items-center justify-center shrink-0">
-          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+          <svg className="w-full h-full -rotate-90 drop-shadow-lg" viewBox="0 0 100 100">
             <circle
               cx="50"
               cy="50"
               r="40"
               fill="none"
               stroke="#1A284D"
-              strokeWidth="10"
+              strokeWidth="9"
             />
             {/* Dynamic gauge segment */}
             <circle
@@ -73,7 +75,7 @@ export default function RiskLevelCard({ riskScore: propScore, riskLevel: propLev
               r="40"
               fill="none"
               stroke={level === 'Very High' ? '#EF4444' : level === 'High' ? '#F97316' : level === 'Moderate' ? '#FACC15' : '#10B981'}
-              strokeWidth="10"
+              strokeWidth="9"
               strokeDasharray={`${Math.round(score * 2.512)} 251.2`}
               strokeDashoffset="0"
               strokeLinecap="round"
@@ -83,25 +85,27 @@ export default function RiskLevelCard({ riskScore: propScore, riskLevel: propLev
 
           {/* Center Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-base font-extrabold text-white leading-tight font-display">
+            <span className="text-base font-extrabold text-white leading-tight font-mono">
               {level}
             </span>
             <span className="text-[9px] text-slate-400 uppercase tracking-widest font-mono">
-              Live Index
+              Risk Level
             </span>
           </div>
         </div>
 
-        {/* Hazard Legend Breakdown */}
-        <div className="space-y-1 text-[11px]">
+        {/* Hazard Legend Breakdown with color-coded markers */}
+        <div className="space-y-1.5 text-[11px]">
           {hazards.map((h) => (
-            <div key={h.name} className="flex items-center gap-2">
+            <div key={h.name} className="flex items-center gap-2 group cursor-default">
               <span 
-                className="w-2 h-2 rounded-full shrink-0" 
+                className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm transition-transform group-hover:scale-125" 
                 style={{ backgroundColor: h.color }}
               />
               <span className="text-slate-300 font-medium text-[10px]">{h.name}:</span>
-              <span className="text-slate-400 text-[10px] font-mono">{h.percent}%</span>
+              <span className="text-slate-400 text-[10px] font-mono">
+                <AnimatedCounter value={h.percent} suffix="%" />
+              </span>
             </div>
           ))}
         </div>
@@ -109,20 +113,23 @@ export default function RiskLevelCard({ riskScore: propScore, riskLevel: propLev
       </div>
 
       {/* Guidance Summary Box */}
-      <div className="pt-2 border-t border-[#1E2C4F]">
+      <div className="pt-2.5 border-t border-[#1E2C4F]/80">
         <div className="flex items-baseline justify-between gap-1.5">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-xs font-bold text-white">Live Assessment:</span>
-            <span className={`text-xs font-bold ${level === 'Very High' ? 'text-rose-400' : level === 'High' ? 'text-orange-400' : 'text-amber-400'}`}>
-              {level} Risk
+            <span className="text-xs font-bold text-white">Assessment:</span>
+            <span className={`text-xs font-bold font-mono ${level === 'Very High' ? 'text-rose-400' : level === 'High' ? 'text-orange-400' : 'text-amber-400'}`}>
+              {level} Severity
             </span>
           </div>
-          <span className="text-[9px] font-mono text-emerald-400">● OpenWeather Live</span>
+          <span className="text-[9px] font-mono text-emerald-400 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
+            Telemetry Synced
+          </span>
         </div>
-        <p className="text-[10px] text-slate-400 mt-0.5 leading-snug">
-          {level === 'Very High' ? 'Severe hazard alert active. Follow evacuation advisories.' :
+        <p className="text-[10px] text-slate-400 mt-1 leading-snug font-sans">
+          {level === 'Very High' ? 'Severe hazard alert active. Follow emergency relocation advisories.' :
            level === 'High' ? 'Significant weather alert. Maintain indoor shelter.' :
-           'Moderate atmospheric variation. Normal alert precautions apply.'}
+           'Atmospheric index within operational safety parameters.'}
         </p>
       </div>
 

@@ -70,8 +70,12 @@ export default function App() {
 
   return (
     <WeatherProvider city={currentLocation.city}>
-      <div className="min-h-screen bg-[#0B132B] text-slate-100 flex flex-col font-sans selection:bg-[#38BDF8]/30 selection:text-[#38BDF8]">
+      <div className="min-h-screen bg-[#070D1E] text-slate-100 flex flex-col font-sans selection:bg-[#38BDF8]/30 selection:text-[#38BDF8] relative overflow-x-hidden">
         
+        {/* Ambient Background Glow Highlights for Glassmorphism Depth */}
+        <div className="fixed top-24 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="fixed bottom-24 right-1/4 w-[32rem] h-[32rem] bg-rose-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+
         {/* 1. Top Modern Disaster Command Navbar */}
         <TopNavbar
           currentLocation={currentLocation}

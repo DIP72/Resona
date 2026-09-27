@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWeather } from '../context/WeatherContext';
+import AnimatedCounter from './AnimatedCounter';
 
 export const INDIAN_LOCATIONS = [
   { city: 'Bhubaneswar', state: 'Odisha', risk: 'Low', temp: 24, condition: 'Clouds', wind: '10 km/h' },
@@ -120,7 +121,7 @@ export default function TopNavbar({
       ];
 
   return (
-    <header className="sticky top-0 z-30 bg-[#0B132B] border-b border-[#1E2C4F] px-4 lg:px-6 py-2.5 transition-colors">
+    <header className="sticky top-0 z-30 bg-[#0B132B]/85 backdrop-blur-xl border-b border-[#1E2C4F]/80 px-4 lg:px-6 py-2.5 transition-colors shadow-2xl">
       <div className="max-w-[1720px] mx-auto flex items-center justify-between gap-4">
         
         {/* Left: Brand Identity */}
@@ -135,9 +136,9 @@ export default function TopNavbar({
               <span className="text-xl font-bold tracking-tight text-white font-display">
                 Weather<span className="text-[#38BDF8]">Alert</span>
               </span>
-              <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950/70 border border-emerald-500/40 text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                IMD & NDMA FEED
+              <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
+                <span>IMD & NDMA FEED</span>
               </span>
             </div>
             <p className="text-[11px] text-slate-400 font-medium tracking-wide">
@@ -280,12 +281,12 @@ export default function TopNavbar({
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative p-2 rounded-xl bg-[#111C38] border border-[#1E2C4F] text-slate-300 hover:text-white hover:border-[#38BDF8]/50 transition-colors"
+              className="relative p-2 rounded-xl bg-[#111C38]/80 backdrop-blur-md border border-[#1E2C4F] text-slate-300 hover:text-white hover:border-[#38BDF8]/50 transition-all card-hover-lift shadow-sm"
               title="Alert Notifications"
             >
               <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-[10px] font-bold text-white flex items-center justify-center ring-2 ring-[#0B132B] shadow-sm">
-                8
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-[10px] font-bold text-white flex items-center justify-center ring-2 ring-[#0B132B] shadow-md animate-scale-bounce font-mono">
+                <AnimatedCounter value={notifications.length} />
               </span>
             </button>
 
