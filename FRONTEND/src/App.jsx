@@ -195,12 +195,12 @@ export default function App() {
           </section>
 
           {/* MongoDB Verification & Operational Data Strip */}
-          <section className="p-3 rounded-xl bg-[#0E1730] border border-[#1E2C4F] flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-mono text-slate-400">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <section className="p-3.5 rounded-2xl bg-[#0E1730]/75 backdrop-blur-md border border-[#1E2C4F] flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-mono text-slate-400 shadow-xl card-hover-lift">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
               <span>Backend & Database:</span>
               <span className="text-emerald-300 font-semibold">mongodb://localhost:27017/resona_db</span>
-              <span className="hidden md:inline text-slate-600">• users & alerts collections synced</span>
+              <span className="hidden md:inline text-slate-600">• users & alerts synced</span>
             </div>
             <div className="flex items-center gap-3">
               <button

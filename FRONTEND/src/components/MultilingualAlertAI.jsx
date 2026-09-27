@@ -352,7 +352,7 @@ export default function MultilingualAlertAI({
       {current && (
         <div className="px-4 py-2 bg-[#091024] border-b border-[#1A284A] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
             <span className="text-emerald-400 font-semibold">Real-Time OpenWeather Station:</span>
             <span className="text-white font-bold">{current.city}</span>
             <span className="text-cyan-300 font-bold bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">

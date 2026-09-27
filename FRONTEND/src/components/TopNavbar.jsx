@@ -239,7 +239,7 @@ export default function TopNavbar({
               <span className="text-[#38BDF8] font-mono font-bold text-[11px] bg-blue-950/60 px-1.5 py-0.5 rounded border border-blue-500/30">
                 {current?.temp ?? currentLocation.temp}°C {current?.condition ? `• ${current.condition}` : ''}
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" title="Live OpenWeather Feed"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green" title="Live OpenWeather Feed"></span>
             </button>
 
             {locationMenuOpen && (

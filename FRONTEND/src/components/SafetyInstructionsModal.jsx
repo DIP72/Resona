@@ -106,13 +106,13 @@ export default function SafetyInstructionsModal({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
       
-      <div className="relative w-full max-w-3xl bg-[#0D162E] border border-rose-600/50 rounded-2xl shadow-[0_0_50px_rgba(239,68,68,0.25)] flex flex-col max-h-[92vh] overflow-hidden">
+      <div className="relative w-full max-w-3xl bg-[#0D162E]/90 backdrop-blur-2xl border border-rose-600/50 rounded-2xl shadow-[0_0_50px_rgba(239,68,68,0.25)] flex flex-col max-h-[92vh] overflow-hidden">
         
         {/* Glowing Alert Top Bar */}
         <div className="h-1.5 w-full bg-gradient-to-r from-rose-600 via-orange-500 to-amber-500" />
 
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-rose-950/60 to-[#0D162E] border-b border-rose-900/40 flex items-center justify-between">
+        <div className="p-4 sm:p-5 bg-gradient-to-r from-rose-950/60 to-[#0D162E]/80 border-b border-rose-900/40 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-600/25 border border-rose-500/50 flex items-center justify-center text-rose-400 shrink-0">
               <ShieldAlert className="w-6 h-6 animate-pulse" />
@@ -122,7 +122,8 @@ export default function SafetyInstructionsModal({ isOpen, onClose }) {
                 <h2 className="text-base sm:text-lg font-bold text-white tracking-wide font-display">
                   EMERGENCY PROTOCOLS & SAFETY INSTRUCTIONS
                 </h2>
-                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-mono bg-rose-900/80 text-rose-200 border border-rose-500/40">
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-rose-900/80 text-rose-200 border border-rose-500/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 live-pulse-dot-red"></span>
                   RED ALERT ACTIVE
                 </span>
               </div>
