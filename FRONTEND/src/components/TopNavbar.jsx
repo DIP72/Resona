@@ -13,7 +13,8 @@ import {
   Radio,
   ExternalLink,
   Globe,
-  RefreshCw
+  RefreshCw,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWeather } from '../context/WeatherContext';
@@ -53,6 +54,7 @@ export default function TopNavbar({
   onSelectLocation, 
   onOpenSafetyModal,
   onOpenAuthModal,
+  onOpenWallpaperModal,
   emergencyModeActive,
   onToggleEmergencyMode
 }) {
@@ -226,6 +228,16 @@ export default function TopNavbar({
               {getVernacularBadgeText(currentLocation)}
             </span>
           </div>
+
+          {/* Atmospheric Wallpaper Switcher Pill */}
+          <button
+            onClick={onOpenWallpaperModal}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#111C38] border border-[#1E2C4F] hover:border-cyan-400/60 text-xs text-slate-300 hover:text-white transition-all shadow-sm"
+            title="Customize Atmospheric Background Wallpaper"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="font-medium">Atmosphere</span>
+          </button>
 
           {/* Active Location Pill with Real-Time Weather */}
           <div className="relative" ref={locRef}>

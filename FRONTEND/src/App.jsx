@@ -33,6 +33,7 @@ import IncidentReportModal from './components/IncidentReportModal';
 import AuthModal from './components/AuthModal';
 import MobileBottomNav from './components/MobileBottomNav';
 import MultilingualAlertAI from './components/MultilingualAlertAI';
+import WallpaperSelector, { WALLPAPER_PRESETS } from './components/WallpaperSelector';
 import { sound } from './utils/audioSynth';
 
 export default function App() {
@@ -40,6 +41,41 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'multilingual' | 'map' | 'alerts' | 'forecast' | 'reports' | 'resources' | 'settings'
   const [activeHazardFilter, setActiveHazardFilter] = useState(null); // 'cyclone' | 'flood' | etc.
   
+  // Atmospheric Wallpaper State
+  const [currentBg, setCurrentBg] = useState(() => {
+    try {
+      const saved = localStorage.getItem('resona_dashboard_bg');
+      return saved ? JSON.parse(saved) : WALLPAPER_PRESETS[0];
+    } catch {
+      return WALLPAPER_PRESETS[0];
+    }
+  });
+
+  const [bgOpacity, setBgOpacity] = useState(() => {
+    try {
+      const saved = localStorage.getItem('resona_bg_opacity');
+      return saved ? parseFloat(saved) : 0.82;
+    } catch {
+      return 0.82;
+    }
+  });
+
+  const [isWallpaperModalOpen, setIsWallpaperModalOpen] = useState(false);
+
+  const handleSelectBg = (bg) => {
+    setCurrentBg(bg);
+    try {
+      localStorage.setItem('resona_dashboard_bg', JSON.stringify(bg));
+    } catch {}
+  };
+
+  const handleChangeOpacity = (val) => {
+    setBgOpacity(val);
+    try {
+      localStorage.setItem('resona_bg_opacity', val.toString());
+    } catch {}
+  };
+
   // Modals state
   const [isSafetyModalOpen, setIsSafetyModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -89,6 +125,24 @@ export default function App() {
     <WeatherProvider city={currentLocation.city}>
       <div className="min-h-screen bg-[#070D1E] text-slate-100 flex flex-col font-sans selection:bg-[#38BDF8]/30 selection:text-[#38BDF8] relative overflow-x-hidden">
         
+        {/* Atmospheric Wallpaper Background Layer (Pinterest / Satellite / Coastal Storm) */}
+        {currentBg?.url && (
+          <div 
+            className="fixed inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700 pointer-events-none -z-20 transform scale-105"
+            style={{ backgroundImage: `url("${currentBg.url}")` }}
+          />
+        )}
+
+        {/* Dynamic Dark Vignette & Glass Blending Overlay */}
+        <div 
+          className="fixed inset-0 pointer-events-none -z-10 transition-opacity duration-300"
+          style={{ 
+            backgroundColor: '#070D1E',
+            opacity: currentBg?.url ? bgOpacity : 1,
+            backdropFilter: currentBg?.url ? 'blur(1.5px)' : 'none'
+          }}
+        />
+
         {/* Ambient Background Glow Highlights for Glassmorphism Depth */}
         <div className="fixed top-24 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
         <div className="fixed bottom-24 right-1/4 w-[32rem] h-[32rem] bg-rose-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -102,6 +156,10 @@ export default function App() {
           }}
           onOpenSafetyModal={handleOpenSafety}
           onOpenAuthModal={handleOpenAuth}
+          onOpenWallpaperModal={() => {
+            sound.playBlip();
+            setIsWallpaperModalOpen(true);
+          }}
           emergencyModeActive={emergencyModeActive}
           onToggleEmergencyMode={() => setEmergencyModeActive(!emergencyModeActive)}
         />
@@ -576,6 +634,15 @@ export default function App() {
           isOpen={isAuthModalOpen}
           initialMode={authModalMode}
           onClose={() => setIsAuthModalOpen(false)}
+        />
+
+        <WallpaperSelector
+          isOpen={isWallpaperModalOpen}
+          onClose={() => setIsWallpaperModalOpen(false)}
+          currentBg={currentBg}
+          onSelectBg={handleSelectBg}
+          bgOpacity={bgOpacity}
+          onChangeOpacity={handleChangeOpacity}
         />
 
       </div>
