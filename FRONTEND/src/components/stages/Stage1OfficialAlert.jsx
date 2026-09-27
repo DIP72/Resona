@@ -79,14 +79,14 @@ export default function Stage1OfficialAlert({
             <div className="flex items-center justify-between mb-1">
               <span className="flex items-center gap-1.5 text-xs font-bold text-rose-400 font-display">
                 <Wind className="w-4 h-4 text-rose-400" />
-                Cyclone DANA (Severe)
+                Cyclone Scenario (Simulation)
               </span>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">
-                145 km/h
+                Sim
               </span>
             </div>
             <p className="text-[11px] text-slate-400 line-clamp-2">
-              Deep depression Bay of Bengal; landfall near Puri / Dhamra coast with 2.0m storm surge.
+              Simulated severe cyclonic storm scenario for coastal Odisha with storm surge potential.
             </p>
           </button>
 

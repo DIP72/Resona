@@ -6,14 +6,7 @@ require('dotenv').config();
 const alertRoutes = require('./routes/alertRoutes');
 const authRoutes = require('./routes/authRoutes');
 const weatherRoutes = require('./routes/weatherRoutes');
-const { PRESETS } = require('./data/presets');
-const Alert = require('./models/Alert');
-const Telemetry = require('./models/Telemetry');
 const User = require('./models/User');
-const { simplifyBureaucraticAlert } = require('./services/simplifierService');
-const { getTranslationsForAlert } = require('./services/translatorService');
-const { generateCapXml, generateCompressedSms, generateUssdString, generateLoraHexPayload } = require('./services/capGenerator');
-const { generateInitialTelemetry } = require('./services/telemetrySimulator');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,68 +24,6 @@ app.use(express.json());
 app.use('/api', alertRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/weather', weatherRoutes);
-
-// Seed initial default alert into MongoDB
-async function seedDefaultAlert() {
-  try {
-    const existing = await Alert.findOne({ presetKey: 'cyclone' });
-    if (!existing) {
-      console.log('Seeding initial Cyclone Dana emergency alert into MongoDB...');
-      const p = PRESETS[0];
-      const alertId = 'ALERT-INITIAL-DANA';
-      const plainLanguage = simplifyBureaucraticAlert(p.rawTechnicalBulletin, p.category, p.severity, p.affectedArea);
-      const translations = getTranslationsForAlert('cyclone', plainLanguage);
-
-      const alertDataForEnc = {
-        alertId,
-        title: p.title,
-        category: p.category,
-        severity: p.severity,
-        urgency: p.urgency,
-        affectedArea: p.affectedArea,
-        plainLanguage,
-      };
-
-      const capXml = generateCapXml(alertDataForEnc);
-      const sms140 = generateCompressedSms(alertDataForEnc);
-      const ussdCode = generateUssdString(alertDataForEnc);
-      const loraPayloadHex = generateLoraHexPayload(alertDataForEnc);
-
-      const alertDoc = {
-        alertId,
-        presetKey: 'cyclone',
-        title: p.title,
-        category: p.category,
-        severity: p.severity,
-        urgency: p.urgency,
-        issuingAuthority: p.issuingAuthority,
-        rawTechnicalBulletin: p.rawTechnicalBulletin,
-        affectedArea: p.affectedArea,
-        plainLanguage,
-        translations,
-        visualAssets: p.visualAssets,
-        transmissionData: {
-          capXml,
-          capPacketSizeBytes: Buffer.byteLength(capXml, 'utf8'),
-          sms140,
-          ussdCode,
-          loraPayloadHex,
-          loraBytes: 48,
-        },
-        pipelineStage: 6,
-        status: 'BROADCAST_ACTIVE',
-        createdAt: new Date(),
-      };
-
-      await Alert.create(alertDoc);
-      const telemDoc = generateInitialTelemetry(alertId, alertDoc);
-      await Telemetry.create(telemDoc);
-      console.log('Initial Cyclone alert seeded successfully!');
-    }
-  } catch (err) {
-    console.warn('Seeding note:', err.message);
-  }
-}
 
 // Seed initial demonstration users into MongoDB if empty
 async function seedDemoUsers() {
@@ -152,7 +83,6 @@ mongoose.connect(MONGODB_URI, {
 })
 .then(async () => {
   console.log(`>>> Connected to MongoDB database successfully at ${MONGODB_URI}`);
-  await seedDefaultAlert();
   await seedDemoUsers();
 })
 .catch((err) => {

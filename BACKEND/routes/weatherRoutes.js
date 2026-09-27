@@ -392,36 +392,6 @@ router.get('/live-alerts', async (req, res) => {
       }
     });
 
-    // Provide live regional atmospheric observation bulletins for key hubs
-    const keyRegions = weatherData.filter(Boolean);
-    keyRegions.forEach(d => {
-      const city = d.name;
-      const alreadyHasAlert = alerts.some(a => a.city.toLowerCase() === city.toLowerCase());
-      if (!alreadyHasAlert) {
-        const temp = Math.round(d.main.temp);
-        const windKm = Math.round((d.wind?.speed || 0) * 3.6);
-        const cond = d.weather?.[0]?.main || 'Clear';
-        const desc = d.weather?.[0]?.description || 'clear';
-        const hum = d.main.humidity;
-
-        alerts.push({
-          id: `obs-${city.toLowerCase()}`,
-          category: 'wind',
-          hazardType: 'weather',
-          title: `Live Weather Status — ${city}`,
-          severity: 'Low',
-          severityColor: 'bg-slate-900/80 text-cyan-300 border border-cyan-500/30',
-          description: `Current: ${desc} | Temp: ${temp}°C | Humidity: ${hum}%`,
-          subtext: `Wind: ${windKm} km/h | Pressure: ${d.main.pressure} hPa | Live Station`,
-          validity: 'Live OpenWeather Observation',
-          city,
-          temp,
-          humidity: hum,
-          windKm,
-          cond,
-        });
-      }
-    });
 
     res.json({ success: true, count: alerts.length, alerts, isRealTime: true, source: 'openweathermap' });
   } catch (err) {

@@ -3,8 +3,6 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { 
   Layers, 
-  Play, 
-  Pause, 
   Radio, 
   Crosshair, 
   Info,
@@ -15,33 +13,106 @@ import {
   Compass,
   AlertTriangle,
   RefreshCw,
-  Maximize2
+  Maximize2,
+  ShieldCheck
 } from 'lucide-react';
 
 // Set Mapbox Public Token from environment variable
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
-import { 
-  ALL_INDIA_CITIES, 
-  CYCLONE_TIMELINE, 
-  HAZARD_ZONES_GEOJSON, 
-  CYCLONE_TRACK_GEOJSON 
-} from '../data/indiaCities';
+import { ALL_INDIA_CITIES } from '../data/indiaCities';
+
+/**
+ * Build hazard zones GeoJSON dynamically from live city weather data.
+ * Only generates zones around cities with ACTIVE severe weather (rain, high wind, thunderstorm, heatwave).
+ */
+function buildLiveHazardZones(cities) {
+  const features = [];
+  const R = 0.8; // approximate radius in degrees (~80 km)
+
+  cities.forEach(city => {
+    const cond = (city.condition || '').toLowerCase();
+    const wind = city.wind_speed || 0;
+    const rain = city.rain_1h || 0;
+    const temp = city.temp || 25;
+
+    let hazardType = null;
+    let severity = 'Normal';
+    let color = '#10B981'; // green
+    let details = '';
+
+    // Heavy rain / flood risk
+    if (cond.includes('rain') || cond.includes('drizzle') || rain > 0) {
+      hazardType = 'rain';
+      severity = rain >= 5 ? 'High / Orange Watch' : 'Moderate / Yellow Watch';
+      color = rain >= 5 ? '#F97316' : '#38BDF8';
+      details = `Live: ${city.description || cond} | Rain: ${rain > 0 ? rain + ' mm/h' : 'Active'} | Humidity: ${city.humidity || '--'}%`;
+    }
+    // Thunderstorm
+    if (cond.includes('thunderstorm') || cond.includes('thunder')) {
+      hazardType = 'thunderstorm';
+      severity = 'High / Red Watch';
+      color = '#EF4444';
+      details = `Live: Active thunderstorm convection | Wind: ${wind} km/h | Temp: ${temp}°C`;
+    }
+    // High wind / cyclone-grade
+    if (wind >= 50) {
+      hazardType = 'cyclone';
+      severity = wind >= 80 ? 'Extreme / Red Alert' : 'High / Orange Alert';
+      color = wind >= 80 ? '#DC2626' : '#F97316';
+      details = `Live: Sustained wind ${wind} km/h | Gale conditions active`;
+    }
+    // Heatwave
+    if (temp >= 40) {
+      hazardType = 'heatwave';
+      severity = temp >= 44 ? 'Extreme / Red Alert' : 'High / Orange Alert';
+      color = '#EC4899';
+      details = `Live: Ambient temperature ${temp}°C | Heat stress risk`;
+    }
+
+    if (hazardType) {
+      const lon = city.lon;
+      const lat = city.lat;
+      features.push({
+        type: 'Feature',
+        properties: {
+          id: `live-${city.city.toLowerCase().replace(/\s/g, '-')}`,
+          name: `${city.city} — ${hazardType.charAt(0).toUpperCase() + hazardType.slice(1)} Zone`,
+          type: hazardType,
+          severity,
+          wind: `${wind} km/h`,
+          color,
+          details: details || `Live observation for ${city.city}`
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [lon - R, lat - R * 0.7],
+            [lon + R, lat - R * 0.7],
+            [lon + R, lat + R * 0.7],
+            [lon - R, lat + R * 0.7],
+            [lon - R, lat - R * 0.7],
+          ]]
+        }
+      });
+    }
+  });
+
+  return { type: 'FeatureCollection', features };
+}
 
 export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
-  const cycloneMarkerRef = useRef(null);
 
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [timelineIndex, setTimelineIndex] = useState(0);
-  const [activeLayer, setActiveLayer] = useState('all'); // 'all' | 'cyclone' | 'flood' | 'weather'
+  const [activeLayer, setActiveLayer] = useState('all');
   const [liveCities, setLiveCities] = useState([]);
   const [isLoadingLiveWeather, setIsLoadingLiveWeather] = useState(true);
   const [selectedHazardInfo, setSelectedHazardInfo] = useState(null);
   const [activeRegion, setActiveRegion] = useState('all');
+  const [activeAlertCount, setActiveAlertCount] = useState(0);
 
   // Fetch Live Weather for All India Cities
   const fetchLiveIndiaWeather = useCallback(async () => {
@@ -53,7 +124,6 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.cities?.length) {
-          // Merge with coordinates and state metadata
           const merged = ALL_INDIA_CITIES.map(baseCity => {
             const liveMatch = data.cities.find(c => 
               c.city.toLowerCase() === baseCity.city.toLowerCase() ||
@@ -72,6 +142,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
                 pressure: liveMatch.pressure,
                 visibility: liveMatch.visibility,
                 icon: liveMatch.icon,
+                rain_1h: liveMatch.rain_1h || 0,
                 risk: liveMatch.riskLevel || baseCity.risk,
                 riskScore: liveMatch.riskScore,
                 isLive: true
@@ -116,40 +187,35 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
 
   useEffect(() => {
     fetchLiveIndiaWeather();
+    // Re-fetch every 2 minutes for continuous live sync
+    const interval = setInterval(fetchLiveIndiaWeather, 2 * 60 * 1000);
+    return () => clearInterval(interval);
   }, [fetchLiveIndiaWeather]);
 
   // 1. Initialize Mapbox Map
   useEffect(() => {
     if (!mapContainerRef.current) return;
-    if (mapRef.current) return; // Prevent multiple instances
+    if (mapRef.current) return;
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: 'mapbox://styles/mapbox/dark-v11',
-      center: [79.2, 22.4], // Geographic Center of India
+      center: [79.2, 22.4],
       zoom: 4.1,
       minZoom: 3.5,
       maxZoom: 12,
       attributionControl: false
     });
 
-    // Add navigation controls (Zoom +/- and Compass)
     map.addControl(new mapboxgl.NavigationControl({ showCompass: true }), 'top-right');
 
     map.on('load', () => {
-      // Add Hazard GeoJSON Sources
+      // Add empty hazard source — will be updated dynamically
       map.addSource('hazard-zones', {
         type: 'geojson',
-        data: HAZARD_ZONES_GEOJSON
+        data: { type: 'FeatureCollection', features: [] }
       });
 
-      // Add Cyclone Track GeoJSON Source
-      map.addSource('cyclone-track', {
-        type: 'geojson',
-        data: CYCLONE_TRACK_GEOJSON
-      });
-
-      // 1. Hazard Polygons Fill Layer
       map.addLayer({
         id: 'hazard-zones-fill',
         type: 'fill',
@@ -160,7 +226,6 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         }
       });
 
-      // 2. Hazard Polygons Border Line Layer
       map.addLayer({
         id: 'hazard-zones-line',
         type: 'line',
@@ -173,20 +238,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         }
       });
 
-      // 3. Cyclone Projected Track Line
-      map.addLayer({
-        id: 'cyclone-track-line',
-        type: 'line',
-        source: 'cyclone-track',
-        paint: {
-          'line-color': '#EF4444',
-          'line-width': 3,
-          'line-dasharray': [3, 2],
-          'line-opacity': 0.85
-        }
-      });
-
-      // Interactive Click on Hazard Zones
+      // Interactive click on hazard zones
       map.on('click', 'hazard-zones-fill', (e) => {
         if (e.features && e.features[0]) {
           const props = e.features[0].properties;
@@ -197,13 +249,8 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         }
       });
 
-      // Change cursor on hover over hazard zones
-      map.on('mouseenter', 'hazard-zones-fill', () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-      map.on('mouseleave', 'hazard-zones-fill', () => {
-        map.getCanvas().style.cursor = '';
-      });
+      map.on('mouseenter', 'hazard-zones-fill', () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', 'hazard-zones-fill', () => { map.getCanvas().style.cursor = ''; });
 
       mapRef.current = map;
       setMapLoaded(true);
@@ -215,109 +262,85 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         mapRef.current = null;
       }
     };
-  }, [onSelectAlertZone, onSelectLocation]);
+  }, [onSelectAlertZone]);
 
-  // 2. Render Live Weather City Markers on Mapbox
+  // 2. Update hazard zones dynamically from live weather data
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current) return;
+    if (!mapLoaded || !mapRef.current || liveCities.length === 0) return;
+    const map = mapRef.current;
+    const source = map.getSource('hazard-zones');
+    if (!source) return;
+
+    const liveHazards = buildLiveHazardZones(liveCities);
+    source.setData(liveHazards);
+    setActiveAlertCount(liveHazards.features.length);
+  }, [liveCities, mapLoaded]);
+
+  // 3. Render city weather markers on map
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current || liveCities.length === 0) return;
     const map = mapRef.current;
 
-    const citiesToDisplay = liveCities.length ? liveCities : ALL_INDIA_CITIES;
-
-    // Clear existing markers
+    // Clear old markers
     markersRef.current.forEach(m => m.remove());
     markersRef.current = [];
 
-    citiesToDisplay.forEach((city) => {
-      // Create custom DOM element for marker
+    const getWeatherIcon = (cond) => {
+      const c = (cond || '').toLowerCase();
+      if (c.includes('thunder')) return '⛈️';
+      if (c.includes('rain') || c.includes('drizzle')) return '🌧️';
+      if (c.includes('snow')) return '❄️';
+      if (c.includes('cloud') || c.includes('overcast')) return '☁️';
+      if (c.includes('mist') || c.includes('haze') || c.includes('fog')) return '🌫️';
+      if (c.includes('clear')) return '☀️';
+      return '🌤️';
+    };
+
+    const getRiskColor = (risk) => {
+      if (risk === 'Very High') return 'border-rose-500 shadow-rose-500/40';
+      if (risk === 'High') return 'border-orange-500 shadow-orange-500/30';
+      if (risk === 'Moderate') return 'border-amber-500 shadow-amber-500/20';
+      return 'border-emerald-500 shadow-emerald-500/20';
+    };
+
+    liveCities.forEach(city => {
       const el = document.createElement('div');
-      el.className = 'group cursor-pointer select-none';
-
-      // Pick badge style based on weather condition & risk
-      const isRain = city.condition?.toLowerCase().includes('rain') || city.condition?.toLowerCase().includes('drizzle');
-      const isThunder = city.condition?.toLowerCase().includes('thunder');
-      const isClear = city.condition?.toLowerCase().includes('clear');
-
-      let badgeBg = 'bg-[#111C38]/95 border-[#2B4372] text-slate-200';
-      let dotColor = 'bg-blue-400';
-      if (city.risk === 'Very High') {
-        badgeBg = 'bg-rose-950/90 border-rose-500/60 text-rose-200';
-        dotColor = 'bg-rose-500';
-      } else if (city.risk === 'High') {
-        badgeBg = 'bg-amber-950/90 border-amber-500/60 text-amber-200';
-        dotColor = 'bg-amber-400';
-      } else if (isRain) {
-        badgeBg = 'bg-sky-950/90 border-sky-500/60 text-sky-200';
-        dotColor = 'bg-sky-400';
-      }
-
+      el.className = 'flex items-center justify-center cursor-pointer relative group';
       el.innerHTML = `
-        <div class="flex items-center gap-1.5 px-2 py-1 rounded-full border shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:border-[#38BDF8] ${badgeBg}">
-          <span class="w-1.5 h-1.5 rounded-full ${dotColor} ${city.risk === 'Very High' ? 'animate-ping' : ''}"></span>
-          <span class="text-[10px] font-bold tracking-tight">${city.city}</span>
-          <span class="text-[10px] font-mono font-semibold text-white ml-0.5">${city.temp ?? city.defaultTemp ?? '--'}°</span>
+        <div class="relative flex flex-col items-center">
+          <div class="w-8 h-8 rounded-full bg-[#0E1730]/90 backdrop-blur border-2 ${getRiskColor(city.risk)} flex items-center justify-center text-base shadow-lg">
+            ${getWeatherIcon(city.condition)}
+          </div>
+          <span class="text-[9px] font-bold text-white bg-[#0E1730]/90 px-1 rounded mt-0.5 whitespace-nowrap shadow">
+            ${city.temp || '--'}°C
+          </span>
         </div>
       `;
 
-      // Popup on marker click
-      const popupHtml = `
-        <div class="text-xs p-1 space-y-2 min-w-[180px]">
-          <div class="flex items-center justify-between border-b border-[#1E2C4F] pb-1.5">
-            <div>
-              <div class="font-bold text-white text-sm">${city.city}</div>
-              <div class="text-[10px] text-slate-400">${city.state}</div>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
-              city.risk === 'Very High' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40' :
-              city.risk === 'High' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' :
-              'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-            }">${city.risk} Risk</span>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <div class="text-2xl font-extrabold text-white font-mono">${city.temp ?? '--'}°C</div>
-            <div class="text-right">
-              <div class="text-slate-200 font-medium capitalize text-[11px]">${city.description || city.condition || 'Clear'}</div>
-              <div class="text-[10px] text-slate-400">Wind: ${city.wind_speed || 15} km/h</div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-1 pt-1 text-[10px] text-slate-300 font-mono bg-[#0D162E] p-1.5 rounded-lg">
-            <div>Humidity: <span class="text-white">${city.humidity || 75}%</span></div>
-            <div>Pressure: <span class="text-white">${city.pressure || 1010} hPa</span></div>
-          </div>
-
-          <button id="btn-select-${city.city.toLowerCase()}" class="w-full mt-2 py-1 px-2 rounded-lg bg-[#38BDF8] hover:bg-[#0284C7] text-slate-950 font-bold text-[11px] text-center transition-colors">
-            Focus Location
-          </button>
-        </div>
-      `;
-
-      const popup = new mapboxgl.Popup({ offset: 12, closeButton: true })
-        .setHTML(popupHtml);
-
-      popup.on('open', () => {
-        const btn = document.getElementById(`btn-select-${city.city.toLowerCase()}`);
-        if (btn) {
-          btn.onclick = () => {
-            if (onSelectLocation) {
-              onSelectLocation({
-                city: city.city,
-                state: city.state,
-                risk: city.risk,
-                temp: city.temp,
-                condition: city.condition,
-                wind: `${city.wind_speed || 18} km/h`
-              });
-            }
-            map.flyTo({
-              center: [city.lon, city.lat],
-              zoom: 7.5,
-              duration: 1500
-            });
-          };
+      el.addEventListener('click', () => {
+        if (onSelectLocation) {
+          onSelectLocation(city);
         }
       });
+
+      const popup = new mapboxgl.Popup({ offset: 18, maxWidth: '230px' })
+        .setHTML(`
+          <div class="text-xs p-1.5 space-y-1 min-w-[180px]">
+            <div class="font-bold text-white border-b border-[#1E2C4F] pb-0.5 flex items-center justify-between">
+              <span>${city.city}, ${city.state}</span>
+              <span class="text-[9px] px-1 py-0.5 rounded ${
+                city.isLive ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
+              }">${city.isLive ? 'LIVE' : 'Cached'}</span>
+            </div>
+            <div class="text-slate-300">Temp: <strong class="text-white">${city.temp || '--'}°C</strong></div>
+            <div class="text-slate-300">Condition: <strong class="text-white">${city.description || city.condition || '--'}</strong></div>
+            <div class="text-slate-300">Wind: <strong class="text-white">${city.wind_speed || 0} km/h</strong></div>
+            <div class="text-slate-300">Humidity: <strong class="text-white">${city.humidity || '--'}%</strong></div>
+            <div class="text-slate-300">Risk: <strong class="${
+              (city.risk === 'Very High' || city.risk === 'High') ? 'text-rose-400' : 'text-emerald-400'
+            }">${city.risk || 'Low'} ${city.riskScore ? `(${city.riskScore})` : ''}</strong></div>
+          </div>
+        `);
 
       const marker = new mapboxgl.Marker({ element: el })
         .setLngLat([city.lon, city.lat])
@@ -328,60 +351,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
     });
   }, [liveCities, mapLoaded, onSelectLocation]);
 
-  // 3. Cyclone "Dana" Pulsing Center Marker on Map
-  useEffect(() => {
-    if (!mapLoaded || !mapRef.current) return;
-    const map = mapRef.current;
-
-    const currentStep = CYCLONE_TIMELINE[timelineIndex];
-
-    if (!cycloneMarkerRef.current) {
-      const el = document.createElement('div');
-      el.className = 'relative flex items-center justify-center cursor-pointer';
-      el.innerHTML = `
-        <div class="absolute w-12 h-12 rounded-full bg-rose-500/25 danger-radar-pulse"></div>
-        <div class="absolute w-8 h-8 rounded-full bg-rose-600/40 animate-ping"></div>
-        <div class="relative w-7 h-7 rounded-full bg-rose-600 border-2 border-white flex items-center justify-center text-white shadow-xl shadow-rose-600/50">
-          <svg class="w-4 h-4 animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-          </svg>
-        </div>
-      `;
-
-      const popup = new mapboxgl.Popup({ offset: 15 })
-        .setHTML(`
-          <div class="text-xs p-1 space-y-1.5 min-w-[190px]">
-            <div class="flex items-center gap-1.5 text-rose-400 font-bold border-b border-[#1E2C4F] pb-1">
-              <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-              Cyclone "Dana" Eye
-            </div>
-            <div class="text-[11px] text-slate-200">Wind: <strong class="text-white font-mono">${currentStep.wind} km/h</strong></div>
-            <div class="text-[11px] text-slate-200">Pressure: <strong class="text-white font-mono">${currentStep.pressure} hPa</strong></div>
-            <div class="text-[10px] text-amber-300 font-medium">${currentStep.status}</div>
-          </div>
-        `);
-
-      cycloneMarkerRef.current = new mapboxgl.Marker({ element: el })
-        .setLngLat(currentStep.coords)
-        .setPopup(popup)
-        .addTo(map);
-    } else {
-      cycloneMarkerRef.current.setLngLat(currentStep.coords);
-    }
-  }, [timelineIndex, mapLoaded]);
-
-  // 4. Auto Timeline Playback
-  useEffect(() => {
-    let timer;
-    if (isPlaying) {
-      timer = setInterval(() => {
-        setTimelineIndex(prev => (prev + 1) % CYCLONE_TIMELINE.length);
-      }, 2500);
-    }
-    return () => clearInterval(timer);
-  }, [isPlaying]);
-
-  // 5. Region Quick-Fly Controller
+  // Region Quick-Fly Controller
   const handleFlyToRegion = (region) => {
     setActiveRegion(region);
     if (!mapRef.current) return;
@@ -398,47 +368,39 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         map.flyTo({ center: [77.2, 28.6], zoom: 6.2, duration: 1600 });
         break;
       case 'south':
-        map.flyTo({ center: [78.8, 13.2], zoom: 6.0, duration: 1600 });
+        map.flyTo({ center: [78.5, 12.5], zoom: 6.2, duration: 1600 });
         break;
       case 'west':
-        map.flyTo({ center: [73.2, 20.0], zoom: 6.0, duration: 1600 });
+        map.flyTo({ center: [73.0, 19.2], zoom: 6.2, duration: 1600 });
         break;
       case 'northeast':
-        map.flyTo({ center: [92.6, 26.2], zoom: 6.4, duration: 1600 });
+        map.flyTo({ center: [91.8, 26.0], zoom: 7.0, duration: 1600 });
         break;
       default:
-        break;
+        map.flyTo({ center: [79.2, 22.4], zoom: 4.1, duration: 1500 });
     }
   };
 
-  // 6. Layer Toggle Controller
+  // Layer filter handler
   const handleToggleLayer = (layerType) => {
     setActiveLayer(layerType);
     if (!mapRef.current) return;
     const map = mapRef.current;
 
-    if (!map.getLayer('hazard-zones-fill')) return;
-
     if (layerType === 'all') {
       map.setFilter('hazard-zones-fill', null);
       map.setFilter('hazard-zones-line', null);
-      if (map.getLayer('cyclone-track-line')) map.setLayoutProperty('cyclone-track-line', 'visibility', 'visible');
     } else if (layerType === 'cyclone') {
       map.setFilter('hazard-zones-fill', ['==', ['get', 'type'], 'cyclone']);
       map.setFilter('hazard-zones-line', ['==', ['get', 'type'], 'cyclone']);
-      if (map.getLayer('cyclone-track-line')) map.setLayoutProperty('cyclone-track-line', 'visibility', 'visible');
     } else if (layerType === 'flood') {
-      map.setFilter('hazard-zones-fill', ['==', ['get', 'type'], 'flood']);
-      map.setFilter('hazard-zones-line', ['==', ['get', 'type'], 'flood']);
-      if (map.getLayer('cyclone-track-line')) map.setLayoutProperty('cyclone-track-line', 'visibility', 'none');
+      map.setFilter('hazard-zones-fill', ['any', ['==', ['get', 'type'], 'rain'], ['==', ['get', 'type'], 'flood']]);
+      map.setFilter('hazard-zones-line', ['any', ['==', ['get', 'type'], 'rain'], ['==', ['get', 'type'], 'flood']]);
     } else if (layerType === 'weather') {
-      map.setFilter('hazard-zones-fill', ['==', ['get', 'type'], 'rain']);
-      map.setFilter('hazard-zones-line', ['==', ['get', 'type'], 'rain']);
-      if (map.getLayer('cyclone-track-line')) map.setLayoutProperty('cyclone-track-line', 'visibility', 'none');
+      map.setFilter('hazard-zones-fill', ['any', ['==', ['get', 'type'], 'thunderstorm'], ['==', ['get', 'type'], 'heatwave']]);
+      map.setFilter('hazard-zones-line', ['any', ['==', ['get', 'type'], 'thunderstorm'], ['==', ['get', 'type'], 'heatwave']]);
     }
   };
-
-  const currentStep = CYCLONE_TIMELINE[timelineIndex];
 
   return (
     <div className="weather-card rounded-2xl border border-[#1E2C4F] overflow-hidden flex flex-col relative h-[500px]">
@@ -545,72 +507,71 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         )}
 
         {/* Legend Overlay (Bottom Left) */}
-        <div className="absolute bottom-16 left-3 z-10 bg-[#0E1730]/90 backdrop-blur-md border border-[#1E2C4F] rounded-xl p-2.5 text-[10px] space-y-1.5 hidden sm:block shadow-lg">
+        <div className="absolute bottom-4 left-3 z-10 bg-[#0E1730]/90 backdrop-blur-md border border-[#1E2C4F] rounded-xl p-2.5 text-[10px] space-y-1.5 hidden sm:block shadow-lg">
           <div className="font-bold text-slate-300 uppercase tracking-wider text-[9px] mb-1">
             Real-Time Map Layers
           </div>
           <div className="flex items-center gap-2 text-slate-300">
-            <span className="w-3 h-3 rounded bg-blue-500/50 border border-blue-500"></span>
-            <span>Precipitation & Rain Belts (Live)</span>
-          </div>
-          <div className="flex items-center gap-2 text-slate-300">
             <span className="w-3 h-3 rounded bg-sky-500/50 border border-sky-500"></span>
-            <span>Coastal Maritime Humidity (90-95%)</span>
+            <span>Precipitation & Rain (Live)</span>
           </div>
           <div className="flex items-center gap-2 text-slate-300">
-            <span className="w-3 h-3 rounded bg-emerald-500/50 border border-emerald-500"></span>
-            <span>Ambient Stable Weather Belts</span>
+            <span className="w-3 h-3 rounded bg-orange-500/50 border border-orange-500"></span>
+            <span>Heavy Rain / Flood Risk</span>
+          </div>
+          <div className="flex items-center gap-2 text-slate-300">
+            <span className="w-3 h-3 rounded bg-rose-500/50 border border-rose-500"></span>
+            <span>Severe Wind / Cyclone / Thunderstorm</span>
+          </div>
+          <div className="flex items-center gap-2 text-slate-300">
+            <span className="w-3 h-3 rounded bg-pink-500/50 border border-pink-500"></span>
+            <span>Heatwave Zone</span>
           </div>
         </div>
 
         {/* Live Stations Count Badge (Bottom Right) */}
-        <div className="absolute bottom-16 right-3 z-10 bg-[#0E1730]/90 backdrop-blur-md border border-[#1E2C4F] rounded-xl px-2.5 py-1 text-[10px] font-mono text-slate-400 shadow-lg">
+        <div className="absolute bottom-4 right-3 z-10 bg-[#0E1730]/90 backdrop-blur-md border border-[#1E2C4F] rounded-xl px-2.5 py-1 text-[10px] font-mono text-slate-400 shadow-lg">
           <span className="text-emerald-400 font-bold">{liveCities.length || ALL_INDIA_CITIES.length}</span> Indian Cities Online (OpenWeather)
         </div>
       </div>
 
-      {/* Bottom Timeline Trajectory Controller */}
+      {/* Bottom Status Bar */}
       <div className="px-4 py-2.5 bg-[#0E1730]/95 backdrop-blur-md border-t border-[#1E2C4F] flex flex-wrap items-center justify-between gap-3 z-10">
         
-        {/* Play/Pause & Synoptic Forecast Status */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="w-7 h-7 rounded-lg bg-[#38BDF8] hover:bg-[#0284C7] text-slate-950 flex items-center justify-center transition-colors shadow-md"
-            title={isPlaying ? 'Pause Timeline' : 'Play Synoptic Progression'}
-          >
-            {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
-          </button>
-          
           <div className="flex flex-col">
             <div className="text-xs font-semibold text-white flex items-center gap-1.5">
-              <span>Atmospheric Radar & Synoptic Forecast</span>
-              <span className="text-[10px] text-cyan-400 font-mono font-bold">(Live Sync)</span>
+              <span>Live Weather Intelligence</span>
+              <span className="text-[10px] text-cyan-400 font-mono font-bold">(Auto-Sync)</span>
             </div>
             <div className="text-[10px] text-slate-400 font-mono">
-              {currentStep.status}
+              {activeAlertCount > 0 
+                ? `${activeAlertCount} active hazard zone${activeAlertCount !== 1 ? 's' : ''} detected from live readings`
+                : 'All stations reporting normal conditions — no active hazards'}
             </div>
           </div>
         </div>
 
-        {/* Timeline Scrubber Waypoints */}
-        <div className="flex items-center gap-1 bg-[#111C38] p-1 rounded-lg border border-[#1E2C4F]">
-          {CYCLONE_TIMELINE.map((step, idx) => (
-            <button
-              key={step.label}
-              onClick={() => {
-                setIsPlaying(false);
-                setTimelineIndex(idx);
-              }}
-              className={`px-2.5 py-1 rounded text-[11px] font-mono transition-all ${
-                timelineIndex === idx
-                  ? 'bg-cyan-600 text-white font-bold shadow-md shadow-cyan-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1E2E54]'
-              }`}
-            >
-              {step.label}
-            </button>
-          ))}
+        {/* Status badges */}
+        <div className="flex items-center gap-2">
+          {activeAlertCount === 0 ? (
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 text-[11px] font-medium">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              All Clear — No Active Disasters
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-950/60 border border-amber-500/30 text-amber-400 text-[11px] font-medium animate-pulse">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              {activeAlertCount} Active Hazard{activeAlertCount !== 1 ? 's' : ''} Detected
+            </div>
+          )}
+          <button
+            onClick={fetchLiveIndiaWeather}
+            className="p-1.5 rounded-lg bg-[#111C38] border border-[#1E2C4F] text-slate-400 hover:text-cyan-400 hover:border-cyan-500/50 transition-colors"
+            title="Refresh Live Data"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLiveWeather ? 'animate-spin' : ''}`} />
+          </button>
         </div>
 
       </div>
