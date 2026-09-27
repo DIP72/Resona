@@ -14,13 +14,16 @@ import {
   AlertTriangle,
   RefreshCw,
   Maximize2,
-  ShieldCheck
+  ShieldCheck,
+  Satellite,
+  Flame
 } from 'lucide-react';
 
 // Set Mapbox Public Token from environment variable
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
 import { ALL_INDIA_CITIES } from '../data/indiaCities';
+import { useWeather } from '../context/WeatherContext';
 
 /**
  * Build hazard zones GeoJSON dynamically from live city weather data.
@@ -105,7 +108,10 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
+  const nasaMarkersRef = useRef([]);
 
+  const { eonetEvents } = useWeather();
+  const [showNasaLayer, setShowNasaLayer] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [activeLayer, setActiveLayer] = useState('all');
   const [liveCities, setLiveCities] = useState([]);
@@ -351,6 +357,90 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
     });
   }, [liveCities, mapLoaded, onSelectLocation]);
 
+  // 4. Render NASA EONET Live Natural Disaster Markers on Map
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current) return;
+    const map = mapRef.current;
+
+    // Clear old NASA markers
+    nasaMarkersRef.current.forEach(m => m.remove());
+    nasaMarkersRef.current = [];
+
+    if (!showNasaLayer || !eonetEvents || eonetEvents.length === 0) return;
+
+    eonetEvents.forEach(event => {
+      const lon = event.coordinates?.longitude;
+      const lat = event.coordinates?.latitude;
+      if (lon == null || lat == null) return;
+
+      const isSevereStorm = event.categoryId === 'severeStorms' || (event.category || '').toLowerCase().includes('storm') || (event.title || '').toLowerCase().includes('cyclone') || (event.title || '').toLowerCase().includes('typhoon') || (event.title || '').toLowerCase().includes('hurricane');
+      const isFire = event.categoryId === 'wildfires' || (event.category || '').toLowerCase().includes('fire');
+      const isVolcano = event.categoryId === 'volcanoes' || (event.category || '').toLowerCase().includes('volcano');
+
+      let icon = '🌀';
+      let ringColor = 'border-rose-500 shadow-rose-500/60 bg-rose-950/90 text-rose-400';
+      let pulseColor = 'bg-rose-500/30';
+      if (isFire) {
+        icon = '🔥';
+        ringColor = 'border-amber-500 shadow-amber-500/60 bg-amber-950/90 text-amber-400';
+        pulseColor = 'bg-amber-500/30';
+      } else if (isVolcano) {
+        icon = '🌋';
+        ringColor = 'border-orange-500 shadow-orange-500/60 bg-orange-950/90 text-orange-400';
+        pulseColor = 'bg-orange-500/30';
+      }
+
+      const el = document.createElement('div');
+      el.className = 'flex flex-col items-center cursor-pointer group z-30';
+      el.innerHTML = `
+        <div class="relative flex items-center justify-center">
+          <span class="absolute w-10 h-10 rounded-full ${pulseColor} animate-ping"></span>
+          <div class="w-9 h-9 rounded-full ${ringColor} border-2 flex items-center justify-center text-base shadow-xl backdrop-blur transition-transform group-hover:scale-125">
+            ${icon}
+          </div>
+          <span class="absolute -top-2.5 -right-2.5 text-[8px] font-mono px-1 rounded bg-black/90 text-cyan-300 border border-cyan-500/40">
+            NASA
+          </span>
+        </div>
+        <span class="text-[9px] font-bold text-white bg-black/85 px-1.5 py-0.5 rounded shadow mt-1 max-w-[130px] truncate text-center border border-white/10">
+          ${event.title}
+        </span>
+      `;
+
+      const popup = new mapboxgl.Popup({ offset: 20, maxWidth: '280px' })
+        .setHTML(`
+          <div class="text-xs p-2 space-y-1.5 min-w-[210px] bg-[#0E1730] text-slate-200">
+            <div class="font-bold text-white border-b border-[#1E2C4F] pb-1 flex items-center justify-between">
+              <span class="flex items-center gap-1 text-cyan-400 font-semibold">
+                🛰️ NASA EONET Live
+              </span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/40 font-mono">
+                REAL-TIME
+              </span>
+            </div>
+            <div class="font-bold text-sm text-white">${event.title}</div>
+            <div class="text-slate-300">Category: <strong class="text-amber-400">${event.category}</strong></div>
+            <div class="text-slate-300">Coordinates: <strong class="text-cyan-300 font-mono">${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E</strong></div>
+            <div class="text-slate-300">Observation Date: <strong class="text-white">${event.date ? new Date(event.date).toLocaleDateString() : 'Live'}</strong></div>
+            ${event.magnitudeValue ? `<div class="text-slate-300">Wind/Intensity: <strong class="text-rose-400">${event.magnitudeValue} ${event.magnitudeUnit || ''}</strong></div>` : ''}
+            <div class="pt-1.5 flex items-center justify-between border-t border-[#1E2C4F]">
+              <span class="text-[9px] text-slate-400 font-mono">Source: NASA GSFC</span>
+              <a href="${event.link || '#'}" target="_blank" rel="noreferrer" class="text-[10px] text-cyan-400 hover:underline flex items-center gap-1 font-mono">
+                NASA Registry ↗
+              </a>
+            </div>
+          </div>
+        `);
+
+      const marker = new mapboxgl.Marker({ element: el })
+        .setLngLat([lon, lat])
+        .setPopup(popup)
+        .addTo(map);
+
+      nasaMarkersRef.current.push(marker);
+    });
+  }, [eonetEvents, mapLoaded, showNasaLayer]);
+
   // Region Quick-Fly Controller
   const handleFlyToRegion = (region) => {
     setActiveRegion(region);
@@ -467,6 +557,31 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
             >
               Flood
             </button>
+            <button
+              onClick={() => {
+                const next = !showNasaLayer;
+                setShowNasaLayer(next);
+                if (next && eonetEvents?.length && mapRef.current) {
+                  const cycloneOrStorm = eonetEvents.find(e => 
+                    e.categoryId === 'severeStorms' || (e.title || '').toLowerCase().includes('cyclone')
+                  ) || eonetEvents[0];
+                  if (cycloneOrStorm && cycloneOrStorm.coordinates?.longitude != null) {
+                    mapRef.current.flyTo({ 
+                      center: [cycloneOrStorm.coordinates.longitude, cycloneOrStorm.coordinates.latitude], 
+                      zoom: 5.5, 
+                      duration: 1500 
+                    });
+                  }
+                }
+              }}
+              className={`px-2 py-0.5 rounded flex items-center gap-1 transition-all ${
+                showNasaLayer ? 'bg-rose-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Toggle NASA EONET Live Natural Events"
+            >
+              <Satellite className="w-3 h-3" />
+              <span>NASA ({eonetEvents?.length || 0})</span>
+            </button>
           </div>
 
           <button
@@ -527,11 +642,17 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
             <span className="w-3 h-3 rounded bg-pink-500/50 border border-pink-500"></span>
             <span>Heatwave Zone</span>
           </div>
+          <div className="flex items-center gap-2 text-slate-300">
+            <span className="w-3.5 h-3.5 rounded-full bg-rose-600/80 border border-rose-400 flex items-center justify-center text-[8px] animate-pulse">🛰️</span>
+            <span>NASA EONET Live Events ({eonetEvents?.length || 0})</span>
+          </div>
         </div>
 
         {/* Live Stations Count Badge (Bottom Right) */}
-        <div className="absolute bottom-4 right-3 z-10 bg-[#0E1730]/90 backdrop-blur-md border border-[#1E2C4F] rounded-xl px-2.5 py-1 text-[10px] font-mono text-slate-400 shadow-lg">
-          <span className="text-emerald-400 font-bold">{liveCities.length || ALL_INDIA_CITIES.length}</span> Indian Cities Online (OpenWeather)
+        <div className="absolute bottom-4 right-3 z-10 bg-[#0E1730]/90 backdrop-blur-md border border-[#1E2C4F] rounded-xl px-2.5 py-1 text-[10px] font-mono text-slate-400 shadow-lg flex items-center gap-2">
+          <span><strong className="text-emerald-400">{liveCities.length || ALL_INDIA_CITIES.length}</strong> Cities Online</span>
+          <span>•</span>
+          <span className="text-cyan-400 font-bold">{eonetEvents?.length || 0} NASA Disasters</span>
         </div>
       </div>
 
@@ -541,13 +662,20 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         <div className="flex items-center gap-3">
           <div className="flex flex-col">
             <div className="text-xs font-semibold text-white flex items-center gap-1.5">
-              <span>Live Weather Intelligence</span>
+              <span>Live Weather & Natural Disaster Intelligence</span>
               <span className="text-[10px] text-cyan-400 font-mono font-bold">(Auto-Sync)</span>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">
-              {activeAlertCount > 0 
-                ? `${activeAlertCount} active hazard zone${activeAlertCount !== 1 ? 's' : ''} detected from live readings`
-                : 'All stations reporting normal conditions — no active hazards'}
+            <div className="text-[10px] text-slate-400 font-mono flex items-center gap-2 flex-wrap">
+              <span>
+                {activeAlertCount > 0 
+                  ? `${activeAlertCount} active regional hazard zone${activeAlertCount !== 1 ? 's' : ''}`
+                  : 'Regional stations reporting normal conditions'}
+              </span>
+              <span>•</span>
+              <span className="text-rose-400 flex items-center gap-1">
+                <Satellite className="w-3 h-3" />
+                NASA EONET: {eonetEvents?.length || 0} real-time active global disasters
+              </span>
             </div>
           </div>
         </div>

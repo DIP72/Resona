@@ -16,6 +16,7 @@ export function WeatherProvider({ children, city }) {
   const [forecast, setForecast] = useState(null);
   const [allCities, setAllCities] = useState([]);
   const [liveAlerts, setLiveAlerts] = useState([]);
+  const [eonetEvents, setEonetEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -28,11 +29,12 @@ export function WeatherProvider({ children, city }) {
       setError(null);
 
       const freshParam = isFresh ? '&fresh=true' : '';
-      const [currentRes, forecastRes, multiRes, alertsRes] = await Promise.all([
+      const [currentRes, forecastRes, multiRes, alertsRes, eventsRes] = await Promise.all([
         fetch(`${API_BASE}/current?city=${encodeURIComponent(cityName)}${freshParam}`),
         fetch(`${API_BASE}/forecast?city=${encodeURIComponent(cityName)}${freshParam}`),
         fetch(`${API_BASE}/multi?cities=${DEFAULT_INDIAN_HUBS.join(',')}${freshParam}`),
-        fetch(`${API_BASE}/live-alerts`)
+        fetch(`${API_BASE}/live-alerts`),
+        fetch(`http://localhost:5000/api/events?limit=25`).catch(() => fetch(`/api/events?limit=25`))
       ]);
 
       if (currentRes.ok) {
@@ -60,6 +62,13 @@ export function WeatherProvider({ children, city }) {
         const alertsData = await alertsRes.json();
         if (alertsData.success && alertsData.alerts) {
           setLiveAlerts(alertsData.alerts);
+        }
+      }
+
+      if (eventsRes && eventsRes.ok) {
+        const eventsData = await eventsRes.json();
+        if (eventsData.success && Array.isArray(eventsData.data)) {
+          setEonetEvents(eventsData.data);
         }
       }
 
@@ -93,6 +102,7 @@ export function WeatherProvider({ children, city }) {
       forecast, 
       allCities, 
       liveAlerts, 
+      eonetEvents,
       loading, 
       error, 
       lastUpdated, 

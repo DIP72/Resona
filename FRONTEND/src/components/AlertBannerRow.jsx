@@ -9,27 +9,42 @@ import {
 import { useWeather } from '../context/WeatherContext';
 
 export default function AlertBannerRow({ activeFilter, onSelectFilter }) {
-  const { liveAlerts, allCities } = useWeather();
+  const { liveAlerts, allCities, eonetEvents } = useWeather();
 
-  // Dynamically compute real-time counts and active regions from live OpenWeather observation stream
+  // Dynamically compute real-time counts and active regions from live OpenWeather observation stream & NASA EONET
   const rainCities = (allCities || []).filter(c => (c.condition === 'Rain' || c.condition === 'Drizzle' || (c.rain_1h || 0) > 0)).map(c => c.city);
   const windCities = (allCities || []).filter(c => ((c.wind_speed || 0) >= 20)).map(c => c.city);
   const thunderCities = (allCities || []).filter(c => (c.condition === 'Thunderstorm')).map(c => c.city);
   const heatCities = (allCities || []).filter(c => ((c.temp || 0) >= 36)).map(c => c.city);
   const floodCount = (liveAlerts || []).filter(a => a.category === 'flood').length;
 
+  // Real NASA EONET live storms & cyclones
+  const nasaStorms = (eonetEvents || []).filter(e => 
+    e.categoryId === 'severeStorms' || 
+    e.category.toLowerCase().includes('storm') || 
+    e.title.toLowerCase().includes('cyclone') ||
+    e.title.toLowerCase().includes('typhoon') ||
+    e.title.toLowerCase().includes('hurricane')
+  );
+
+  const cycloneHasActive = nasaStorms.length > 0;
+
   const alertsSummary = [
     {
       id: 'cyclone',
-      type: 'Rain & Precipitation',
-      count: rainCities.length > 0 ? `${rainCities.length} Active` : '0 Active (Dry)',
-      regions: rainCities.length > 0 ? `(${rainCities.slice(0, 3).join(', ')})` : '(No Active Rain)',
+      type: cycloneHasActive ? 'Live Cyclones & Storms' : 'Cyclone Alert',
+      count: cycloneHasActive 
+        ? `${nasaStorms.length} Active (NASA EONET)` 
+        : (rainCities.length > 0 ? `${rainCities.length} Rain Watch` : '0 Active (Clear)'),
+      regions: cycloneHasActive 
+        ? `(${nasaStorms[0].title}${nasaStorms.length > 1 ? ` +${nasaStorms.length - 1}` : ''})` 
+        : (rainCities.length > 0 ? `(${rainCities.slice(0, 2).join(', ')})` : '(No Active Cyclone)'),
       icon: Disc,
-      iconBg: rainCities.length > 0 ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-800 text-slate-400',
-      cardBg: rainCities.length > 0 ? 'bg-gradient-to-br from-[#0B2545] to-[#07172B] border-blue-900/60 hover:border-blue-500' : 'bg-[#0E1730] border-[#1E2C4F]',
-      activeRing: 'ring-2 ring-blue-500',
-      textAccent: rainCities.length > 0 ? 'text-blue-400' : 'text-slate-300',
-      countColor: rainCities.length > 0 ? 'text-blue-300' : 'text-slate-400'
+      iconBg: cycloneHasActive ? 'bg-rose-500/20 text-rose-400' : 'bg-slate-800 text-slate-400',
+      cardBg: cycloneHasActive ? 'bg-gradient-to-br from-[#2D0B1C] to-[#1F0713] border-rose-900/60 hover:border-rose-500' : 'bg-[#0E1730] border-[#1E2C4F]',
+      activeRing: 'ring-2 ring-rose-500',
+      textAccent: cycloneHasActive ? 'text-rose-400' : 'text-slate-300',
+      countColor: cycloneHasActive ? 'text-rose-300' : 'text-slate-400'
     },
     {
       id: 'flood',

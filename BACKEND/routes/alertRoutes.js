@@ -14,6 +14,7 @@ const {
 } = require('../services/translatorService');
 const { generateCapXml, generateCompressedSms, generateUssdString, generateLoraHexPayload } = require('../services/capGenerator');
 const { generateInitialTelemetry } = require('../services/telemetrySimulator');
+const { fetchEonetEvents } = require('../services/eonetService');
 
 // In-memory fallback in case MongoDB server ever has intermittent connectivity
 let memoryAlerts = new Map();
@@ -52,6 +53,20 @@ router.get('/alerts', async (req, res) => {
   }
   const list = Array.from(memoryAlerts.values()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   res.json({ alerts: list });
+});
+
+// GET /api/events - Real-time NASA EONET natural disaster tracker
+router.get('/events', async (req, res) => {
+  try {
+    const category = req.query.category || null;
+    const limit = parseInt(req.query.limit) || 10;
+    const days = req.query.days ? parseInt(req.query.days) : null;
+
+    const events = await fetchEonetEvents(category, limit, days);
+    res.json({ success: true, count: events.length, data: events });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 // ==========================================
