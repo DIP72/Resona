@@ -40,3 +40,30 @@ __pycache__/
 .pytest_cache/
 venv/
 .venv/
+
+# Secrets, Keys, Certificates & Tokens
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+id_rsa
+id_rsa.pub
+id_ed25519
+credentials.json
+client_secret*.json
+serviceAccountKey*.json
+secrets.json
+
+# Local Databases & Dumps
+*.sqlite
+*.sqlite3
+*.db
+dump.rdb
+
+# Temporary & Cache
+.cache/
+.parcel-cache/
+scratch/
+
