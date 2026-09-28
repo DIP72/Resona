@@ -315,19 +315,21 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
       const isSevere = city.risk === 'Very High' || city.risk === 'High' || city.condition === 'Thunderstorm' || (city.rain_1h || 0) > 0;
       
       const el = document.createElement('div');
-      el.className = 'flex items-center justify-center cursor-pointer relative group';
+      el.style.width = '0px';
+      el.style.height = '0px';
+      el.className = 'cursor-pointer z-10';
       
       const dotColor = isSevere ? 'bg-rose-400 ring-rose-400/40' : 'bg-sky-400 ring-sky-400/30';
       
       el.innerHTML = `
-        <div class="relative flex items-center gap-1.5 transition-transform duration-150 group-hover:scale-110">
-          <span class="w-2.5 h-2.5 rounded-full ${dotColor} ring-4 shadow-md shrink-0"></span>
+        <div class="absolute -left-1.5 -top-1.5 w-3 h-3 group flex items-center justify-center">
+          <span class="absolute w-2.5 h-2.5 rounded-full ${dotColor} ring-4 shadow-md transition-transform duration-150 group-hover:scale-110"></span>
           ${(isKeyHub || isSevere) ? `
-            <span class="text-[10px] font-medium text-slate-200 bg-slate-950/80 backdrop-blur border border-white/10 px-1.5 py-0.5 rounded shadow whitespace-nowrap hidden sm:inline">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-medium text-slate-200 bg-slate-950/80 backdrop-blur border border-white/10 px-1.5 py-0.5 rounded shadow whitespace-nowrap hidden sm:inline">
               ${city.city} <strong class="text-white">${city.temp || '--'}°</strong>
             </span>
           ` : `
-            <span class="text-[10px] font-medium text-slate-200 bg-slate-950/90 backdrop-blur border border-white/10 px-1.5 py-0.5 rounded shadow whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity absolute left-4 pointer-events-none z-20">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-medium text-slate-200 bg-slate-950/90 backdrop-blur border border-white/10 px-1.5 py-0.5 rounded shadow whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
               ${city.city} ${city.temp || '--'}°
             </span>
           `}
@@ -399,20 +401,22 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
       }
 
       const el = document.createElement('div');
-      el.className = 'flex flex-col items-center cursor-pointer group z-30';
+      el.style.width = '0px';
+      el.style.height = '0px';
+      el.className = 'cursor-pointer z-30';
       el.innerHTML = `
-        <div class="relative flex items-center justify-center">
+        <div class="absolute -left-4 -top-4 w-8 h-8 group flex items-center justify-center">
           <span class="absolute w-8 h-8 rounded-full bg-rose-500/25 animate-ping"></span>
-          <div class="w-8 h-8 rounded-full ${ringColor} border flex items-center justify-center text-sm shadow-xl backdrop-blur-md transition-transform group-hover:scale-125 ${isSevereStorm ? 'animate-cyclone-bob' : ''}">
+          <div class="absolute w-8 h-8 rounded-full ${ringColor} border flex items-center justify-center text-sm shadow-xl backdrop-blur-md transition-transform group-hover:scale-125 ${isSevereStorm ? 'animate-cyclone-bob' : ''}">
             ${icon}
           </div>
-          <span class="absolute -top-2 -right-2 text-[8px] font-mono px-1 rounded-full bg-rose-950 text-rose-300 border border-rose-500/40">
+          <span class="absolute -top-2 -right-2 text-[8px] font-mono px-1 rounded-full bg-rose-950 text-rose-300 border border-rose-500/40 z-10">
             NASA
           </span>
+          <span class="text-[9px] font-medium text-white bg-slate-950/90 px-1.5 py-0.5 rounded shadow mt-1 max-w-[120px] truncate text-center border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity absolute top-8 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap z-30">
+            ${event.title}
+          </span>
         </div>
-        <span class="text-[9px] font-medium text-white bg-slate-950/90 px-1.5 py-0.5 rounded shadow mt-1 max-w-[120px] truncate text-center border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity absolute top-9 pointer-events-none whitespace-nowrap z-30">
-          ${event.title}
-        </span>
       `;
 
       const popup = new mapboxgl.Popup({ offset: 16, maxWidth: '280px' })

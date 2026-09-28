@@ -27,17 +27,19 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: [
+      'Citizen',
+      'Volunteer',
       'Emergency Responder',
       'Disaster Management Officer',
       'Meteorological Specialist',
       'Citizen / Volunteer',
       'Administrator'
     ],
-    default: 'Emergency Responder'
+    default: 'Citizen'
   },
   organization: {
     type: String,
-    default: 'National Disaster Response Force (NDRF)',
+    default: 'General Public',
     trim: true
   },
   phone: {
@@ -47,7 +49,7 @@ const UserSchema = new mongoose.Schema({
   },
   location: {
     type: String,
-    default: 'Puri, Odisha',
+    default: 'Bhubaneswar, Odisha',
     trim: true
   },
   badgeNumber: {
@@ -73,7 +75,7 @@ const UserSchema = new mongoose.Schema({
 // Auto-generate badge number if not provided
 UserSchema.pre('save', async function () {
   if (!this.badgeNumber) {
-    const prefix = this.role === 'Citizen / Volunteer' ? 'CIT' : 'CMD';
+    const prefix = this.role === 'Volunteer' ? 'VOL' : (this.role === 'Citizen' ? 'CIT' : 'CMD');
     const randNum = Math.floor(1000 + Math.random() * 9000);
     this.badgeNumber = `${prefix}-${randNum}`;
   }

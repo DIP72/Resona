@@ -21,33 +21,33 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
       case 'flood':
         return { 
           icon: Waves, 
-          accentBorder: 'border-l-2 border-l-sky-400',
-          tint: 'bg-sky-500/10 text-sky-400' 
+          accentBorder: 'border-l-4 border-l-blue-500',
+          tint: 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
         };
       case 'thunderstorm':
         return { 
           icon: CloudLightning, 
-          accentBorder: 'border-l-2 border-l-amber-400',
-          tint: 'bg-amber-500/10 text-amber-400' 
+          accentBorder: 'border-l-4 border-l-purple-500',
+          tint: 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
         };
       case 'heatwave':
         return { 
           icon: Flame, 
-          accentBorder: 'border-l-2 border-l-orange-400',
-          tint: 'bg-orange-500/10 text-orange-400' 
+          accentBorder: 'border-l-4 border-l-orange-500',
+          tint: 'bg-orange-500/20 text-orange-400 border border-orange-500/30' 
         };
       case 'wind':
         return { 
           icon: Wind, 
-          accentBorder: 'border-l-2 border-l-teal-400',
-          tint: 'bg-teal-500/10 text-teal-400' 
+          accentBorder: 'border-l-4 border-l-teal-500',
+          tint: 'bg-teal-500/20 text-teal-400 border border-teal-500/30' 
         };
       case 'cyclone':
       default:
         return { 
           icon: Disc, 
-          accentBorder: 'border-l-2 border-l-rose-500',
-          tint: 'bg-rose-500/10 text-rose-400' 
+          accentBorder: 'border-l-4 border-l-rose-500',
+          tint: 'bg-rose-500/20 text-rose-400 border border-rose-500/30' 
         };
     }
   };
@@ -59,17 +59,17 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
     const isFlood = e.categoryId === 'floods' || (e.category || '').toLowerCase().includes('flood');
     
     let cat = 'cyclone';
-    let sevColor = 'bg-rose-500/10 text-rose-300 border border-rose-500/25';
+    let sevColor = 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.2)]';
     let sev = 'Extreme';
     let isEmergency = true;
     if (isWildfire) {
       cat = 'heatwave';
-      sevColor = 'bg-amber-500/10 text-amber-300 border border-amber-500/25';
+      sevColor = 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]';
       sev = 'High';
       isEmergency = false;
     } else if (isFlood) {
       cat = 'flood';
-      sevColor = 'bg-sky-500/10 text-sky-300 border border-sky-500/25';
+      sevColor = 'bg-blue-500/20 text-blue-300 border border-blue-500/40 shadow-[0_0_10px_rgba(59,130,246,0.2)]';
       sev = 'Severe';
       isEmergency = true;
     }
@@ -116,63 +116,67 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
   });
 
   return (
-    <div className="weather-card rounded-2xl border border-white/[0.08] p-4 flex flex-col h-[560px] shadow-2xl relative">
+    <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 p-5 flex flex-col h-[560px] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] relative overflow-hidden">
       
+      {/* Decorative ambient background */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
       {/* Header */}
-      <div className="flex items-center justify-between pb-2.5 border-b border-white/[0.06] mb-2.5">
-        <div className="flex items-center gap-2">
-          <h3 className="text-xs font-semibold text-white tracking-wide">
+      <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4 relative z-10">
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-bold text-white tracking-widest uppercase">
             Live Hazard Feed
           </h3>
-          <span className="text-[10px] px-2 py-0.2 rounded-full bg-white/[0.05] text-slate-300 font-mono font-medium border border-white/[0.08]">
+          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200 font-mono font-bold border border-white/20 shadow-sm">
             <AnimatedCounter value={filtered.length} /> Active
           </span>
         </div>
         
         {/* Continuous live pulsing status indicators */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           {nasaAlerts.length > 0 && (
-            <span className="flex items-center gap-1.5 text-[9px] font-mono text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 live-pulse-dot-red"></span>
+            <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold tracking-widest text-rose-300 bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.1)]">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shadow-[0_0_5px_rgba(244,63,94,0.8)]"></span>
               <span>NASA LIVE</span>
             </span>
           )}
-          <div className="flex items-center gap-1.5 text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
+          <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold tracking-widest text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_5px_rgba(16,185,129,0.8)]"></span>
             <span>SYNCED</span>
           </div>
         </div>
       </div>
 
       {/* Sub-Tabs: Harmonious Segmented Control */}
-      <div className="flex items-center gap-1 mb-2.5 bg-white/[0.03] p-1 rounded-xl border border-white/[0.06] text-[10px] font-medium">
+      <div className="flex items-center gap-1.5 mb-4 bg-slate-950/50 p-1.5 rounded-xl border border-white/10 text-xs font-bold relative z-10 shadow-inner">
         <button
           onClick={() => setSourceFilter('all')}
-          className={`flex-1 py-1 rounded-lg text-center transition-all ${
+          className={`flex-1 py-1.5 rounded-lg text-center transition-all duration-300 ${
             sourceFilter === 'all' 
-              ? 'bg-white/10 text-white font-semibold shadow-sm' 
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-white/15 text-white shadow-md' 
+              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
           }`}
         >
           All (<AnimatedCounter value={combinedAlerts.length} />)
         </button>
         <button
           onClick={() => setSourceFilter('nasa')}
-          className={`flex-1 py-1 rounded-lg text-center transition-all flex items-center justify-center gap-1 ${
+          className={`flex-1 py-1.5 rounded-lg text-center transition-all duration-300 flex items-center justify-center gap-2 ${
             sourceFilter === 'nasa' 
-              ? 'bg-white/10 text-white font-semibold shadow-sm' 
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-rose-500/20 text-rose-300 shadow-md border border-rose-500/30' 
+              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
           }`}
         >
-          <Satellite className="w-3 h-3 text-rose-400" />
+          <Satellite className="w-3.5 h-3.5" />
           <span>NASA (<AnimatedCounter value={nasaAlerts.length} />)</span>
         </button>
         <button
           onClick={() => setSourceFilter('imd')}
-          className={`flex-1 py-1 rounded-lg text-center transition-all ${
+          className={`flex-1 py-1.5 rounded-lg text-center transition-all duration-300 ${
             sourceFilter === 'imd' 
-              ? 'bg-white/10 text-white font-semibold shadow-sm' 
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-white/15 text-white shadow-md' 
+              : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
           }`}
         >
           Weather (<AnimatedCounter value={liveAlerts?.length || 0} />)
@@ -180,12 +184,14 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
       </div>
 
       {/* Alert Cards List */}
-      <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+      <div className="flex-1 overflow-y-auto space-y-3 pr-2 no-scrollbar relative z-10">
         {filtered.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
-            <Disc className="w-8 h-8 text-emerald-500/40 mb-2" />
-            <p className="text-xs font-semibold text-slate-300">All Parameters Normal</p>
-            <p className="text-[10px] text-slate-500 mt-1 max-w-[200px]">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+                <Disc className="w-8 h-8 text-emerald-400 opacity-80" />
+            </div>
+            <p className="text-sm font-bold text-slate-200 tracking-wide">All Parameters Normal</p>
+            <p className="text-xs text-slate-500 mt-1 max-w-[200px] leading-relaxed">
               No active warnings detected matching current filter criteria.
             </p>
           </div>
@@ -199,55 +205,62 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
                 key={alert.id || index}
                 onClick={() => onSelectAlert && onSelectAlert(alert)}
                 style={{ animationDelay: `${Math.min(index * 40, 200)}ms` }}
-                className={`p-3 rounded-xl border border-white/[0.07] hover:border-white/[0.14] transition-all duration-150 cursor-pointer group bg-slate-900/50 hover:bg-slate-800/50 backdrop-blur-md relative overflow-hidden ${
+                className={`p-4 rounded-xl border border-white/5 hover:border-white/20 transition-all duration-300 cursor-pointer group bg-slate-800/40 hover:bg-slate-700/60 backdrop-blur-xl relative overflow-hidden shadow-lg hover:shadow-xl ${
                   accentBorder
                 }`}
               >
-                <div className="flex items-start justify-between gap-2.5">
-                  <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                {/* Hover gradient effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+
+                <div className="flex items-start justify-between gap-4 relative z-10">
+                  <div className="flex items-start gap-3.5 min-w-0 flex-1">
                     
                     {/* Category Icon */}
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-105 ${tint}`}>
-                      <Icon className={`w-4 h-4 ${alert.category === 'cyclone' ? 'animate-cyclone-bob' : ''}`} />
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition-transform duration-300 group-hover:scale-110 shadow-inner ${tint}`}>
+                      <Icon className={`w-5 h-5 ${alert.category === 'cyclone' ? 'animate-[spin_4s_linear_infinite]' : ''}`} />
                     </div>
 
                     <div className="min-w-0 flex-1">
                       {/* Title & Tag */}
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="text-xs font-semibold text-slate-100 group-hover:text-white transition-colors leading-snug break-words">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <h4 className="text-[13px] font-bold text-slate-200 group-hover:text-white transition-colors leading-snug break-words tracking-wide">
                           {alert.title}
                         </h4>
                         {alert.isNasaEonet && (
-                          <span className="text-[8px] font-mono px-1.5 py-0.2 rounded bg-white/[0.06] text-slate-400 border border-white/10">
+                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-white/10 text-slate-300 border border-white/20 uppercase tracking-widest">
                             NASA EONET
                           </span>
                         )}
                       </div>
 
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                      <p className="text-xs text-slate-400 leading-relaxed opacity-90">
                         {alert.description}
                       </p>
 
                       {/* Technical Telemetry Readout */}
-                      <div className="flex items-center gap-2 mt-1.5 flex-wrap text-[10px] font-mono text-slate-400">
+                      <div className="flex items-center gap-2.5 mt-2.5 flex-wrap text-[10px] font-mono font-medium text-slate-400 bg-slate-950/40 p-2 rounded-lg border border-white/5">
                         {alert.coordinatesStr && (
-                          <span className="text-slate-300 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">
+                          <span className="text-sky-300">
                             {alert.coordinatesStr}
                           </span>
                         )}
+                        <span className="opacity-50">•</span>
                         <span>{alert.subtext}</span>
                         {alert.magnitude && (
-                          <span className="text-rose-300 font-medium">
-                            Intensity: {alert.magnitude}
-                          </span>
+                          <>
+                            <span className="opacity-50">•</span>
+                            <span className="text-rose-300 font-bold">
+                              INTENSITY: {alert.magnitude}
+                            </span>
+                          </>
                         )}
                       </div>
                     </div>
                   </div>
 
                   {/* Severity Badge */}
-                  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded font-mono shrink-0 ${
-                    alert.severityColor || 'bg-white/[0.06] text-slate-300 border border-white/10'
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md font-mono shrink-0 uppercase tracking-widest ${
+                    alert.severityColor || 'bg-white/10 text-slate-300 border border-white/20'
                   }`}>
                     {alert.severity}
                   </span>

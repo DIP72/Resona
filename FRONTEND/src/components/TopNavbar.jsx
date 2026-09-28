@@ -14,7 +14,8 @@ import {
   ExternalLink,
   Globe,
   RefreshCw,
-  Sparkles
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWeather } from '../context/WeatherContext';
@@ -54,6 +55,7 @@ export default function TopNavbar({
   onSelectLocation, 
   onOpenSafetyModal,
   onOpenAuthModal,
+  onNavigateToAuth,
   onOpenWallpaperModal,
   onShuffleWallpaper,
   emergencyModeActive,
@@ -123,27 +125,29 @@ export default function TopNavbar({
       ];
 
   return (
-    <header className="sticky top-0 z-30 h-14 bg-[#090D18]/85 backdrop-blur-xl border-b border-white/[0.06] px-4 lg:px-6 flex items-center justify-between gap-4 transition-colors">
+    <header className="sticky top-0 z-30 h-16 bg-slate-950/40 backdrop-blur-2xl border-b border-white/5 px-6 flex items-center justify-between gap-6 transition-all duration-300">
       
       {/* Left: Brand Identity */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500/20 to-blue-600/10 border border-sky-400/20 flex items-center justify-center shadow-md">
-          <CloudLightning className="w-4 h-4 text-sky-400" />
+      <div className="flex items-center gap-4 shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500/20 to-indigo-600/20 border border-sky-400/30 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.15)] relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-tr from-sky-400/0 via-white/10 to-sky-400/0 translate-x-[-100%] group-hover:animate-[shimmer_1.5s_infinite]"></div>
+          <CloudLightning className="w-5 h-5 text-sky-400 relative z-10 drop-shadow-[0_0_5px_rgba(56,189,248,0.5)]" />
         </div>
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold tracking-tight text-white">
-              Resona<span className="text-sky-400">Alert</span>
+          <div className="flex items-center gap-2.5">
+            <span className="text-lg font-bold tracking-tight text-white">
+              Resona<span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">Alert</span>
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green" title="IMD & NASA Telemetry Online" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" title="IMD & NASA Telemetry Online" />
           </div>
+          <div className="text-[10px] text-slate-400 font-mono tracking-widest uppercase mt-0.5">Mission Control Engine</div>
         </div>
       </div>
 
       {/* Center: Search Location Bar */}
-      <div className="flex-1 max-w-md relative hidden md:block" ref={searchRef}>
-        <div className="relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+      <div className="flex-1 max-w-xl relative hidden lg:block" ref={searchRef}>
+        <div className="relative group">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors group-hover:text-sky-400" />
           <input
             type="text"
             value={searchQuery}
@@ -153,21 +157,21 @@ export default function TopNavbar({
             }}
             onFocus={() => setSearchOpen(true)}
             placeholder="Search monitoring zone or station..."
-            className="w-full pl-9 pr-12 py-1.5 bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.14] focus:border-cyan-400/50 rounded-lg text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none transition-all"
+            className="w-full pl-10 pr-12 py-2 bg-slate-900/50 border border-white/10 hover:border-white/20 focus:border-sky-500/50 focus:bg-slate-900/80 rounded-xl text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none transition-all duration-300 shadow-inner"
           />
-          <kbd className="absolute right-2.5 top-1.5 text-[9px] font-mono text-slate-500 bg-white/[0.05] px-1.5 py-0.5 rounded border border-white/[0.08]">
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-bold text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
             ⌘K
           </kbd>
         </div>
 
         {/* Search Dropdown Results */}
         {searchOpen && (
-          <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0D1324] border border-white/[0.09] rounded-xl shadow-2xl overflow-hidden z-50">
-            <div className="p-2 border-b border-white/[0.06] text-[10px] font-mono text-slate-400 uppercase tracking-wider flex justify-between">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="px-3 py-2 bg-slate-800/50 border-b border-white/5 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest flex justify-between items-center">
               <span>Target Disaster Hubs</span>
-              <span className="text-cyan-400">10 Cities</span>
+              <span className="text-sky-400 bg-sky-400/10 px-2 py-0.5 rounded-full">10 Cities</span>
             </div>
-            <div className="max-h-60 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto no-scrollbar">
               {filteredLocations.map((loc) => (
                 <button
                   key={loc.city}
@@ -176,15 +180,17 @@ export default function TopNavbar({
                     setSearchOpen(false);
                     setSearchQuery('');
                   }}
-                  className="w-full px-3 py-2 text-left text-xs flex items-center justify-between hover:bg-white/[0.04] transition-colors border-b border-white/[0.03] last:border-0"
+                  className="w-full px-4 py-2.5 text-left text-sm flex items-center justify-between hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 group"
                 >
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                    <span className="font-medium text-white">{loc.city}</span>
-                    <span className="text-slate-500 text-[10px]">({loc.state})</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center group-hover:bg-sky-500/20 group-hover:text-sky-400 transition-colors">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-400" />
+                    </div>
+                    <span className="font-medium text-slate-200 group-hover:text-white transition-colors">{loc.city}</span>
+                    <span className="text-slate-500 text-xs font-medium">({loc.state})</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-slate-300 font-mono text-xs">{loc.temp}°C</span>
+                  <div className="flex items-center gap-2 bg-slate-950/50 px-2 py-1 rounded-md border border-white/5">
+                    <span className="text-slate-300 font-mono font-medium text-xs">{loc.temp}°C</span>
                   </div>
                 </button>
               ))}
@@ -194,28 +200,28 @@ export default function TopNavbar({
       </div>
 
       {/* Right Section: Location Pill, Atmosphere, Notifications, Profile */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-3 shrink-0">
         
         {/* Active Location Pill */}
         <div className="relative" ref={locRef}>
           <button
             onClick={() => setLocationMenuOpen(!locationMenuOpen)}
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs text-slate-200 transition-all shadow-sm"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-white/10 text-sm text-slate-200 transition-all duration-300 shadow-sm"
           >
-            <MapPin className="w-3.5 h-3.5 text-sky-400" />
-            <span className="font-medium text-white">{currentLocation.city}</span>
-            <span className="font-mono text-sky-300 text-[11px] font-semibold">
+            <MapPin className="w-4 h-4 text-sky-400" />
+            <span className="font-semibold text-white">{currentLocation.city}</span>
+            <span className="font-mono text-sky-300 text-xs font-bold bg-sky-500/10 px-1.5 py-0.5 rounded">
               {current?.temp ?? currentLocation.temp}°C
             </span>
           </button>
 
           {locationMenuOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-[#0D1324] border border-white/[0.09] rounded-xl shadow-2xl p-2 z-50">
-              <div className="text-[10px] font-mono text-slate-400 px-2 py-1 border-b border-white/[0.06] flex items-center justify-between">
+            <div className="absolute right-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="px-3 py-2 bg-slate-800/50 border-b border-white/5 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
                 <span>Active Ground Stations</span>
-                <span className="text-emerald-400 text-[10px]">● Live</span>
+                <span className="text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 px-2 py-0.5 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Live</span>
               </div>
-              <div className="max-h-60 overflow-y-auto mt-1 space-y-0.5">
+              <div className="max-h-64 overflow-y-auto no-scrollbar py-1">
                 {locationsWithLiveData.map((loc) => (
                   <button
                     key={loc.city}
@@ -223,14 +229,14 @@ export default function TopNavbar({
                       onSelectLocation(loc);
                       setLocationMenuOpen(false);
                     }}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors ${
+                    className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors ${
                       loc.city === currentLocation.city 
-                        ? 'bg-cyan-500/15 text-cyan-300 font-medium' 
-                        : 'text-slate-300 hover:bg-white/[0.04]'
+                        ? 'bg-sky-500/15 text-sky-300 font-semibold' 
+                        : 'text-slate-300 hover:bg-white/5 font-medium'
                     }`}
                   >
                     <span>{loc.city}</span>
-                    <span className="font-mono text-slate-400 text-[11px]">{loc.temp}°C</span>
+                    <span className={`font-mono text-xs px-2 py-0.5 rounded-md ${loc.city === currentLocation.city ? 'bg-sky-500/20 text-sky-300' : 'bg-slate-950/50 text-slate-400'}`}>{loc.temp}°C</span>
                   </button>
                 ))}
               </div>
@@ -239,25 +245,24 @@ export default function TopNavbar({
         </div>
 
         {/* Atmosphere Wallpaper Switcher & Quick Pexels Shuffle */}
-        <div className="flex items-center bg-white/[0.04] rounded-lg border border-white/[0.08] p-0.5 shadow-sm">
+        <div className="flex items-center bg-slate-900/50 rounded-xl border border-white/10 p-1 shadow-sm h-[38px]">
           <button
             onClick={onOpenWallpaperModal}
-            className="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-300 hover:text-white transition-all rounded-md hover:bg-white/[0.06]"
+            className="flex items-center gap-2 px-2.5 h-full text-xs font-semibold text-slate-300 hover:text-white transition-all rounded-lg hover:bg-white/10"
             title="Atmospheric Wallpaper Settings (Pexels 4K)"
           >
-            <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-            <span className="hidden sm:inline text-xs font-medium">Atmosphere</span>
+            <Sparkles className="w-4 h-4 text-indigo-400" />
+            <span className="hidden md:inline">Atmosphere</span>
           </button>
           {onShuffleWallpaper && (
             <button
               onClick={() => {
-                sound.playBlip();
                 onShuffleWallpaper();
               }}
-              className="p-1.5 text-slate-400 hover:text-cyan-300 hover:bg-white/[0.06] rounded-md transition-all border-l border-white/[0.06]"
+              className="px-2 h-full text-slate-400 hover:text-indigo-300 hover:bg-white/10 rounded-lg transition-all border-l border-white/10 flex items-center justify-center"
               title="Shuffle to a new Pexels background now"
             >
-              <RefreshCw className="w-3 h-3" />
+              <RefreshCw className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -266,24 +271,27 @@ export default function TopNavbar({
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white transition-all relative"
+            className="w-[38px] h-[38px] flex items-center justify-center rounded-xl bg-slate-900/50 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white transition-all relative shadow-sm"
             title="Alert Notifications"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-[#090D18]" />
+            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-slate-900 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
           </button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-[#0D1324] border border-white/[0.09] rounded-xl shadow-2xl p-3 z-50">
-              <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
-                <span className="font-semibold text-xs text-white">Emergency Broadcasts</span>
-                <span className="text-[10px] text-cyan-400 font-mono">Real-Time</span>
+            <div className="absolute right-0 mt-2 w-80 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="px-4 py-3 bg-slate-800/50 border-b border-white/5 flex items-center justify-between">
+                <span className="font-bold text-sm text-white">Emergency Broadcasts</span>
+                <span className="text-[10px] text-rose-400 font-mono font-bold bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">LIVE</span>
               </div>
-              <div className="divide-y divide-white/[0.04] max-h-60 overflow-y-auto mt-1">
+              <div className="divide-y divide-white/5 max-h-72 overflow-y-auto no-scrollbar">
                 {notifications.map((n) => (
-                  <div key={n.id} className="py-2 px-1 hover:bg-white/[0.02] transition-colors">
-                    <span className="text-xs font-semibold text-rose-300 block">{n.title}</span>
-                    <span className="text-[10px] text-slate-500 font-mono">{n.time}</span>
+                  <div key={n.id} className="p-4 hover:bg-white/5 transition-colors group cursor-default">
+                    <div className="flex justify-between items-start mb-1">
+                        <span className="text-sm font-bold text-rose-300 group-hover:text-rose-200 transition-colors">{n.title}</span>
+                        <span className="text-[10px] text-slate-500 font-mono font-medium">{n.time}</span>
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">{n.text}</p>
                   </div>
                 ))}
               </div>
@@ -291,37 +299,96 @@ export default function TopNavbar({
           )}
         </div>
 
-        {/* Profile Avatar */}
-        <div className="relative" ref={userRef}>
-          <button
-            onClick={() => {
-              if (isAuthenticated) setUserMenuOpen(!userMenuOpen);
-              else onOpenAuthModal('login');
-            }}
-            className="w-7 h-7 rounded-lg bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-white flex items-center justify-center text-xs font-medium transition-all shadow-sm"
-            title={isAuthenticated ? currentUser?.name : 'Login to Command Center'}
-          >
-            {isAuthenticated ? currentUser?.name?.[0]?.toUpperCase() || 'A' : <User className="w-3.5 h-3.5 text-slate-300" />}
-          </button>
+        {/* Role Status Badge & Profile Avatar */}
+        {isAuthenticated && currentUser ? (
+          <div className="flex items-center gap-2 pl-2 border-l border-white/10">
+            <button
+              onClick={() => onNavigateToAuth ? onNavigateToAuth() : onOpenAuthModal('login')}
+              className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all duration-300 shadow-sm ${
+                currentUser?.role === 'Volunteer' || currentUser?.role === 'Emergency Responder' || currentUser?.role === 'Citizen / Volunteer'
+                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
+                  : currentUser?.role === 'Disaster Management Officer'
+                  ? 'bg-amber-500/15 border-amber-500/30 text-amber-300 hover:bg-amber-500/25 shadow-[0_0_10px_rgba(245,158,11,0.1)]'
+                  : 'bg-sky-500/15 border-sky-500/30 text-sky-300 hover:bg-sky-500/25 shadow-[0_0_10px_rgba(56,189,248,0.1)]'
+              }`}
+              title="Click to view Identity & Roles portal"
+            >
+              {currentUser?.role === 'Volunteer' || currentUser?.role === 'Emergency Responder' || currentUser?.role === 'Citizen / Volunteer' ? (
+                <>
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Volunteer <span className="opacity-70 font-mono font-normal">({currentUser.badgeNumber || 'VOL-4022'})</span></span>
+                </>
+              ) : currentUser?.role === 'Disaster Management Officer' ? (
+                <>
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+                  <span>Commander</span>
+                </>
+              ) : (
+                <>
+                  <User className="w-4 h-4 text-sky-400" />
+                  <span>Citizen <span className="opacity-70 font-mono font-normal">({currentUser.badgeNumber || 'CIT-8821'})</span></span>
+                </>
+              )}
+            </button>
 
-          {userMenuOpen && isAuthenticated && (
-            <div className="absolute right-0 mt-2 w-52 bg-[#0D1324] border border-white/[0.09] rounded-xl shadow-2xl p-2 z-50">
-              <div className="px-2 py-1.5 border-b border-white/[0.06]">
-                <div className="font-semibold text-xs text-white truncate">{currentUser?.name}</div>
-                <div className="text-[10px] text-slate-500 font-mono truncate">{currentUser?.email}</div>
-              </div>
+            <div className="relative" ref={userRef}>
               <button
-                onClick={() => {
-                  logout();
-                  setUserMenuOpen(false);
-                }}
-                className="w-full text-left px-2 py-1.5 mt-1 text-xs text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex items-center gap-2 font-mono"
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 border border-white/20 text-white flex items-center justify-center text-sm font-bold transition-all shadow-md cursor-pointer"
+                title={currentUser?.name}
               >
-                <LogOut className="w-3.5 h-3.5" /> Sign Out
+                {currentUser?.name?.[0]?.toUpperCase() || 'U'}
               </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="p-4 bg-slate-800/50 border-b border-white/5">
+                    <div className="font-bold text-sm text-white truncate">{currentUser?.name}</div>
+                    <div className="text-[11px] text-slate-400 font-mono truncate mt-0.5">{currentUser?.email}</div>
+                    <div className="mt-2 inline-block">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                        {currentUser?.role || 'Citizen'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-2 space-y-1">
+                    {onNavigateToAuth && (
+                      <button
+                        onClick={() => {
+                          onNavigateToAuth();
+                          setUserMenuOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 cursor-pointer"
+                      >
+                        <User className="w-4 h-4 text-sky-400" /> Identity & Roles
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        logout();
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm font-bold text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 rounded-lg transition-colors flex items-center gap-3 cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" /> Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => onNavigateToAuth ? onNavigateToAuth() : onOpenAuthModal('login')}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-sm transition-all shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:shadow-[0_0_20px_rgba(56,189,248,0.5)] cursor-pointer"
+            title="Sign in as Citizen or Relief Volunteer"
+          >
+            <User className="w-4 h-4" />
+            <span>Sign In</span>
+          </button>
+        )}
 
       </div>
 

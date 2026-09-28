@@ -195,7 +195,18 @@ router.post('/alerts/broadcast-vernacular', async (req, res) => {
       recipientsCount = 185000,
       messageText,
       senderName = 'State Disaster Management Authority (SDMA)',
+      senderRole = 'Volunteer',
+      senderBadge = 'VOL-4022',
     } = req.body;
+
+    // Security & Permission Enforcement: Normal citizens cannot send broadcasts to the public
+    if (senderRole === 'Citizen' || senderRole === 'Normal User') {
+      return res.status(403).json({
+        success: false,
+        message: 'Permission Denied: Citizen accounts are restricted from broadcasting mass emergency alerts. Only verified Disaster Relief Volunteers and Command Officers have dispatch authorization.',
+        senderRole,
+      });
+    }
 
     const statePrefix = (state || 'IN').replace(/[^a-zA-Z]/g, '').substring(0, 3).toUpperCase();
     const broadcastId = `VBCST-${statePrefix}-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;

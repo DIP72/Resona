@@ -5,10 +5,71 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'resona_lastmile_secret_key_2026_super_secure';
+const JWT_SECRET = process.env.JWT_SECRET || 'resona_dev_jwt_secret_change_in_production';
 
 // In-memory fallback if MongoDB is temporarily inaccessible
 let memoryUsers = new Map();
+
+// Initialize default demo accounts
+(async () => {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const pass = await bcrypt.hash('Password123!', salt);
+    
+    // 1. Citizen / Normal User
+    memoryUsers.set('citizen@resona.org', {
+      _id: 'MEM-CIT-101',
+      id: 'MEM-CIT-101',
+      name: 'Sunita Nayak',
+      email: 'citizen@resona.org',
+      password: pass,
+      role: 'Citizen',
+      organization: 'General Public Resident',
+      phone: '+91 94370 22334',
+      location: 'Bhubaneswar, Odisha',
+      badgeNumber: 'CIT-8821',
+      status: 'ACTIVE',
+      createdAt: new Date(),
+      lastLogin: new Date()
+    });
+
+    // 2. Disaster Relief Volunteer (Authorized Broadcaster)
+    memoryUsers.set('volunteer@resona.org', {
+      _id: 'MEM-VOL-202',
+      id: 'MEM-VOL-202',
+      name: 'Ramesh Das',
+      email: 'volunteer@resona.org',
+      password: pass,
+      role: 'Volunteer',
+      organization: 'Odisha Coastal Volunteer Corps',
+      phone: '+91 70081 99887',
+      location: 'Puri Coastal Sector 4',
+      badgeNumber: 'VOL-4022',
+      status: 'ACTIVE',
+      createdAt: new Date(),
+      lastLogin: new Date()
+    });
+
+    // 3. Commander
+    memoryUsers.set('commander@resona.gov.in', {
+      _id: 'MEM-CMD-303',
+      id: 'MEM-CMD-303',
+      name: 'Commander Arjun Patel',
+      email: 'commander@resona.gov.in',
+      password: pass,
+      role: 'Disaster Management Officer',
+      organization: 'Odisha Disaster Rapid Action Force (ODRAF)',
+      phone: '+91 98765 43210',
+      location: 'Odisha State Command',
+      badgeNumber: 'CMD-1011',
+      status: 'ACTIVE',
+      createdAt: new Date(),
+      lastLogin: new Date()
+    });
+  } catch (err) {
+    console.warn('Memory users init error:', err.message);
+  }
+})();
 
 // Helper to generate JWT
 function generateToken(user) {
@@ -35,7 +96,7 @@ function sanitizeUser(user) {
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role, organization, phone, location } = req.body;
+    const { name, email, password, role = 'Citizen', organization, phone, location } = req.body;
 
     // Validation
     if (!name || !email || !password) {
@@ -69,10 +130,10 @@ router.post('/register', async (req, res) => {
         name: name.trim(),
         email: cleanEmail,
         password,
-        role: role || 'Emergency Responder',
-        organization: organization || 'National Disaster Response Force (NDRF)',
+        role: role || 'Citizen',
+        organization: organization || (role === 'Volunteer' ? 'Disaster Relief Volunteers' : 'General Public'),
         phone: phone || '+91 98765 43210',
-        location: location || 'Puri, Odisha'
+        location: location || 'Bhubaneswar, Odisha'
       });
 
       await newUser.save();
@@ -98,17 +159,18 @@ router.post('/register', async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const prefix = role === 'Volunteer' ? 'VOL' : (role === 'Citizen' ? 'CIT' : 'CMD');
     const fallbackUser = {
       _id: 'MEM-' + Date.now(),
       id: 'MEM-' + Date.now(),
       name: name.trim(),
       email: cleanEmail,
       password: hashedPassword,
-      role: role || 'Emergency Responder',
-      organization: organization || 'Disaster Response Command',
+      role: role || 'Citizen',
+      organization: organization || (role === 'Volunteer' ? 'Disaster Relief Volunteers' : 'General Public'),
       phone: phone || '+91 98765 43210',
-      location: location || 'Odisha Central',
-      badgeNumber: 'CMD-' + Math.floor(1000 + Math.random() * 9000),
+      location: location || 'Bhubaneswar, Odisha',
+      badgeNumber: `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`,
       status: 'ACTIVE',
       createdAt: new Date(),
       lastLogin: new Date()

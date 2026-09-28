@@ -2,232 +2,277 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────────────
+   RESONA ALERT – PREMIUM DESIGN SYSTEM
+   Mission Control Aesthetic with Living Glassmorphism
+───────────────────────────────────────────────────── */
+
 :root {
   color-scheme: dark;
+  --bg-primary: #060B18;
+  --bg-card: rgba(10, 15, 30, 0.55);
+  --bg-panel: rgba(8, 12, 24, 0.78);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.14);
+  --accent-cyan: #22D3EE;
+  --accent-blue: #3B82F6;
+  --accent-rose: #FB7185;
+  --accent-emerald: #34D399;
+  --glow-cyan: rgba(34, 211, 238, 0.12);
+  --glow-rose: rgba(251, 113, 133, 0.10);
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background-color: #070D1E;
+  background-color: var(--bg-primary);
   background-image: 
-    radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.05) 0px, transparent 50%),
-    radial-gradient(at 90% 90%, rgba(239, 68, 68, 0.04) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.5) 0px, transparent 100%);
+    radial-gradient(ellipse at 15% 5%, rgba(34, 211, 238, 0.04) 0px, transparent 50%),
+    radial-gradient(ellipse at 85% 95%, rgba(251, 113, 133, 0.03) 0px, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.4) 0px, transparent 100%);
   background-attachment: fixed;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #E2E8F0;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 1. Glassmorphism & Depth - Dashboard Card Containers */
+/* ─── GLASSMORPHIC CARD SYSTEM ─── */
+
 .weather-card {
-  background: rgba(11, 17, 34, 0.62);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  border-radius: 1rem;
-  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), 
-              box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), 
-              border-color 180ms ease;
+  background: var(--bg-card);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 40px -8px rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-xl);
+  transition: 
+    transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1), 
+    box-shadow 240ms ease,
+    border-color 240ms ease;
 }
 
 .weather-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.5), 
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px) scale(1.003);
+  border-color: var(--border-hover);
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 20px 50px -12px rgba(0, 0, 0, 0.6),
+    0 0 30px -8px var(--glow-cyan);
 }
 
 /* Semi-transparent Glass Panel for overlays, navbars, and sidebars */
 .glass-panel {
-  background: rgba(9, 14, 28, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.38);
+  background: var(--bg-panel);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-/* 2. Live Pulse Animations for Indicator Dots */
+/* ─── LIVE PULSE ANIMATIONS ─── */
+
 @keyframes liveDotGreen {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
   }
   50% {
-    transform: scale(1.22);
-    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    transform: scale(1.25);
+    box-shadow: 0 0 0 7px rgba(52, 211, 153, 0);
   }
 }
 .live-pulse-dot-green {
-  animation: liveDotGreen 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: liveDotGreen 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes liveDotRed {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75);
+    box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.75);
   }
   50% {
-    transform: scale(1.22);
-    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    transform: scale(1.25);
+    box-shadow: 0 0 0 7px rgba(251, 113, 133, 0);
   }
 }
 .live-pulse-dot-red {
-  animation: liveDotRed 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: liveDotRed 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes liveDotCyan {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.75);
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.75);
   }
   50% {
-    transform: scale(1.22);
-    box-shadow: 0 0 0 6px rgba(6, 182, 212, 0);
+    transform: scale(1.25);
+    box-shadow: 0 0 0 7px rgba(34, 211, 238, 0);
   }
 }
 .live-pulse-dot-cyan {
-  animation: liveDotCyan 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: liveDotCyan 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Soft breathing box-shadow animation for active emergency / alert cards */
+/* ─── EMERGENCY BREATHING GLOW ─── */
+
 @keyframes breathingRedCard {
   0%, 100% {
-    border-color: rgba(239, 68, 68, 0.45);
-    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.25), 0 4px 16px rgba(0, 0, 0, 0.4);
+    border-color: rgba(251, 113, 133, 0.35);
+    box-shadow: 0 0 0 1px rgba(251, 113, 133, 0.15), 0 4px 20px rgba(0, 0, 0, 0.4);
   }
   50% {
-    border-color: rgba(239, 68, 68, 0.9);
-    box-shadow: 0 0 22px 3px rgba(239, 68, 68, 0.5), 0 8px 30px rgba(239, 68, 68, 0.3);
+    border-color: rgba(251, 113, 133, 0.7);
+    box-shadow: 0 0 30px 4px rgba(251, 113, 133, 0.25), 0 8px 36px rgba(251, 113, 133, 0.15);
   }
 }
 .animate-breathing-red {
-  animation: breathingRedCard 2.4s ease-in-out infinite;
+  animation: breathingRedCard 2.6s ease-in-out infinite;
 }
 
-/* 3. Hurricane & Cyclone Map Markers: subtle continuous rotation + gentle bob */
+/* ─── CYCLONE MARKER ANIMATION ─── */
+
 @keyframes cycloneSpinBob {
-  0% {
-    transform: rotate(0deg) translateY(0px);
-  }
-  25% {
-    transform: rotate(90deg) translateY(-2.5px);
-  }
-  50% {
-    transform: rotate(180deg) translateY(0px);
-  }
-  75% {
-    transform: rotate(270deg) translateY(2.5px);
-  }
-  100% {
-    transform: rotate(360deg) translateY(0px);
-  }
+  0%   { transform: rotate(0deg) translateY(0px); }
+  25%  { transform: rotate(90deg) translateY(-2px); }
+  50%  { transform: rotate(180deg) translateY(0px); }
+  75%  { transform: rotate(270deg) translateY(2px); }
+  100% { transform: rotate(360deg) translateY(0px); }
 }
 .animate-cyclone-bob {
-  animation: cycloneSpinBob 6.5s linear infinite;
+  animation: cycloneSpinBob 7s linear infinite;
 }
 
-/* Scale-bounce animation for newly arrived badges & count updates */
+/* ─── ENTRANCE ANIMATIONS ─── */
+
 @keyframes scaleBounce {
-  0% {
-    transform: scale(0.65);
-    opacity: 0;
-  }
-  60% {
-    transform: scale(1.18);
-    opacity: 1;
-  }
-  80% {
-    transform: scale(0.94);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0%  { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.12); opacity: 1; }
+  80% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 .animate-scale-bounce {
-  animation: scaleBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: scaleBounce 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* 4. Interactive Micro-Motion: Slide & fade in for feed items */
 @keyframes feedItemSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .animate-slide-in {
-  animation: feedItemSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: feedItemSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Card hover micro-interaction */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── CARD INTERACTIONS ─── */
+
 .card-hover-lift {
-  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), 
-              box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), 
-              border-color 180ms ease;
+  transition: 
+    transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), 
+    box-shadow 200ms ease,
+    border-color 200ms ease;
 }
 .card-hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.5);
+  border-color: var(--border-hover);
 }
 
-/* Tab indicator slide transition */
 .tab-transition {
-  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Custom Scrollbar */
+/* ─── SIDEBAR ACTIVE INDICATOR ─── */
+
+@keyframes sidebarGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.sidebar-active-glow {
+  position: relative;
+}
+.sidebar-active-glow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, var(--accent-cyan), var(--accent-blue));
+  border-radius: 0 4px 4px 0;
+  animation: sidebarGlow 3s ease-in-out infinite;
+}
+
+/* ─── CUSTOM SCROLLBAR ─── */
+
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(11, 19, 43, 0.6);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E2E54;
-  border-radius: 4px;
+  background: rgba(34, 211, 238, 0.15);
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #38BDF8;
+  background: rgba(34, 211, 238, 0.35);
 }
 
-/* Cyclone Eye Spin Animation */
+/* ─── SLOW SPIN ─── */
+
 @keyframes spinSlow {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 .animate-spin-slow {
   animation: spinSlow 8s linear infinite;
 }
 
-/* Mapbox Dark Theme Overrides */
+/* ─── MAPBOX THEME OVERRIDES ─── */
+
 .mapboxgl-popup-content {
-  background: rgba(14, 23, 48, 0.95) !important;
-  backdrop-filter: blur(14px) !important;
+  background: rgba(10, 18, 40, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
   color: #E2E8F0 !important;
-  border: 1px solid rgba(56, 189, 248, 0.3) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.25) !important;
-  padding: 12px 14px !important;
+  border: 1px solid rgba(34, 211, 238, 0.25) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.7), 0 0 24px rgba(34, 211, 238, 0.15) !important;
+  padding: 14px 16px !important;
   font-family: inherit !important;
 }
 
 .mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
-  border-bottom-color: rgba(14, 23, 48, 0.95) !important;
+  border-bottom-color: rgba(10, 18, 40, 0.95) !important;
 }
 .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
-  border-top-color: rgba(14, 23, 48, 0.95) !important;
+  border-top-color: rgba(10, 18, 40, 0.95) !important;
 }
 .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
-  border-right-color: rgba(14, 23, 48, 0.95) !important;
+  border-right-color: rgba(10, 18, 40, 0.95) !important;
 }
 .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
-  border-left-color: rgba(14, 23, 48, 0.95) !important;
+  border-left-color: rgba(10, 18, 40, 0.95) !important;
 }
 .mapboxgl-popup-close-button {
   color: #94A3B8 !important;
@@ -237,26 +282,26 @@ body {
   top: 4px !important;
 }
 .mapboxgl-popup-close-button:hover {
-  color: #F87171 !important;
+  color: #FB7185 !important;
   background: transparent !important;
 }
 
 .mapboxgl-ctrl-group {
-  background: rgba(17, 28, 56, 0.9) !important;
-  backdrop-filter: blur(10px) !important;
-  border: 1px solid #1E2C4F !important;
-  border-radius: 10px !important;
+  background: rgba(10, 18, 40, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
   overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.5) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
 }
 .mapboxgl-ctrl-group button {
-  border-bottom: 1px solid #1E2C4F !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 .mapboxgl-ctrl-group button:last-child {
   border-bottom: none !important;
 }
 .mapboxgl-ctrl-group button:hover {
-  background: #1E2E54 !important;
+  background: rgba(34, 211, 238, 0.08) !important;
 }
 .mapboxgl-ctrl-icon {
   filter: invert(1) brightness(1.5) !important;
@@ -273,7 +318,8 @@ body {
   cursor: pointer !important;
 }
 
-/* Audio Equalizer animations for Vernacular Voice Synthesizer */
+/* ─── AUDIO EQUALIZER BARS ─── */
+
 @keyframes eqBounce1 { 0%, 100% { height: 6px; } 50% { height: 26px; } }
 @keyframes eqBounce2 { 0%, 100% { height: 18px; } 50% { height: 8px; } }
 @keyframes eqBounce3 { 0%, 100% { height: 12px; } 50% { height: 30px; } }
@@ -290,18 +336,20 @@ body {
 .eq-bar-6 { animation: eqBounce6 0.6s ease-in-out infinite; }
 .eq-bar-7 { animation: eqBounce7 0.8s ease-in-out infinite; }
 
-/* Subtle AI glow shimmer */
+/* ─── AI SHIMMER EFFECT ─── */
+
 @keyframes cyberShimmer {
-  0% { background-position: -200% 0; }
+  0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 .animate-cyber-shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(56, 189, 248, 0.15) 50%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(34, 211, 238, 0.12) 50%, rgba(255,255,255,0) 100%);
   background-size: 200% 100%;
-  animation: cyberShimmer 3s ease-in-out infinite;
+  animation: cyberShimmer 3.5s ease-in-out infinite;
 }
 
-/* Hide scrollbar utility */
+/* ─── SCROLLBAR HIDE UTILITY ─── */
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -310,3 +358,40 @@ body {
   scrollbar-width: none;
 }
 
+/* ─── GRADIENT TEXT UTILITY ─── */
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── GLOW BUTTON ─── */
+
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  opacity: 0;
+  transition: opacity 300ms ease;
+  z-index: -1;
+  filter: blur(12px);
+}
+.btn-glow:hover::after {
+  opacity: 0.3;
+}
+
+/* ─── STAGGER ANIMATION UTILITY ─── */
+
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }

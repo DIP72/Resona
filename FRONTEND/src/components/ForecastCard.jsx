@@ -38,10 +38,10 @@ function getForecastColor(condition) {
   const map = {
     'Thunderstorm': 'text-yellow-400',
     'Drizzle': 'text-blue-300',
-    'Rain': 'text-blue-400',
+    'Rain': 'text-sky-400',
     'Snow': 'text-white',
-    'Clear': 'text-yellow-400',
-    'Clouds': 'text-slate-400',
+    'Clear': 'text-amber-400',
+    'Clouds': 'text-slate-300',
     'Mist': 'text-slate-400',
     'Haze': 'text-amber-300',
   };
@@ -54,9 +54,9 @@ export default function ForecastCard() {
   // Loading state
   if (loading && !forecast) {
     return (
-      <div className="weather-card rounded-2xl border border-[#1E2C4F] p-5 flex flex-col items-center justify-center min-h-[200px]">
-        <Loader2 className="w-6 h-6 text-[#38BDF8] animate-spin mb-2" />
-        <p className="text-xs text-slate-400 font-mono">Loading atmospheric forecast...</p>
+      <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 p-6 flex flex-col items-center justify-center min-h-[260px] shadow-xl">
+        <Loader2 className="w-8 h-8 text-sky-400 animate-spin mb-3" />
+        <p className="text-sm text-slate-300 font-bold tracking-wide">Loading outlook...</p>
       </div>
     );
   }
@@ -64,14 +64,14 @@ export default function ForecastCard() {
   // Error state
   if (error && !forecast) {
     return (
-      <div className="weather-card rounded-2xl border border-red-900/40 p-5 flex flex-col items-center justify-center min-h-[200px]">
-        <CloudOff className="w-6 h-6 text-red-400 mb-2" />
-        <p className="text-xs text-red-300 font-mono">Forecast unavailable</p>
+      <div className="bg-rose-950/30 backdrop-blur-2xl rounded-2xl border border-rose-500/20 p-6 flex flex-col items-center justify-center min-h-[260px] shadow-xl">
+        <CloudOff className="w-8 h-8 text-rose-400 mb-3" />
+        <p className="text-sm text-rose-300 font-bold tracking-wide">Forecast unavailable</p>
         <button
           onClick={refresh}
-          className="mt-2 text-[10px] text-[#38BDF8] hover:underline flex items-center gap-1 font-mono"
+          className="mt-4 px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg text-xs text-rose-300 flex items-center gap-2 font-bold transition-colors"
         >
-          <RefreshCw className="w-3 h-3" /> Retry
+          <RefreshCw className="w-3.5 h-3.5" /> Retry
         </button>
       </div>
     );
@@ -80,23 +80,26 @@ export default function ForecastCard() {
   const days = forecast?.days || [];
 
   return (
-    <div className="weather-card rounded-2xl border border-[#1E2C4F] p-4.5 sm:p-5 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+    <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 p-5 flex flex-col justify-between shadow-xl relative overflow-hidden group">
       
+      {/* Decorative ambient background */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-amber-500/10 transition-colors duration-500"></div>
+
       {/* Header */}
-      <div className="flex items-center justify-between pb-2.5 border-b border-[#1E2C4F]/80 mb-2.5">
-        <div className="flex items-center gap-2">
-          <h3 className="text-xs font-bold text-white tracking-wide uppercase font-mono">
-            5-Day Atmospheric Outlook
+      <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3 relative z-10">
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-bold text-white tracking-widest uppercase">
+            5-Day Outlook
           </h3>
           {forecast?.city && (
-            <span className="text-[10px] text-slate-400 font-mono">
-              • {forecast.city}
+            <span className="text-[10px] text-amber-400 font-mono font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+              {forecast.city}
             </span>
           )}
         </div>
         <button
           onClick={refresh}
-          className="text-slate-400 hover:text-[#38BDF8] transition-colors p-1"
+          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all shadow-sm"
           title="Refresh forecast"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -104,9 +107,11 @@ export default function ForecastCard() {
       </div>
 
       {/* 5-Day List with Micro-Motion Hover Lift */}
-      <div className="space-y-1.5">
+      <div className="space-y-2 relative z-10 flex-1 overflow-y-auto no-scrollbar">
         {days.length === 0 ? (
-          <p className="text-xs text-slate-500 text-center py-4 font-mono">No forecast telemetry available</p>
+          <div className="h-full flex items-center justify-center">
+            <p className="text-xs text-slate-500 font-mono font-bold uppercase tracking-widest">No forecast telemetry</p>
+          </div>
         ) : (
           days.map((d, idx) => {
             const Icon = getForecastIcon(d.condition);
@@ -114,28 +119,28 @@ export default function ForecastCard() {
             return (
               <div 
                 key={d.day + d.date}
-                className="flex items-center justify-between py-2 px-2.5 rounded-xl hover:bg-[#0D162E]/90 hover:border-[#1E2C4F] border border-transparent transition-all duration-200 text-xs group cursor-default"
+                className="flex items-center justify-between p-3 rounded-xl bg-slate-800/30 hover:bg-slate-700/50 border border-white/5 hover:border-white/10 transition-all duration-300 text-xs group/item cursor-default"
               >
-                <div className="w-20">
-                  <span className="font-semibold text-white block group-hover:text-cyan-300 transition-colors">{d.day}</span>
-                  <span className="text-[10px] text-slate-400 font-mono">{d.date}</span>
+                <div className="w-24 flex flex-col">
+                  <span className="font-bold text-slate-200 group-hover/item:text-white tracking-wide transition-colors">{d.day}</span>
+                  <span className="text-[10px] text-slate-500 font-mono mt-0.5 group-hover/item:text-slate-400 transition-colors">{d.date}</span>
                 </div>
 
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-slate-800/40 flex items-center justify-center transition-transform group-hover:scale-110">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-slate-800/80 border border-white/5 flex items-center justify-center transition-transform duration-300 group-hover/item:scale-110 shadow-inner">
                     <Icon className={`w-4 h-4 ${color}`} />
                   </div>
-                  <span className="text-[11px] text-white font-mono font-medium tracking-tight">
-                    <AnimatedCounter value={d.high} suffix="°" /> / <AnimatedCounter value={d.low} suffix="°" />
+                  <span className="text-xs text-white font-mono font-bold tracking-tight">
+                    <AnimatedCounter value={d.high} suffix="°" /> <span className="text-slate-500 font-normal">/</span> <AnimatedCounter value={d.low} suffix="°" />
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="text-right w-24 text-[11px] text-slate-300 capitalize truncate font-sans">
+                <div className="flex flex-col items-end w-28 gap-1">
+                  <span className="text-[11px] font-bold text-slate-300 capitalize truncate w-full text-right">
                     {d.condition}
-                  </div>
+                  </span>
                   {d.rain_mm > 0 && (
-                    <span className="flex items-center gap-0.5 text-[9px] text-blue-400 font-mono bg-blue-950/40 px-1 py-0.5 rounded border border-blue-500/20" title="Expected rainfall">
+                    <span className="flex items-center gap-1 text-[9px] font-bold tracking-widest text-blue-400 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded-md border border-blue-500/20" title="Expected rainfall">
                       <Droplets className="w-2.5 h-2.5" />
                       {d.rain_mm}mm
                     </span>

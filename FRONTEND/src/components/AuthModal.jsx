@@ -142,33 +142,41 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     }
   };
 
+  const [persona, setPersona] = useState('citizen'); // 'citizen' | 'volunteer'
+
   const demoAccounts = [
+    {
+      email: 'citizen@resona.org',
+      name: 'Sunita Nayak',
+      role: 'Normal Citizen',
+      org: 'Coastal Resident',
+      initials: 'SN',
+      badge: 'CIT-8821',
+      color: 'sky',
+      canBroadcast: false,
+      desc: 'Public warnings, SOS reports'
+    },
+    {
+      email: 'volunteer@resona.org',
+      name: 'Ramesh Das',
+      role: 'Relief Volunteer',
+      org: 'Coastal Volunteer Corps',
+      initials: 'RD',
+      badge: 'VOL-4022',
+      color: 'emerald',
+      canBroadcast: true,
+      desc: 'Authorized to dispatch broadcasts'
+    },
     {
       email: 'commander@resona.gov.in',
       name: 'Arjun Patel',
       role: 'Disaster Commander',
       org: 'ODRAF Coastal Force',
       initials: 'AP',
-      badge: 'Command',
-      color: 'sky'
-    },
-    {
-      email: 'priya.imd@gov.in',
-      name: 'Dr. Priya Sengupta',
-      role: 'Lead Meteorologist',
-      org: 'IMD Severe Weather Desk',
-      initials: 'PS',
-      badge: 'Radar Met',
-      color: 'emerald'
-    },
-    {
-      email: 'ramesh.volunteer@gmail.com',
-      name: 'Ramesh Das',
-      role: 'Community Volunteer',
-      org: 'Konark Coastal Sector',
-      initials: 'RD',
-      badge: 'Citizen',
-      color: 'indigo'
+      badge: 'CMD-1011',
+      color: 'amber',
+      canBroadcast: true,
+      desc: 'State command authority'
     }
   ];
 
@@ -388,6 +396,15 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                         <p className="text-[10px] text-slate-400 truncate">
                           {acc.role}
                         </p>
+                        <div className="mt-1">
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border inline-block ${
+                            acc.canBroadcast 
+                              ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40' 
+                              : 'bg-amber-950/70 text-amber-300 border-amber-500/40'
+                          }`}>
+                            {acc.canBroadcast ? '✓ Can Broadcast' : '🔒 Broadcast Off'}
+                          </span>
+                        </div>
                       </div>
                     </button>
                   ))}
@@ -472,10 +489,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                     onChange={(e) => setRegisterForm({ ...registerForm, role: e.target.value })}
                     className="w-full px-3 py-2 bg-[#0E1528] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-sky-500"
                   >
-                    <option value="Emergency Responder">Ground Responder (ODRAF)</option>
-                    <option value="Disaster Management Officer">Disaster Officer (NDMA)</option>
-                    <option value="Meteorological Specialist">Meteorologist (IMD)</option>
-                    <option value="Citizen / Volunteer">Citizen Volunteer</option>
+                    <option value="Citizen">👥 Citizen (Public Resident - Warnings & SOS)</option>
+                    <option value="Volunteer">🛡️ Volunteer (Relief Operative - Broadcast Authorized)</option>
+                    <option value="Emergency Responder">Ground Responder (ODRAF / NDRF)</option>
+                    <option value="Disaster Management Officer">Disaster Officer (NDMA / SDMA)</option>
                   </select>
                 </div>
 

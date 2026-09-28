@@ -44,7 +44,7 @@ function getIconColor(condition) {
   const map = {
     'Thunderstorm': 'text-yellow-400',
     'Drizzle': 'text-blue-300',
-    'Rain': 'text-[#38BDF8]',
+    'Rain': 'text-sky-400',
     'Snow': 'text-white',
     'Clear': 'text-amber-400',
     'Clouds': 'text-slate-300',
@@ -53,7 +53,7 @@ function getIconColor(condition) {
     'Dust': 'text-amber-500',
     'Fog': 'text-slate-400',
   };
-  return map[condition] || 'text-[#38BDF8]';
+  return map[condition] || 'text-sky-400';
 }
 
 export default function CurrentWeatherCard({ location }) {
@@ -67,10 +67,10 @@ export default function CurrentWeatherCard({ location }) {
   // Loading state
   if (loading && !current) {
     return (
-      <div className="weather-card rounded-2xl border border-[#1E2C4F] p-5 flex flex-col items-center justify-center min-h-[200px]">
-        <Loader2 className="w-8 h-8 text-[#38BDF8] animate-spin mb-2" />
-        <p className="text-xs text-slate-400 font-mono">Fetching live telemetry...</p>
-        <p className="text-[10px] text-slate-500 mt-1">{location.city}, {location.state}</p>
+      <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 p-6 flex flex-col items-center justify-center min-h-[260px] shadow-xl">
+        <Loader2 className="w-8 h-8 text-sky-400 animate-spin mb-3" />
+        <p className="text-sm text-slate-300 font-bold tracking-wide">Fetching telemetry...</p>
+        <p className="text-[11px] text-slate-500 mt-1 font-mono uppercase tracking-widest">{location.city}</p>
       </div>
     );
   }
@@ -78,15 +78,15 @@ export default function CurrentWeatherCard({ location }) {
   // Error / fallback state
   if (error && !current) {
     return (
-      <div className="weather-card rounded-2xl border border-red-900/40 p-5 flex flex-col items-center justify-center min-h-[200px]">
-        <CloudOff className="w-8 h-8 text-red-400 mb-2" />
-        <p className="text-xs text-red-300 font-mono text-center">Telemetry feed unavailable</p>
-        <p className="text-[10px] text-slate-500 mt-1">{error}</p>
+      <div className="bg-rose-950/30 backdrop-blur-2xl rounded-2xl border border-rose-500/20 p-6 flex flex-col items-center justify-center min-h-[260px] shadow-xl">
+        <CloudOff className="w-8 h-8 text-rose-400 mb-3" />
+        <p className="text-sm text-rose-300 font-bold tracking-wide text-center">Telemetry feed unavailable</p>
+        <p className="text-[11px] text-rose-400/70 mt-1">{error}</p>
         <button
           onClick={refresh}
-          className="mt-3 text-[10px] text-[#38BDF8] hover:underline flex items-center gap-1 font-mono"
+          className="mt-4 px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg text-xs text-rose-300 flex items-center gap-2 font-bold transition-colors"
         >
-          <RefreshCw className="w-3 h-3" /> Retry Stream
+          <RefreshCw className="w-3.5 h-3.5" /> Retry Stream
         </button>
       </div>
     );
@@ -107,100 +107,112 @@ export default function CurrentWeatherCard({ location }) {
   const iconColor = getIconColor(condition);
 
   return (
-    <div className="weather-card rounded-2xl border border-[#1E2C4F] p-4.5 sm:p-5 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+    <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 p-5 flex flex-col justify-between shadow-xl relative overflow-hidden group">
       
+      {/* Decorative ambient background */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-sky-500/10 transition-colors duration-500"></div>
+
       {/* Header */}
-      <div className="flex items-center justify-between pb-2.5 border-b border-[#1E2C4F]/80">
+      <div className="flex items-center justify-between pb-3 border-b border-white/10 relative z-10">
         <div>
-          <h3 className="text-xs font-bold text-white tracking-wide uppercase font-mono">
-            Ground Station Telemetry
+          <h3 className="text-sm font-bold text-white tracking-widest uppercase mb-0.5">
+            Ground Station
           </h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">
+          <p className="text-[11px] text-sky-400 font-mono font-medium">
             {cityName}, {location.state}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={refresh}
-            className="text-slate-400 hover:text-[#38BDF8] transition-colors p-1"
+            className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all shadow-sm"
             title="Refresh weather"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_5px_rgba(16,185,129,0.8)]"></span>
             <span>Live Stream</span>
           </span>
         </div>
       </div>
 
       {/* Main Temperature and Icon display */}
-      <div className="my-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-3.5">
-          <div className={`w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center transition-transform hover:scale-105 shadow-md shadow-blue-950/30`}>
-            <WeatherIcon className={`w-8 h-8 ${iconColor} ${condition === 'Clear' ? 'animate-spin-slow' : ''}`} />
+      <div className="py-4 flex items-center justify-between relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-slate-800/50 border border-white/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-inner">
+            <WeatherIcon className={`w-8 h-8 ${iconColor} drop-shadow-md ${condition === 'Clear' ? 'animate-[spin_20s_linear_infinite]' : ''}`} />
           </div>
-          <div>
-            <div className="text-3xl font-extrabold text-white tracking-tight font-mono">
-              <AnimatedCounter value={temp} suffix="°C" />
+          <div className="flex flex-col">
+            <div className="text-4xl font-black text-white tracking-tighter drop-shadow-lg flex items-start">
+              <AnimatedCounter value={temp} />
+              <span className="text-2xl mt-1 text-slate-300">°C</span>
             </div>
-            <p className="text-xs font-semibold text-slate-200 capitalize">
+            <p className="text-[13px] font-bold text-sky-300 capitalize tracking-wide drop-shadow">
               {description || condition}
             </p>
-            <p className="text-[10px] text-slate-400 font-mono">
-              Feels like: <AnimatedCounter value={feelsLike} suffix="°C" />
+            <p className="text-[11px] text-slate-400 font-mono font-medium mt-1">
+              Feels like: <span className="text-slate-200"><AnimatedCounter value={feelsLike} />°</span>
             </p>
           </div>
         </div>
       </div>
 
       {/* 4-Metric Grid with Monospace Telemetry and Hover Lift */}
-      <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-[#1E2C4F]/80 text-xs">
-        <div className="p-2.5 rounded-xl bg-[#0D162E]/80 border border-[#1E2C4F]/60 flex items-center gap-2.5 card-hover-lift">
-          <Droplets className="w-4 h-4 text-blue-400 shrink-0" />
+      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/10 relative z-10">
+        <div className="p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700/60 border border-white/5 hover:border-white/20 flex items-center gap-3 transition-all duration-300">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+            <Droplets className="w-4 h-4" />
+          </div>
           <div>
-            <span className="text-[10px] text-slate-400 block font-sans">Humidity</span>
-            <span className="font-semibold text-white font-mono text-xs">
-              <AnimatedCounter value={humidity} suffix="%" />
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Humidity</span>
+            <span className="font-bold text-white font-mono text-[13px]">
+              <AnimatedCounter value={humidity} /><span className="text-slate-400 text-[10px] ml-0.5">%</span>
             </span>
           </div>
         </div>
 
-        <div className="p-2.5 rounded-xl bg-[#0D162E]/80 border border-[#1E2C4F]/60 flex items-center gap-2.5 card-hover-lift">
-          <Wind className="w-4 h-4 text-teal-400 shrink-0" />
+        <div className="p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700/60 border border-white/5 hover:border-white/20 flex items-center gap-3 transition-all duration-300">
+          <div className="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
+            <Wind className="w-4 h-4" />
+          </div>
           <div>
-            <span className="text-[10px] text-slate-400 block font-sans">Wind</span>
-            <span className="font-semibold text-white font-mono text-xs">
-              <AnimatedCounter value={windSpeed} suffix=" km/h" />
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Wind</span>
+            <span className="font-bold text-white font-mono text-[13px]">
+              <AnimatedCounter value={windSpeed} /><span className="text-slate-400 text-[10px] ml-0.5">km/h</span>
             </span>
           </div>
         </div>
 
-        <div className="p-2.5 rounded-xl bg-[#0D162E]/80 border border-[#1E2C4F]/60 flex items-center gap-2.5 card-hover-lift">
-          <Gauge className="w-4 h-4 text-amber-400 shrink-0" />
+        <div className="p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700/60 border border-white/5 hover:border-white/20 flex items-center gap-3 transition-all duration-300">
+          <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+            <Gauge className="w-4 h-4" />
+          </div>
           <div>
-            <span className="text-[10px] text-slate-400 block font-sans">Pressure</span>
-            <span className="font-semibold text-white font-mono text-xs">
-              <AnimatedCounter value={pressure} suffix=" hPa" />
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Pressure</span>
+            <span className="font-bold text-white font-mono text-[13px]">
+              <AnimatedCounter value={pressure} /><span className="text-slate-400 text-[10px] ml-0.5">hPa</span>
             </span>
           </div>
         </div>
 
-        <div className="p-2.5 rounded-xl bg-[#0D162E]/80 border border-[#1E2C4F]/60 flex items-center gap-2.5 card-hover-lift">
-          <Eye className="w-4 h-4 text-cyan-400 shrink-0" />
+        <div className="p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700/60 border border-white/5 hover:border-white/20 flex items-center gap-3 transition-all duration-300">
+          <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+            <Eye className="w-4 h-4" />
+          </div>
           <div>
-            <span className="text-[10px] text-slate-400 block font-sans">Visibility</span>
-            <span className="font-semibold text-white font-mono text-xs">
-              <AnimatedCounter value={visibility} suffix=" km" />
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-0.5">Visibility</span>
+            <span className="font-bold text-white font-mono text-[13px]">
+              <AnimatedCounter value={visibility} /><span className="text-slate-400 text-[10px] ml-0.5">km</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* Last updated footer */}
-      <div className="mt-2.5 pt-2 border-t border-[#1E2C4F]/80 flex items-center justify-between text-[10px] font-mono text-slate-400">
+      <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[9px] font-mono font-bold tracking-widest text-slate-500 uppercase relative z-10">
         <span>Station Sync: {cityName}</span>
-        <span className="text-slate-500">
+        <span className="text-sky-500/70">
           Telemetry: {updatedStr}
         </span>
       </div>

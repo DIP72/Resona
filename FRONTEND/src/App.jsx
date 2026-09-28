@@ -31,6 +31,7 @@ import RecentAlertsTimeline from './components/RecentAlertsTimeline';
 import SafetyInstructionsModal from './components/SafetyInstructionsModal';
 import IncidentReportModal from './components/IncidentReportModal';
 import AuthModal from './components/AuthModal';
+import AuthPage from './components/AuthPage';
 import MobileBottomNav from './components/MobileBottomNav';
 import MultilingualAlertAI from './components/MultilingualAlertAI';
 import WallpaperSelector, { WALLPAPER_PRESETS } from './components/WallpaperSelector';
@@ -50,11 +51,17 @@ export default function App() {
   // Dynamic Pexels Auto-Refresh State
   const [isAutoRefresh, setIsAutoRefresh] = useState(isPexelsAutoRefreshEnabled);
 
-  // Atmospheric Wallpaper State
+  // Atmospheric Wallpaper State - Always ensure a valid photographic wallpaper is active
   const [currentBg, setCurrentBg] = useState(() => {
     try {
       const saved = localStorage.getItem('resona_dashboard_bg');
-      return saved ? JSON.parse(saved) : getCachedFallbackWallpaper();
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.url && parsed.url.trim().length > 0) {
+          return parsed;
+        }
+      }
+      return getCachedFallbackWallpaper();
     } catch {
       return getCachedFallbackWallpaper();
     }
@@ -63,27 +70,28 @@ export default function App() {
   const [bgOpacity, setBgOpacity] = useState(() => {
     try {
       const saved = localStorage.getItem('resona_bg_opacity');
-      const parsed = saved ? parseFloat(saved) : 0.48;
-      return parsed > 0.65 ? 0.48 : parsed;
+      const parsed = saved ? parseFloat(saved) : 0.35;
+      return parsed > 0.6 ? 0.35 : parsed;
     } catch {
-      return 0.48;
+      return 0.35;
     }
   });
 
   const [isWallpaperModalOpen, setIsWallpaperModalOpen] = useState(false);
 
-  // On every website launch or page refresh, automatically gather a fresh dynamic Pexels atmospheric background!
+  // AUTOMATIC DYNAMIC PEXELS ROTATION:
+  // Every time the user opens the website or refreshes (F5), automatically fetch a fresh Pexels storm photo
   useEffect(() => {
-    if (isAutoRefresh) {
-      fetchRandomPexelsWallpaper().then((newBg) => {
-        if (newBg && newBg.url) {
-          setCurrentBg(newBg);
-          try {
-            localStorage.setItem('resona_dashboard_bg', JSON.stringify(newBg));
-          } catch {}
-        }
-      });
-    }
+    let isMounted = true;
+    fetchRandomPexelsWallpaper().then((newBg) => {
+      if (isMounted && newBg && newBg.url) {
+        setCurrentBg(newBg);
+        try {
+          localStorage.setItem('resona_dashboard_bg', JSON.stringify(newBg));
+        } catch {}
+      }
+    });
+    return () => { isMounted = false; };
   }, []);
 
   const handleSelectBg = (bg) => {
@@ -167,29 +175,34 @@ export default function App() {
 
   return (
     <WeatherProvider city={currentLocation.city}>
-      <div className="min-h-screen bg-[#070D1E] text-slate-100 flex flex-col font-sans selection:bg-[#38BDF8]/30 selection:text-[#38BDF8] relative overflow-x-hidden">
+      <div className="min-h-screen text-slate-100 flex flex-col font-sans selection:bg-[#38BDF8]/30 selection:text-[#38BDF8] relative overflow-x-hidden bg-[#070D1E]">
         
-        {/* Atmospheric Wallpaper Background Layer (Pinterest / Satellite / Coastal Storm) */}
+        {/* Dynamic High-Resolution Wallpaper Background Layer */}
         {currentBg?.url && (
           <div 
-            className="fixed inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700 pointer-events-none -z-20 transform scale-105"
+            key={currentBg.url}
+            className="fixed inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 pointer-events-none z-0 scale-100 animate-in fade-in"
             style={{ backgroundImage: `url("${currentBg.url}")` }}
           />
         )}
 
-        {/* Dynamic Dark Vignette & Glass Blending Overlay */}
-        <div 
-          className="fixed inset-0 pointer-events-none -z-10 transition-opacity duration-300"
-          style={{ 
-            backgroundColor: '#070D1E',
-            opacity: currentBg?.url ? bgOpacity : 1,
-            backdropFilter: currentBg?.url ? 'blur(1.5px)' : 'none'
-          }}
-        />
+        {/* Dynamic Atmospheric Tint Overlay - Balances vivid wallpaper visibility with perfect UI readability */}
+        {currentBg?.url && (
+          <div 
+            className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-500"
+            style={{ 
+              background: 'linear-gradient(180deg, rgba(7, 13, 30, 0.42) 0%, rgba(7, 13, 30, 0.70) 100%)',
+              backdropFilter: 'blur(1px)'
+            }}
+          />
+        )}
 
-        {/* Ambient Background Glow Highlights for Glassmorphism Depth */}
-        <div className="fixed top-24 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
-        <div className="fixed bottom-24 right-1/4 w-[32rem] h-[32rem] bg-rose-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+        {/* Ambient Highlights for Glassmorphism Depth */}
+        <div className="fixed top-24 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none z-0" />
+        <div className="fixed bottom-24 right-1/4 w-[32rem] h-[32rem] bg-rose-500/5 rounded-full blur-3xl pointer-events-none z-0" />
+
+        {/* Interactive App Content Layer (z-10 on top of wallpaper) */}
+        <div className="relative z-10 flex flex-col min-h-screen">
 
         {/* 1. Top Modern Disaster Command Navbar */}
         <TopNavbar
@@ -200,6 +213,10 @@ export default function App() {
           }}
           onOpenSafetyModal={handleOpenSafety}
           onOpenAuthModal={handleOpenAuth}
+          onNavigateToAuth={() => {
+            sound.playBlip();
+            setActiveTab('auth');
+          }}
           onOpenWallpaperModal={() => {
             sound.playBlip();
             setIsWallpaperModalOpen(true);
@@ -293,6 +310,8 @@ export default function App() {
                   currentLocation={currentLocation}
                   activeHazard={activeHazardFilter || 'cyclone'}
                   severity={currentLocation.risk === 'Very High' ? 'Extreme' : currentLocation.risk === 'High' ? 'Severe' : 'Moderate'}
+                  onOpenAuthModal={handleOpenAuth}
+                  onOpenReportModal={handleOpenReport}
                 />
               </div>
             )}
@@ -608,6 +627,17 @@ export default function App() {
               </div>
             )}
 
+            {/* VIEW 9: IDENTITY & ROLE PORTAL (CITIZEN VS VOLUNTEER) */}
+            {activeTab === 'auth' && (
+              <AuthPage
+                onNavigateToTab={(tab) => {
+                  sound.playBlip();
+                  setActiveTab(tab);
+                }}
+                onOpenSafety={handleOpenSafety}
+              />
+            )}
+
           </main>
 
         </div>
@@ -652,6 +682,7 @@ export default function App() {
           onToggleAutoRefresh={handleToggleAutoRefresh}
         />
 
+        </div>
       </div>
     </WeatherProvider>
   );

@@ -42,10 +42,14 @@ import {
   Cpu,
   Layers,
   ChevronRight,
-  CheckCircle
+  CheckCircle,
+  Lock,
+  User,
+  Users
 } from 'lucide-react';
 import { sound } from '../utils/audioSynth';
 import { useWeather } from '../context/WeatherContext';
+import { useAuth } from '../context/AuthContext';
 
 // Comprehensive Indic Language Matrix with script details & cultural region tags
 export const ALL_VERNACULAR_LANGUAGES = [
@@ -188,8 +192,24 @@ export default function MultilingualAlertAI({
   activeHazard = 'cyclone',
   severity = 'Extreme',
   onAlertBroadcasted,
+  onOpenAuthModal,
+  onOpenReportModal,
 }) {
   const { current } = useWeather();
+  const { currentUser, isAuthenticated, quickLogin } = useAuth();
+
+  // Role permissions: Volunteer has broadcast dispatch authorization; normal citizens do not
+  const isVolunteer = currentUser?.role === 'Volunteer' || 
+    currentUser?.role === 'Emergency Responder' || 
+    currentUser?.role === 'Disaster Management Officer' || 
+    currentUser?.role === 'Administrator' ||
+    currentUser?.role === 'Citizen / Volunteer';
+  const isCitizen = currentUser?.role === 'Citizen' || currentUser?.role === 'Normal User';
+  const canBroadcast = isAuthenticated && isVolunteer;
+
+  // Citizen broadcast restriction notice modal
+  const [isCitizenRestrictedModalOpen, setIsCitizenRestrictedModalOpen] = useState(false);
+
   const [selectedLang, setSelectedLang] = useState('or');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [langSearch, setLangSearch] = useState('');
@@ -377,6 +397,15 @@ export default function MultilingualAlertAI({
   // Simulated Dispatch Broadcast Action
   const handleExecuteBroadcast = async () => {
     if (!alertData) return;
+
+    // Security Gate: Normal citizens cannot send broadcasts
+    if (isCitizen) {
+      sound.playEmergencySiren(0.8);
+      setIsCitizenRestrictedModalOpen(true);
+      setIsBroadcastModalOpen(false);
+      return;
+    }
+
     try {
       setIsBroadcasting(true);
       setBroadcastProgress(10);
@@ -413,7 +442,9 @@ export default function MultilingualAlertAI({
         channel: activeChannel,
         recipientsCount: recipientPool,
         messageText: messageToSend,
-        senderName: `${state} Disaster Management Authority (SDMA)`,
+        senderName: currentUser?.name || `${state} Disaster Management Volunteer`,
+        senderRole: currentUser?.role || 'Volunteer',
+        senderBadge: currentUser?.badgeNumber || 'VOL-4022',
       };
 
       // Progress animation
@@ -595,17 +626,49 @@ export default function MultilingualAlertAI({
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
             </button>
 
-            {/* Direct Dispatch Launch CTA */}
-            <button
-              onClick={() => {
-                sound.playBlip();
-                setIsBroadcastModalOpen(true);
-              }}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-rose-950/60 hover:shadow-rose-900/80 transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Dispatch Alert</span>
-            </button>
+            {/* Direct Dispatch Launch CTA - Role Gated */}
+            {canBroadcast ? (
+              <button
+                onClick={() => {
+                  sound.playBlip();
+                  setIsBroadcastModalOpen(true);
+                }}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-950/60 hover:shadow-emerald-900/80 transition-all hover:scale-[1.02] active:scale-[0.98] border border-emerald-400/40"
+                title="Verified Volunteer Dispatch Authorization Active"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Dispatch Alert (Volunteer)</span>
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              </button>
+            ) : isCitizen ? (
+              <button
+                onClick={() => {
+                  sound.playEmergencySiren(0.8);
+                  setIsCitizenRestrictedModalOpen(true);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-200 font-semibold text-xs flex items-center gap-2 transition-all hover:scale-[1.01]"
+                title="Broadcast transmission is restricted for normal citizens"
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span>Citizen View • Broadcast Restricted</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  sound.playBlip();
+                  if (onOpenAuthModal) {
+                    onOpenAuthModal('login');
+                  } else {
+                    setIsCitizenRestrictedModalOpen(true);
+                  }
+                }}
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 font-semibold text-xs flex items-center gap-2 transition-all"
+                title="Volunteer sign in required to broadcast emergency alerts"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Volunteer Login to Broadcast</span>
+              </button>
+            )}
 
           </div>
         </div>
@@ -1341,6 +1404,12 @@ export default function MultilingualAlertAI({
                   <p className="text-[11px] text-slate-400">
                     Transmitting in <strong className="text-cyan-300">{currentLangMeta.nativeName} ({currentLangMeta.langName})</strong> to {currentLocation?.city}, {currentLocation?.state}
                   </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                      Authorized Volunteer: {currentUser?.name || 'Ramesh Das'} ({currentUser?.badgeNumber || 'VOL-4022'})
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -1509,6 +1578,130 @@ export default function MultilingualAlertAI({
                     : `Confirm & Broadcast in ${currentLangMeta.nativeName}`
                   }
                 </span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* 5. MODAL: CITIZEN BROADCAST RESTRICTION NOTICE                     */}
+      {/* =================================================================== */}
+      {isCitizenRestrictedModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-lg rounded-3xl bg-[#090F24] border border-amber-500/40 shadow-2xl overflow-hidden flex flex-col">
+            
+            {/* Modal Header */}
+            <div className="p-5 border-b border-white/10 bg-amber-950/30 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-md">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-white tracking-wide flex items-center gap-2">
+                    <span>Broadcast Restricted for Citizens</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold">
+                      Public Safety
+                    </span>
+                  </h4>
+                  <p className="text-xs text-slate-400">
+                    Emergency messaging policy for citizen profiles
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  sound.playBlip();
+                  setIsCitizenRestrictedModalOpen(false);
+                }}
+                className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4">
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-2 text-xs leading-relaxed text-slate-300">
+                <p className="font-semibold text-white">
+                  Why can't normal citizens send broadcasts?
+                </p>
+                <p>
+                  To protect our communities from unverified alarms, duplicate alert spam, and communication gridlock, mass emergency messaging (SMS, WhatsApp, Cell Tower overrides) is <strong className="text-amber-300">strictly reserved for verified Disaster Relief Volunteers and Government Command</strong>.
+                </p>
+              </div>
+
+              {/* Citizen Capabilities Checklist */}
+              <div className="space-y-2 text-xs">
+                <span className="text-slate-400 font-semibold text-[11px] uppercase tracking-wider block">
+                  Your Available Citizen Capabilities:
+                </span>
+                <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-2 text-slate-300">
+                  <div className="flex items-center gap-2 text-emerald-300">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Real-time vernacular weather warnings in 12+ Indic dialects</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-emerald-300">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Locate nearest cyclone shelters and emergency relief supplies</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-emerald-300">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Direct ground incident & SOS distress beacon reporting</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions: Switch to Volunteer or File SOS */}
+              <div className="pt-2 space-y-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    sound.playBlip();
+                    setIsCitizenRestrictedModalOpen(false);
+                    await quickLogin('volunteer@resona.org', 'Password123!');
+                    sound.playSuccessChime();
+                    try {
+                      confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+                    } catch {}
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Switch to Volunteer Account (Ramesh Das • VOL-4022)</span>
+                </button>
+
+                {onOpenReportModal && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sound.playBlip();
+                      setIsCitizenRestrictedModalOpen(false);
+                      onOpenReportModal();
+                    }}
+                    className="w-full py-2.5 px-4 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Report Citizen SOS / Ground Incident</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-white/10 bg-[#0C1530] flex items-center justify-between">
+              <span className="text-[10px] text-slate-500 font-mono">Resona Public Safety Policy</span>
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playBlip();
+                  setIsCitizenRestrictedModalOpen(false);
+                }}
+                className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 text-xs font-semibold transition-colors"
+              >
+                Understood
               </button>
             </div>
 
