@@ -21,11 +21,11 @@ body {
 
 /* 1. Glassmorphism & Depth - Dashboard Card Containers */
 .weather-card {
-  background: rgba(14, 23, 48, 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(56, 189, 248, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: rgba(11, 17, 34, 0.62);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   border-radius: 1rem;
   transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), 
               box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1), 
@@ -34,19 +34,18 @@ body {
 
 .weather-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.32);
+  border-color: rgba(255, 255, 255, 0.16);
   box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.5), 
-              0 0 20px -2px rgba(56, 189, 248, 0.16), 
-              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Semi-transparent Glass Panel for overlays, navbars, and sidebars */
 .glass-panel {
-  background: rgba(11, 19, 43, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(56, 189, 248, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+  background: rgba(9, 14, 28, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.38);
 }
 
 /* 2. Live Pulse Animations for Indicator Dots */
@@ -273,3 +272,41 @@ body {
   pointer-events: auto !important;
   cursor: pointer !important;
 }
+
+/* Audio Equalizer animations for Vernacular Voice Synthesizer */
+@keyframes eqBounce1 { 0%, 100% { height: 6px; } 50% { height: 26px; } }
+@keyframes eqBounce2 { 0%, 100% { height: 18px; } 50% { height: 8px; } }
+@keyframes eqBounce3 { 0%, 100% { height: 12px; } 50% { height: 30px; } }
+@keyframes eqBounce4 { 0%, 100% { height: 24px; } 50% { height: 10px; } }
+@keyframes eqBounce5 { 0%, 100% { height: 8px; } 50% { height: 22px; } }
+@keyframes eqBounce6 { 0%, 100% { height: 16px; } 50% { height: 28px; } }
+@keyframes eqBounce7 { 0%, 100% { height: 10px; } 50% { height: 20px; } }
+
+.eq-bar-1 { animation: eqBounce1 0.65s ease-in-out infinite; }
+.eq-bar-2 { animation: eqBounce2 0.5s ease-in-out infinite; }
+.eq-bar-3 { animation: eqBounce3 0.85s ease-in-out infinite; }
+.eq-bar-4 { animation: eqBounce4 0.55s ease-in-out infinite; }
+.eq-bar-5 { animation: eqBounce5 0.75s ease-in-out infinite; }
+.eq-bar-6 { animation: eqBounce6 0.6s ease-in-out infinite; }
+.eq-bar-7 { animation: eqBounce7 0.8s ease-in-out infinite; }
+
+/* Subtle AI glow shimmer */
+@keyframes cyberShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-cyber-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(56, 189, 248, 0.15) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: cyberShimmer 3s ease-in-out infinite;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

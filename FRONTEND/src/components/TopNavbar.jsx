@@ -55,6 +55,7 @@ export default function TopNavbar({
   onOpenSafetyModal,
   onOpenAuthModal,
   onOpenWallpaperModal,
+  onShuffleWallpaper,
   emergencyModeActive,
   onToggleEmergencyMode
 }) {
@@ -84,7 +85,6 @@ export default function TopNavbar({
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  // Merge genuine real-time OpenWeather measurements into location items
   const locationsWithLiveData = INDIAN_LOCATIONS.map(loc => {
     const liveMatch = (allCities || []).find(c => 
       c.city.toLowerCase() === loc.city.toLowerCase() ||
@@ -105,111 +105,132 @@ export default function TopNavbar({
     return loc;
   });
 
-  const filteredLocations = locationsWithLiveData.filter(loc => 
-    loc.city.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredLocations = locationsWithLiveData.filter(loc =>
+    loc.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
     loc.state.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const notifications = (liveAlerts && liveAlerts.length > 0)
-    ? liveAlerts.slice(0, 5).map((a, i) => ({
-        id: a.id || i,
+  const notifications = liveAlerts?.length > 0 
+    ? liveAlerts.slice(0, 5).map(a => ({
+        id: a.id,
         title: a.title,
-        time: i === 0 ? 'Live observation' : `${i * 12}m ago`,
-        severity: a.severity === 'High' ? 'red' : a.severity === 'Moderate' ? 'amber' : 'green',
-        text: `${a.description} — ${a.subtext}`
+        time: 'Just now',
+        severity: a.category === 'cyclone' ? 'red' : 'amber',
+        text: a.description
       }))
     : [
         { id: 1, title: 'OpenWeather Sensor Feed Active', time: 'Live', severity: 'green', text: 'Telemetry synced with IMD / OpenWeather network.' }
       ];
 
   return (
-    <header className="sticky top-0 z-30 bg-[#0B132B]/85 backdrop-blur-xl border-b border-[#1E2C4F]/80 px-4 lg:px-6 py-2.5 transition-colors shadow-2xl">
-      <div className="max-w-[1720px] mx-auto flex items-center justify-between gap-4">
-        
-        {/* Left: Brand Identity */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1E40AF] p-0.5 flex items-center justify-center shadow-lg shadow-blue-900/40">
-            <div className="w-full h-full bg-[#0D1836] rounded-[10px] flex items-center justify-center">
-              <CloudLightning className="w-6 h-6 text-[#38BDF8] fill-[#38BDF8]/20" />
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-bold tracking-tight text-white font-display">
-                Weather<span className="text-[#38BDF8]">Alert</span>
-              </span>
-              <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
-                <span>IMD & NDMA FEED</span>
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 font-medium tracking-wide">
-              Disaster Management System
-            </p>
+    <header className="sticky top-0 z-30 h-14 bg-[#090D18]/85 backdrop-blur-xl border-b border-white/[0.06] px-4 lg:px-6 flex items-center justify-between gap-4 transition-colors">
+      
+      {/* Left: Brand Identity */}
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500/20 to-blue-600/10 border border-sky-400/20 flex items-center justify-center shadow-md">
+          <CloudLightning className="w-4 h-4 text-sky-400" />
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold tracking-tight text-white">
+              Resona<span className="text-sky-400">Alert</span>
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green" title="IMD & NASA Telemetry Online" />
           </div>
         </div>
+      </div>
 
-        {/* Center: Search Location Bar */}
-        <div className="flex-1 max-w-xl relative hidden md:block" ref={searchRef}>
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setSearchOpen(true);
-              }}
-              onFocus={() => setSearchOpen(true)}
-              placeholder="Search location (e.g., city, district, state)..."
-              className="w-full pl-10 pr-4 py-2 bg-[#111C38] border border-[#1E2C4F] rounded-xl text-sm text-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8] transition-all shadow-inner"
-            />
-            {searchQuery && (
-              <button 
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+      {/* Center: Search Location Bar */}
+      <div className="flex-1 max-w-md relative hidden md:block" ref={searchRef}>
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSearchOpen(true);
+            }}
+            onFocus={() => setSearchOpen(true)}
+            placeholder="Search monitoring zone or station..."
+            className="w-full pl-9 pr-12 py-1.5 bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.14] focus:border-cyan-400/50 rounded-lg text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none transition-all"
+          />
+          <kbd className="absolute right-2.5 top-1.5 text-[9px] font-mono text-slate-500 bg-white/[0.05] px-1.5 py-0.5 rounded border border-white/[0.08]">
+            ⌘K
+          </kbd>
+        </div>
+
+        {/* Search Dropdown Results */}
+        {searchOpen && (
+          <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0D1324] border border-white/[0.09] rounded-xl shadow-2xl overflow-hidden z-50">
+            <div className="p-2 border-b border-white/[0.06] text-[10px] font-mono text-slate-400 uppercase tracking-wider flex justify-between">
+              <span>Target Disaster Hubs</span>
+              <span className="text-cyan-400">10 Cities</span>
+            </div>
+            <div className="max-h-60 overflow-y-auto">
+              {filteredLocations.map((loc) => (
+                <button
+                  key={loc.city}
+                  onClick={() => {
+                    onSelectLocation(loc);
+                    setSearchOpen(false);
+                    setSearchQuery('');
+                  }}
+                  className="w-full px-3 py-2 text-left text-xs flex items-center justify-between hover:bg-white/[0.04] transition-colors border-b border-white/[0.03] last:border-0"
+                >
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                    <span className="font-medium text-white">{loc.city}</span>
+                    <span className="text-slate-500 text-[10px]">({loc.state})</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-300 font-mono text-xs">{loc.temp}°C</span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
+        )}
+      </div>
 
-          {/* Search Dropdown Results */}
-          {searchOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#111C38] border border-[#1E2C4F] rounded-xl shadow-2xl overflow-hidden z-50 animate-fadeIn">
-              <div className="p-2 border-b border-[#1E2C4F] text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex justify-between">
-                <span>Select Target Disaster Zone</span>
-                <span className="text-[#38BDF8]">10 Major Hubs</span>
+      {/* Right Section: Location Pill, Atmosphere, Notifications, Profile */}
+      <div className="flex items-center gap-2 shrink-0">
+        
+        {/* Active Location Pill */}
+        <div className="relative" ref={locRef}>
+          <button
+            onClick={() => setLocationMenuOpen(!locationMenuOpen)}
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs text-slate-200 transition-all shadow-sm"
+          >
+            <MapPin className="w-3.5 h-3.5 text-sky-400" />
+            <span className="font-medium text-white">{currentLocation.city}</span>
+            <span className="font-mono text-sky-300 text-[11px] font-semibold">
+              {current?.temp ?? currentLocation.temp}°C
+            </span>
+          </button>
+
+          {locationMenuOpen && (
+            <div className="absolute right-0 mt-2 w-64 bg-[#0D1324] border border-white/[0.09] rounded-xl shadow-2xl p-2 z-50">
+              <div className="text-[10px] font-mono text-slate-400 px-2 py-1 border-b border-white/[0.06] flex items-center justify-between">
+                <span>Active Ground Stations</span>
+                <span className="text-emerald-400 text-[10px]">● Live</span>
               </div>
-              <div className="max-h-60 overflow-y-auto">
-                {filteredLocations.map((loc) => (
+              <div className="max-h-60 overflow-y-auto mt-1 space-y-0.5">
+                {locationsWithLiveData.map((loc) => (
                   <button
                     key={loc.city}
                     onClick={() => {
                       onSelectLocation(loc);
-                      setSearchOpen(false);
-                      setSearchQuery('');
+                      setLocationMenuOpen(false);
                     }}
-                    className="w-full px-3.5 py-2.5 text-left text-xs flex items-center justify-between hover:bg-[#1A284D] transition-colors border-b border-slate-800/40 last:border-0"
+                    className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors ${
+                      loc.city === currentLocation.city 
+                        ? 'bg-cyan-500/15 text-cyan-300 font-medium' 
+                        : 'text-slate-300 hover:bg-white/[0.04]'
+                    }`}
                   >
-                    <div className="flex items-center gap-2.5">
-                      <MapPin className="w-4 h-4 text-[#38BDF8]" />
-                      <div>
-                        <span className="font-semibold text-white">{loc.city}</span>
-                        <span className="text-slate-400 ml-1.5 text-[11px]">({loc.state})</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${
-                        loc.risk === 'Very High' ? 'bg-rose-950 text-rose-300 border border-rose-600/40' :
-                        loc.risk === 'High' ? 'bg-orange-950 text-orange-300 border border-orange-600/40' :
-                        loc.risk === 'Moderate' ? 'bg-amber-950 text-amber-300 border border-amber-600/40' :
-                        'bg-emerald-950 text-emerald-300 border border-emerald-600/40'
-                      }`}>
-                        {loc.risk} Risk
-                      </span>
-                      <span className="text-slate-300 font-mono text-[11px]">{loc.temp}°C</span>
-                    </div>
+                    <span>{loc.city}</span>
+                    <span className="font-mono text-slate-400 text-[11px]">{loc.temp}°C</span>
                   </button>
                 ))}
               </div>
@@ -217,221 +238,93 @@ export default function TopNavbar({
           )}
         </div>
 
-        {/* Right Section: Location Selector, Notifications, Profile */}
-        <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
-          
-          {/* Vernacular Language Auto-Detection Pill */}
-          <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono shadow-sm">
-            <Globe className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span className="text-slate-400">Vernacular:</span>
-            <span className="font-bold text-cyan-300">
-              {getVernacularBadgeText(currentLocation)}
-            </span>
-          </div>
-
-          {/* Atmospheric Wallpaper Switcher Pill */}
+        {/* Atmosphere Wallpaper Switcher & Quick Pexels Shuffle */}
+        <div className="flex items-center bg-white/[0.04] rounded-lg border border-white/[0.08] p-0.5 shadow-sm">
           <button
             onClick={onOpenWallpaperModal}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#111C38] border border-[#1E2C4F] hover:border-cyan-400/60 text-xs text-slate-300 hover:text-white transition-all shadow-sm"
-            title="Customize Atmospheric Background Wallpaper"
+            className="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-300 hover:text-white transition-all rounded-md hover:bg-white/[0.06]"
+            title="Atmospheric Wallpaper Settings (Pexels 4K)"
           >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="font-medium">Atmosphere</span>
+            <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+            <span className="hidden sm:inline text-xs font-medium">Atmosphere</span>
+          </button>
+          {onShuffleWallpaper && (
+            <button
+              onClick={() => {
+                sound.playBlip();
+                onShuffleWallpaper();
+              }}
+              className="p-1.5 text-slate-400 hover:text-cyan-300 hover:bg-white/[0.06] rounded-md transition-all border-l border-white/[0.06]"
+              title="Shuffle to a new Pexels background now"
+            >
+              <RefreshCw className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+
+        {/* Notifications Bell */}
+        <div className="relative" ref={notifRef}>
+          <button
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white transition-all relative"
+            title="Alert Notifications"
+          >
+            <Bell className="w-4 h-4" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-[#090D18]" />
           </button>
 
-          {/* Active Location Pill with Real-Time Weather */}
-          <div className="relative" ref={locRef}>
-            <button
-              onClick={() => setLocationMenuOpen(!locationMenuOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#111C38] border border-[#1E2C4F] hover:border-[#38BDF8]/60 text-xs text-slate-200 transition-all shadow-sm"
-            >
-              <MapPin className="w-3.5 h-3.5 text-[#38BDF8]" />
-              <span className="font-semibold text-white">{currentLocation.city}</span>
-              <span className="text-slate-400 text-[11px] hidden sm:inline">({currentLocation.state})</span>
-              <span className="text-[#38BDF8] font-mono font-bold text-[11px] bg-blue-950/60 px-1.5 py-0.5 rounded border border-blue-500/30">
-                {current?.temp ?? currentLocation.temp}°C {current?.condition ? `• ${current.condition}` : ''}
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green" title="Live OpenWeather Feed"></span>
-            </button>
-
-            {locationMenuOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-[#111C38] border border-[#1E2C4F] rounded-xl shadow-2xl p-2 z-50">
-                <div className="text-[11px] font-semibold text-slate-400 px-2 py-1 border-b border-slate-800 flex items-center justify-between">
-                  <span>Live Indian Weather Hubs</span>
-                  <span className="text-emerald-400 font-mono text-[10px]">● OpenWeather Live</span>
-                </div>
-                <div className="max-h-64 overflow-y-auto mt-1 space-y-0.5">
-                  {locationsWithLiveData.map((loc) => (
-                    <button
-                      key={loc.city}
-                      onClick={() => {
-                        onSelectLocation(loc);
-                        setLocationMenuOpen(false);
-                      }}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors ${
-                        loc.city === currentLocation.city 
-                          ? 'bg-blue-600/20 text-[#38BDF8] font-semibold' 
-                          : 'text-slate-300 hover:bg-[#1A284D]'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-medium text-white">{loc.city}, {loc.state}</div>
-                        <div className="text-[10px] text-slate-400 capitalize">{loc.description || loc.condition}</div>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-cyan-300 font-mono font-bold text-xs">{loc.temp}°C</span>
-                        <div className="text-[9px] text-slate-500 font-mono">{loc.risk} Risk</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+          {notificationsOpen && (
+            <div className="absolute right-0 mt-2 w-80 bg-[#0D1324] border border-white/[0.09] rounded-xl shadow-2xl p-3 z-50">
+              <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
+                <span className="font-semibold text-xs text-white">Emergency Broadcasts</span>
+                <span className="text-[10px] text-cyan-400 font-mono">Real-Time</span>
               </div>
-            )}
-          </div>
-
-          {/* Notifications Bell */}
-          <div className="relative" ref={notifRef}>
-            <button
-              onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative p-2 rounded-xl bg-[#111C38]/80 backdrop-blur-md border border-[#1E2C4F] text-slate-300 hover:text-white hover:border-[#38BDF8]/50 transition-all card-hover-lift shadow-sm"
-              title="Alert Notifications"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#EF4444] text-[10px] font-bold text-white flex items-center justify-center ring-2 ring-[#0B132B] shadow-md animate-scale-bounce font-mono">
-                <AnimatedCounter value={notifications.length} />
-              </span>
-            </button>
-
-            {notificationsOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#111C38] border border-[#1E2C4F] rounded-xl shadow-2xl p-3 z-50 animate-fadeIn">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                  <span className="font-semibold text-xs text-white">Emergency Broadcasts</span>
-                  <span className="text-[10px] text-[#38BDF8] font-mono">5 Unread Bulletins</span>
-                </div>
-                <div className="divide-y divide-slate-800/60 max-h-72 overflow-y-auto mt-1">
-                  {notifications.map((n) => (
-                    <div key={n.id} className="py-2 px-1 hover:bg-[#1A284D]/50 rounded-lg transition-colors">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className={`text-xs font-semibold ${
-                          n.severity === 'red' ? 'text-rose-400' :
-                          n.severity === 'amber' ? 'text-amber-400' : 'text-emerald-400'
-                        }`}>
-                          {n.title}
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-mono">{n.time}</span>
-                      </div>
-                      <p className="text-[11px] text-slate-300 leading-snug">{n.text}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="pt-2 border-t border-slate-800 mt-2 text-center">
-                  <button 
-                    onClick={() => {
-                      setNotificationsOpen(false);
-                      onOpenSafetyModal();
-                    }}
-                    className="text-[11px] text-[#38BDF8] hover:underline font-medium"
-                  >
-                    View Comprehensive Safety Instructions →
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* User Profile / MongoDB Auth Button */}
-          <div className="relative" ref={userRef}>
-            <button
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-[#111C38] border border-[#1E2C4F] hover:border-[#38BDF8]/60 transition-all text-left"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] flex items-center justify-center text-white font-bold text-xs ring-2 ring-blue-500/30 shrink-0">
-                {currentUser ? currentUser.name.charAt(0).toUpperCase() : 'A'}
-              </div>
-              <div className="hidden lg:block leading-tight">
-                <span className="text-xs font-semibold text-white block">
-                  {currentUser ? currentUser.name : 'Anurag Giri'}
-                </span>
-                <span className="text-[10px] text-slate-400 block font-mono">
-                  {currentUser ? (currentUser.role || 'Disaster Volunteer') : 'Disaster Volunteer'}
-                </span>
-              </div>
-            </button>
-
-            {/* Profile Dropdown */}
-            {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-[#111C38] border border-[#1E2C4F] rounded-xl shadow-2xl p-3 z-50 text-xs">
-                <div className="pb-2.5 border-b border-slate-800 mb-2">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                      {currentUser ? currentUser.name.charAt(0).toUpperCase() : 'A'}
-                    </div>
-                    <div>
-                      <p className="font-bold text-white">{currentUser ? currentUser.name : 'Anurag Giri'}</p>
-                      <p className="text-[11px] text-slate-400">{currentUser ? currentUser.email : 'anurag.giri@disaster.resona.gov.in'}</p>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-[#38BDF8] border border-blue-500/30 mt-0.5 inline-block">
-                        {currentUser ? (currentUser.badgeNumber || 'VOL-4821') : 'VOL-4821 • ODRAF Partner'}
-                      </span>
-                    </div>
+              <div className="divide-y divide-white/[0.04] max-h-60 overflow-y-auto mt-1">
+                {notifications.map((n) => (
+                  <div key={n.id} className="py-2 px-1 hover:bg-white/[0.02] transition-colors">
+                    <span className="text-xs font-semibold text-rose-300 block">{n.title}</span>
+                    <span className="text-[10px] text-slate-500 font-mono">{n.time}</span>
                   </div>
-                </div>
-
-                <div className="space-y-1.5 text-[11px] text-slate-300 py-1 border-b border-slate-800 mb-2">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Database Engine:</span>
-                    <span className="text-emerald-400 font-mono font-medium truncate max-w-[130px]">mongodb://localhost:27017</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Status:</span>
-                    <span className="text-emerald-400 font-medium">MongoDB Synced</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <button
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      onOpenAuthModal('database');
-                    }}
-                    className="w-full py-1.5 px-2.5 rounded-lg bg-[#1A284D] hover:bg-[#233566] text-[#38BDF8] flex items-center justify-between text-[11px] transition-colors"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Database className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>MongoDB Users Directory</span>
-                    </span>
-                    <ExternalLink className="w-3 h-3 text-slate-400" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      onOpenAuthModal('register');
-                    }}
-                    className="w-full py-1.5 px-2.5 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/40 border border-emerald-500/30 text-emerald-300 flex items-center justify-center gap-1.5 text-[11px] transition-colors"
-                  >
-                    <span>+ Register New Responder in MongoDB</span>
-                  </button>
-
-                  {isAuthenticated && (
-                    <button
-                      onClick={() => {
-                        logout();
-                        setUserMenuOpen(false);
-                      }}
-                      className="w-full py-1.5 px-2.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/30 text-rose-300 flex items-center justify-center gap-1.5 text-[11px] transition-colors"
-                    >
-                      <LogOut className="w-3.5 h-3.5" />
-                      <span>Sign Out</span>
-                    </button>
-                  )}
-                </div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
+        {/* Profile Avatar */}
+        <div className="relative" ref={userRef}>
+          <button
+            onClick={() => {
+              if (isAuthenticated) setUserMenuOpen(!userMenuOpen);
+              else onOpenAuthModal('login');
+            }}
+            className="w-7 h-7 rounded-lg bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-white flex items-center justify-center text-xs font-medium transition-all shadow-sm"
+            title={isAuthenticated ? currentUser?.name : 'Login to Command Center'}
+          >
+            {isAuthenticated ? currentUser?.name?.[0]?.toUpperCase() || 'A' : <User className="w-3.5 h-3.5 text-slate-300" />}
+          </button>
+
+          {userMenuOpen && isAuthenticated && (
+            <div className="absolute right-0 mt-2 w-52 bg-[#0D1324] border border-white/[0.09] rounded-xl shadow-2xl p-2 z-50">
+              <div className="px-2 py-1.5 border-b border-white/[0.06]">
+                <div className="font-semibold text-xs text-white truncate">{currentUser?.name}</div>
+                <div className="text-[10px] text-slate-500 font-mono truncate">{currentUser?.email}</div>
+              </div>
+              <button
+                onClick={() => {
+                  logout();
+                  setUserMenuOpen(false);
+                }}
+                className="w-full text-left px-2 py-1.5 mt-1 text-xs text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors flex items-center gap-2 font-mono"
+              >
+                <LogOut className="w-3.5 h-3.5" /> Sign Out
+              </button>
+            </div>
+          )}
         </div>
 
       </div>
+
     </header>
   );
 }

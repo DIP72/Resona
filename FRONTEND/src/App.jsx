@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, 
   Globe, 
@@ -34,6 +34,12 @@ import AuthModal from './components/AuthModal';
 import MobileBottomNav from './components/MobileBottomNav';
 import MultilingualAlertAI from './components/MultilingualAlertAI';
 import WallpaperSelector, { WALLPAPER_PRESETS } from './components/WallpaperSelector';
+import { 
+  fetchRandomPexelsWallpaper, 
+  isPexelsAutoRefreshEnabled, 
+  setPexelsAutoRefreshEnabled,
+  getCachedFallbackWallpaper 
+} from './services/pexelsService';
 import { sound } from './utils/audioSynth';
 
 export default function App() {
@@ -41,32 +47,70 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'multilingual' | 'map' | 'alerts' | 'forecast' | 'reports' | 'resources' | 'settings'
   const [activeHazardFilter, setActiveHazardFilter] = useState(null); // 'cyclone' | 'flood' | etc.
   
+  // Dynamic Pexels Auto-Refresh State
+  const [isAutoRefresh, setIsAutoRefresh] = useState(isPexelsAutoRefreshEnabled);
+
   // Atmospheric Wallpaper State
   const [currentBg, setCurrentBg] = useState(() => {
     try {
       const saved = localStorage.getItem('resona_dashboard_bg');
-      return saved ? JSON.parse(saved) : WALLPAPER_PRESETS[0];
+      return saved ? JSON.parse(saved) : getCachedFallbackWallpaper();
     } catch {
-      return WALLPAPER_PRESETS[0];
+      return getCachedFallbackWallpaper();
     }
   });
 
   const [bgOpacity, setBgOpacity] = useState(() => {
     try {
       const saved = localStorage.getItem('resona_bg_opacity');
-      return saved ? parseFloat(saved) : 0.82;
+      const parsed = saved ? parseFloat(saved) : 0.48;
+      return parsed > 0.65 ? 0.48 : parsed;
     } catch {
-      return 0.82;
+      return 0.48;
     }
   });
 
   const [isWallpaperModalOpen, setIsWallpaperModalOpen] = useState(false);
+
+  // On every website launch or page refresh, automatically gather a fresh dynamic Pexels atmospheric background!
+  useEffect(() => {
+    if (isAutoRefresh) {
+      fetchRandomPexelsWallpaper().then((newBg) => {
+        if (newBg && newBg.url) {
+          setCurrentBg(newBg);
+          try {
+            localStorage.setItem('resona_dashboard_bg', JSON.stringify(newBg));
+          } catch {}
+        }
+      });
+    }
+  }, []);
 
   const handleSelectBg = (bg) => {
     setCurrentBg(bg);
     try {
       localStorage.setItem('resona_dashboard_bg', JSON.stringify(bg));
     } catch {}
+  };
+
+  const handleShuffleWallpaper = async () => {
+    try {
+      const newBg = await fetchRandomPexelsWallpaper();
+      if (newBg && newBg.url) {
+        setCurrentBg(newBg);
+        try {
+          localStorage.setItem('resona_dashboard_bg', JSON.stringify(newBg));
+        } catch {}
+        return newBg;
+      }
+    } catch (err) {
+      console.warn('Error shuffling wallpaper:', err);
+    }
+  };
+
+  const handleToggleAutoRefresh = (enabled) => {
+    setIsAutoRefresh(enabled);
+    setPexelsAutoRefreshEnabled(enabled);
   };
 
   const handleChangeOpacity = (val) => {
@@ -160,6 +204,7 @@ export default function App() {
             sound.playBlip();
             setIsWallpaperModalOpen(true);
           }}
+          onShuffleWallpaper={handleShuffleWallpaper}
           emergencyModeActive={emergencyModeActive}
           onToggleEmergencyMode={() => setEmergencyModeActive(!emergencyModeActive)}
         />
@@ -210,55 +255,14 @@ export default function App() {
                   </div>
 
                   {/* Docked Live Operations Column */}
-                  <div className="lg:col-span-12 xl:col-span-4 flex flex-col gap-3.5">
-                    
+                  <div className="lg:col-span-12 xl:col-span-4 flex flex-col">
                     {/* Live Hazard Feed */}
                     <ActiveAlertsList
                       activeFilter={activeHazardFilter}
                       onSelectAlert={(alert) => handleOpenSafety()}
                     />
-
-                    {/* Emergency Mode Protocol Card */}
-                    <EmergencyModeCard
-                      onOpenSafetyModal={handleOpenSafety}
-                      isActive={emergencyModeActive}
-                    />
-
-                    {/* Tactical Quick Operations Card */}
-                    <QuickActionsCard
-                      onFindShelter={handleOpenSafety}
-                      onEmergencyContacts={handleOpenSafety}
-                      onDownloadAlerts={handleDownloadAlerts}
-                      onShareLocation={handleShareLocation}
-                      onReportIncident={handleOpenReport}
-                    />
                   </div>
 
-                </section>
-
-                {/* Database Verification Strip */}
-                <section className="p-3 rounded-xl bg-[#0E1730]/75 backdrop-blur-md border border-[#1E2C4F] flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-mono text-slate-400 shadow-xl card-hover-lift">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
-                    <span>Backend & Database:</span>
-                    <span className="text-emerald-300 font-semibold">mongodb://localhost:27017/resona_db</span>
-                    <span className="hidden md:inline text-slate-600">• users & alerts synced</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => handleOpenAuth('database')}
-                      className="text-[#38BDF8] hover:underline"
-                    >
-                      Inspect MongoDB Users
-                    </button>
-                    <span className="text-slate-700">|</span>
-                    <button
-                      onClick={() => handleOpenAuth('login')}
-                      className="text-slate-300 hover:text-white"
-                    >
-                      Switch Account
-                    </button>
-                  </div>
                 </section>
 
               </div>
@@ -643,6 +647,9 @@ export default function App() {
           onSelectBg={handleSelectBg}
           bgOpacity={bgOpacity}
           onChangeOpacity={handleChangeOpacity}
+          onShufflePexels={handleShuffleWallpaper}
+          isAutoRefresh={isAutoRefresh}
+          onToggleAutoRefresh={handleToggleAutoRefresh}
         />
 
       </div>

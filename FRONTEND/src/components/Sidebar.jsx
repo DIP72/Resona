@@ -15,9 +15,9 @@ import AnimatedCounter from './AnimatedCounter';
 export default function Sidebar({ activeTab, onSelectTab, onOpenSafetyModal }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'multilingual', label: 'Vernacular AI Alert', icon: Globe, badge: 'AI', isAi: true },
+    { id: 'multilingual', label: 'Vernacular AI Alert', icon: Globe, badge: 'AI' },
     { id: 'map', label: 'Live Map', icon: Map },
-    { id: 'alerts', label: 'Alerts', icon: Bell, badgeCount: 5 },
+    { id: 'alerts', label: 'Alerts', icon: Bell, badgeCount: 7 },
     { id: 'forecast', label: 'Forecast', icon: CloudRain },
     { id: 'reports', label: 'Disaster Reports', icon: FileText },
     { id: 'resources', label: 'Resources', icon: Layers },
@@ -25,12 +25,12 @@ export default function Sidebar({ activeTab, onSelectTab, onOpenSafetyModal }) {
   ];
 
   return (
-    <aside className="w-64 bg-[#0B132B]/85 backdrop-blur-xl border-r border-[#1E2C4F]/60 flex flex-col justify-between p-4 shrink-0 hidden md:flex min-h-[calc(100vh-61px)] shadow-2xl z-20">
+    <aside className="w-60 bg-[#090D18]/85 backdrop-blur-xl border-r border-white/[0.06] flex flex-col justify-between p-3.5 shrink-0 hidden md:flex min-h-[calc(100vh-56px)] z-20">
       
       {/* Navigation Links */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-500 font-semibold">
-          Main Console
+          Operations Console
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -39,35 +39,27 @@ export default function Sidebar({ activeTab, onSelectTab, onOpenSafetyModal }) {
             <button
               key={item.id}
               onClick={() => onSelectTab(item.id)}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all duration-200 group relative overflow-hidden ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 group ${
                 isActive
-                  ? 'bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 text-white shadow-lg shadow-rose-950/50 border-l-4 border-white'
-                  : 'text-slate-400 hover:text-white hover:bg-gradient-to-r hover:from-rose-500/15 hover:via-rose-600/5 hover:to-transparent hover:border-l-4 hover:border-rose-400/80 hover:shadow-md hover:shadow-rose-950/20'
+                  ? 'bg-white/[0.08] text-white shadow-sm border border-white/[0.09]'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${
-                  isActive ? 'text-white' : 'text-slate-400 group-hover:text-rose-400'
+              <div className="flex items-center gap-2.5">
+                <Icon className={`w-4 h-4 transition-colors ${
+                  isActive ? 'text-sky-400' : 'text-slate-400 group-hover:text-slate-200'
                 }`} />
                 <span className="tracking-wide">{item.label}</span>
               </div>
 
               {item.badge && (
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold transition-transform duration-200 group-hover:scale-105 ${
-                  isActive 
-                    ? 'bg-white/20 text-white border border-white/30' 
-                    : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                }`}>
+                <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">
                   {item.badge}
                 </span>
               )}
 
               {item.badgeCount && (
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold transition-transform duration-200 group-hover:scale-105 ${
-                  isActive 
-                    ? 'bg-white/20 text-white border border-white/30' 
-                    : 'bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-scale-bounce'
-                }`}>
+                <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
                   <AnimatedCounter value={item.badgeCount} />
                 </span>
               )}
@@ -77,35 +69,22 @@ export default function Sidebar({ activeTab, onSelectTab, onOpenSafetyModal }) {
       </div>
 
       {/* Bottom Promo / Safety Widget with Storm Image */}
-      <div className="relative rounded-2xl overflow-hidden border border-[#1E2C4F] shadow-xl mt-6 group card-hover-lift">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-          style={{ backgroundImage: 'url("/storm_bg.jpg")' }}
-        />
-        {/* Dark Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0B132B] via-[#0B132B]/80 to-transparent backdrop-blur-[2px]" />
-
-        {/* Content */}
-        <div className="relative p-4 text-left space-y-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600/80 backdrop-blur-md border border-blue-400/40 flex items-center justify-center text-white shadow-md">
-            <ShieldCheck className="w-5 h-5 text-white" />
+      <div className="rounded-xl overflow-hidden border border-white/[0.08] bg-[#0E1528]/80 p-3.5 space-y-2 mt-4 shadow-lg">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-sky-500/15 border border-sky-500/25 flex items-center justify-center text-sky-400 shrink-0">
+            <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white tracking-wide">
-              Stay Alert Stay Safe
-            </h4>
-            <p className="text-[11px] text-slate-300 leading-snug mt-1">
-              Real-time weather updates for a safer tomorrow.
-            </p>
+            <h4 className="text-xs font-semibold text-white tracking-wide">Emergency Hub</h4>
+            <p className="text-[10px] text-slate-400 font-mono">NDMA Live Feed</p>
           </div>
-          <button
-            onClick={onOpenSafetyModal}
-            className="w-full mt-1 py-1.5 px-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-lg text-[10px] font-semibold text-white tracking-wider uppercase transition-all duration-200 hover:shadow-lg hover:border-white/40"
-          >
-            Emergency Protocols
-          </button>
         </div>
+        <button
+          onClick={onOpenSafetyModal}
+          className="w-full py-1.5 px-2 bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] rounded-lg text-[10px] font-semibold text-slate-200 tracking-wider uppercase transition-colors"
+        >
+          View Protocols
+        </button>
       </div>
 
     </aside>

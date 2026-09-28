@@ -10,7 +10,6 @@ import {
   Sparkles, 
   CheckCircle2, 
   AlertCircle, 
-  ArrowRight, 
   Building2, 
   Phone, 
   MapPin, 
@@ -19,7 +18,9 @@ import {
   Radio,
   Layers,
   ChevronRight,
-  ShieldAlert
+  Shield,
+  Zap,
+  ArrowRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from '../context/AuthContext';
@@ -55,10 +56,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const triggerConfetti = () => {
     try {
       confetti({
-        particleCount: 80,
-        spread: 70,
+        particleCount: 70,
+        spread: 60,
         origin: { y: 0.6 },
-        colors: ['#00F2FE', '#0077FE', '#00F59B', '#FF0055']
+        colors: ['#38BDF8', '#3B82F6', '#10B981', '#F43F5E']
       });
     } catch {}
   };
@@ -76,10 +77,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     if (res.success) {
       sound.playSuccessChime();
       triggerConfetti();
-      setSuccessMsg(`Welcome back, ${res.user.name}! Connected to MongoDB.`);
+      setSuccessMsg(`Welcome back, ${res.user.name}`);
       setTimeout(() => {
         onClose();
-      }, 1200);
+      }, 1000);
     } else {
       setErrorMsg(res.error || 'Login failed. Please verify your credentials.');
     }
@@ -112,10 +113,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     if (res.success) {
       sound.playSuccessChime();
       triggerConfetti();
-      setSuccessMsg(`Account created and saved in MongoDB at ${mongoUri}!`);
+      setSuccessMsg(`Account created for ${res.user.name}`);
       setTimeout(() => {
         onClose();
-      }, 1400);
+      }, 1200);
     } else {
       setErrorMsg(res.error || 'Registration failed.');
     }
@@ -132,43 +133,71 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
     if (res.success) {
       sound.playSuccessChime();
       triggerConfetti();
-      setSuccessMsg(`Logged in as ${res.user.name} via MongoDB!`);
+      setSuccessMsg(`Authenticated as ${res.user.name}`);
       setTimeout(() => {
         onClose();
-      }, 1000);
+      }, 900);
     } else {
       setErrorMsg(res.error || 'Demo login failed.');
     }
   };
 
+  const demoAccounts = [
+    {
+      email: 'commander@resona.gov.in',
+      name: 'Arjun Patel',
+      role: 'Disaster Commander',
+      org: 'ODRAF Coastal Force',
+      initials: 'AP',
+      badge: 'Command',
+      color: 'sky'
+    },
+    {
+      email: 'priya.imd@gov.in',
+      name: 'Dr. Priya Sengupta',
+      role: 'Lead Meteorologist',
+      org: 'IMD Severe Weather Desk',
+      initials: 'PS',
+      badge: 'Radar Met',
+      color: 'emerald'
+    },
+    {
+      email: 'ramesh.volunteer@gmail.com',
+      name: 'Ramesh Das',
+      role: 'Community Volunteer',
+      org: 'Konark Coastal Sector',
+      initials: 'RD',
+      badge: 'Citizen',
+      color: 'indigo'
+    }
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#030612]/80 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xl animate-in fade-in duration-200">
       
       {/* Container Card */}
-      <div className="relative w-full max-w-2xl bg-[#090F24]/95 border border-cyan-500/30 rounded-2xl shadow-[0_0_50px_rgba(0,242,254,0.18)] overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-lg bg-[#0B1020]/95 border border-white/[0.12] rounded-2xl shadow-2xl shadow-black/80 overflow-hidden flex flex-col max-h-[90vh]">
         
-        {/* Glow Top Bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-[#00F2FE] via-[#0077FE] to-[#FF0055]" />
+        {/* Subtle Ambient Glow Header */}
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-sky-400/50 to-transparent" />
 
         {/* Header */}
-        <div className="p-5 border-b border-cyan-500/20 flex items-center justify-between bg-[#0B1432]/60">
+        <div className="p-5 pb-4 flex items-center justify-between border-b border-white/[0.08]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center text-[#00F2FE] shadow-[0_0_15px_rgba(0,242,254,0.25)]">
-              <KeyRound className="w-5 h-5 animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500/20 to-blue-600/10 border border-sky-400/25 flex items-center justify-center text-sky-400 shadow-inner">
+              <Shield className="w-5 h-5 text-sky-400" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold font-display text-white tracking-wide">
-                  PERSONNEL AUTHENTICATION PORTAL
+                <h2 className="text-base font-semibold text-white tracking-tight">
+                  {mode === 'login' ? 'Welcome to Resona' : mode === 'register' ? 'Create Responder Account' : 'Database Directory'}
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-                  SECURE ACCESS
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                  Secure
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>Database Sync:</span>
-                <span className="text-emerald-400 font-semibold">{mongoUri}</span>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {mode === 'login' ? 'Sign in to access disaster command & telemetry' : mode === 'register' ? 'Register for mission-control privileges' : 'Inspecting live registered records'}
               </p>
             </div>
           </div>
@@ -178,114 +207,94 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
               sound.playBlip();
               onClose();
             }}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors"
-            title="Close Portal"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+            title="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Live MongoDB Status Banner */}
-        <div className="px-5 py-2.5 bg-gradient-to-r from-emerald-950/40 via-cyan-950/30 to-slate-900 border-b border-cyan-500/15 flex items-center justify-between text-xs font-mono">
-          <div className="flex items-center gap-2 text-emerald-300">
-            <Database className="w-4 h-4 text-emerald-400 animate-pulse" />
-            <span>MongoDB Target:</span>
-            <span className="text-white font-bold bg-emerald-900/60 px-2 py-0.5 rounded border border-emerald-500/40">
-              mongodb://localhost:27017/
-            </span>
+        {/* Segmented Mode Switcher */}
+        <div className="p-3 pb-0">
+          <div className="flex p-1 bg-white/[0.04] border border-white/[0.06] rounded-xl">
+            <button
+              type="button"
+              onClick={() => {
+                sound.playBlip();
+                setMode('login');
+                setErrorMsg('');
+                setSuccessMsg('');
+              }}
+              className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                mode === 'login'
+                  ? 'bg-white/10 text-white shadow-sm font-semibold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Sign In
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                sound.playBlip();
+                setMode('register');
+                setErrorMsg('');
+                setSuccessMsg('');
+              }}
+              className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                mode === 'register'
+                  ? 'bg-white/10 text-white shadow-sm font-semibold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Register
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                sound.playBlip();
+                setMode('database');
+                setErrorMsg('');
+                setSuccessMsg('');
+              }}
+              className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                mode === 'database'
+                  ? 'bg-white/10 text-white shadow-sm font-semibold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Database className="w-3 h-3 text-emerald-400" />
+              <span>Users ({usersCount})</span>
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              sound.playBlip();
-              setMode(mode === 'database' ? 'login' : 'database');
-            }}
-            className="flex items-center gap-1.5 text-cyan-300 hover:text-cyan-100 underline decoration-cyan-500/50 hover:decoration-cyan-400 text-[11px]"
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Inspect MongoDB Users ({usersCount})</span>
-          </button>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="px-5 pt-4 flex gap-2 border-b border-slate-800">
-          <button
-            type="button"
-            onClick={() => {
-              sound.playBlip();
-              setMode('login');
-              setErrorMsg('');
-              setSuccessMsg('');
-            }}
-            className={`pb-3 px-4 font-mono text-xs font-medium transition-all relative ${
-              mode === 'login'
-                ? 'text-[#00F2FE] border-b-2 border-[#00F2FE]'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            SIGN IN (LOGIN)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              sound.playBlip();
-              setMode('register');
-              setErrorMsg('');
-              setSuccessMsg('');
-            }}
-            className={`pb-3 px-4 font-mono text-xs font-medium transition-all relative ${
-              mode === 'register'
-                ? 'text-[#00F2FE] border-b-2 border-[#00F2FE]'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            REGISTER NEW ACCOUNT
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              sound.playBlip();
-              setMode('database');
-              setErrorMsg('');
-              setSuccessMsg('');
-            }}
-            className={`pb-3 px-4 font-mono text-xs font-medium transition-all relative ml-auto ${
-              mode === 'database'
-                ? 'text-emerald-400 border-b-2 border-emerald-400'
-                : 'text-slate-400 hover:text-emerald-300'
-            }`}
-          >
-            MONGODB DIRECTORY ({usersCount})
-          </button>
-        </div>
-
-        {/* Scrollable Body */}
-        <div className="p-6 overflow-y-auto space-y-5">
+        {/* Scrollable Content Body */}
+        <div className="p-5 overflow-y-auto space-y-4">
           
-          {/* Success Banner */}
+          {/* Notifications */}
           {successMsg && (
-            <div className="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs font-mono flex items-center gap-2.5 animate-fadeIn">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            <div className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/30 text-emerald-200 text-xs flex items-center gap-2.5 animate-in fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}
 
-          {/* Error Banner */}
           {errorMsg && (
-            <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-200 text-xs font-mono flex items-center gap-2.5 animate-fadeIn">
-              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+            <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-500/30 text-rose-200 text-xs flex items-center gap-2.5 animate-in fade-in">
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* MODE: SIGN IN */}
           {mode === 'login' && (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <form onSubmit={handleLoginSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                  Official Email Address:
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                  Official Email Address
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -294,17 +303,19 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                     required
                     value={loginForm.email}
                     onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                    placeholder="e.g. commander@resona.gov.in"
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#00F2FE] focus:ring-1 focus:ring-[#00F2FE] font-mono transition-all"
+                    placeholder="commander@resona.gov.in"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 transition-all"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-300 mb-1.5 flex justify-between">
-                  <span>Account Password:</span>
-                  <span className="text-[11px] text-cyan-400 font-mono">Encrypted with bcrypt</span>
-                </label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-medium text-slate-300">
+                    Password
+                  </label>
+                  <span className="text-[10px] text-slate-500">256-bit bcrypt encrypted</span>
+                </div>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   <input
@@ -312,13 +323,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                     required
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    placeholder="Enter password..."
-                    className="w-full pl-9 pr-10 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#00F2FE] focus:ring-1 focus:ring-[#00F2FE] font-mono transition-all"
+                    placeholder="••••••••••••"
+                    className="w-full pl-9 pr-10 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 transition-all font-mono"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -329,70 +340,57 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-[#00F2FE] to-[#0077FE] hover:from-[#00F2FE]/90 hover:to-[#0077FE]/90 text-slate-950 font-bold font-mono text-xs rounded-xl shadow-[0_0_20px_rgba(0,242,254,0.3)] transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 active:scale-[0.99] text-white font-medium text-xs rounded-xl shadow-lg shadow-sky-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-1 cursor-pointer"
               >
                 {loading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                    <span>AUTHENTICATING AGAINST MONGODB...</span>
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Verifying Credentials...</span>
                   </>
                 ) : (
                   <>
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>AUTHENTICATE & ENTER COMMAND CENTER</span>
+                    <span>Sign In to Console</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </>
                 )}
               </button>
 
-              {/* Fast 1-Click Demo Accounts */}
-              <div className="pt-4 border-t border-slate-800">
-                <p className="text-[11px] font-mono text-slate-400 mb-2.5 flex items-center justify-between">
-                  <span>⚡ Instant 1-Click Demo Logins (Stored in MongoDB):</span>
-                  <span className="text-cyan-400 text-[10px]">Pre-seeded at 27017</span>
-                </p>
+              {/* Instant 1-Click Demo Accounts */}
+              <div className="pt-4 border-t border-white/[0.08] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1.5">
+                    <Zap className="w-3 h-3 text-amber-400" />
+                    <span>Quick Access Demo Accounts</span>
+                  </span>
+                  <span className="text-[10px] text-slate-500">1-click login</span>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickDemoClick('commander@resona.gov.in')}
-                    className="p-2.5 rounded-lg bg-slate-900 border border-cyan-500/20 hover:border-cyan-400 text-left transition-all group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-cyan-300 group-hover:text-cyan-200">
-                        Disaster Cmdr
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono">CMD</span>
-                    </div>
-                    <p className="text-[10px] text-slate-400 truncate mt-0.5">Arjun Patel (ODRAF)</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickDemoClick('priya.imd@gov.in')}
-                    className="p-2.5 rounded-lg bg-slate-900 border border-emerald-500/20 hover:border-emerald-400 text-left transition-all group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-emerald-300 group-hover:text-emerald-200">
-                        IMD Scientist
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono">MET</span>
-                    </div>
-                    <p className="text-[10px] text-slate-400 truncate mt-0.5">Dr. Priya Sengupta</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickDemoClick('ramesh.volunteer@gmail.com')}
-                    className="p-2.5 rounded-lg bg-slate-900 border border-pink-500/20 hover:border-pink-400 text-left transition-all group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-pink-300 group-hover:text-pink-200">
-                        Citizen Volunteer
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono">CIT</span>
-                    </div>
-                    <p className="text-[10px] text-slate-400 truncate mt-0.5">Ramesh Das (Konark)</p>
-                  </button>
+                  {demoAccounts.map((acc) => (
+                    <button
+                      key={acc.email}
+                      type="button"
+                      onClick={() => handleQuickDemoClick(acc.email)}
+                      className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 text-left transition-all group flex flex-col justify-between cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between w-full mb-1">
+                        <span className="w-6 h-6 rounded-full bg-white/[0.08] border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300">
+                          {acc.initials}
+                        </span>
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] text-slate-400">
+                          {acc.badge}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-white group-hover:text-sky-300 transition-colors truncate">
+                          {acc.name}
+                        </p>
+                        <p className="text-[10px] text-slate-400 truncate">
+                          {acc.role}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
             </form>
@@ -400,64 +398,64 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
           {/* MODE: REGISTER NEW ACCOUNT */}
           {mode === 'register' && (
-            <form onSubmit={handleRegisterSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleRegisterSubmit} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 
                 {/* Full Name */}
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    Full Legal / Official Name: *
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    Full Name *
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="text"
                       required
                       value={registerForm.name}
                       onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
-                      placeholder="e.g. Commander Rajesh Roy"
-                      className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#00F2FE] font-mono"
+                      placeholder="Rajesh Roy"
+                      className="w-full pl-8 pr-3 py-2 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
                     />
                   </div>
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    Official Email Address: *
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    Official Email *
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="email"
                       required
                       value={registerForm.email}
                       onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
-                      placeholder="e.g. rajesh.ndrf@gov.in"
-                      className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#00F2FE] font-mono"
+                      placeholder="rajesh.ndrf@gov.in"
+                      className="w-full pl-8 pr-3 py-2 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
                     />
                   </div>
                 </div>
 
                 {/* Password */}
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    Create Password (min. 6 chars): *
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    Password (min 6 chars) *
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={registerForm.password}
                       onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-                      placeholder="Enter strong password..."
-                      className="w-full pl-9 pr-10 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#00F2FE] font-mono"
+                      placeholder="••••••••"
+                      className="w-full pl-8 pr-9 py-2 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500 font-mono"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"
+                      className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white"
                     >
                       {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
@@ -466,179 +464,147 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
                 {/* Role */}
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    Operational Role / Tier: *
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    Operational Role *
                   </label>
                   <select
                     value={registerForm.role}
                     onChange={(e) => setRegisterForm({ ...registerForm, role: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-[#00F2FE] font-mono"
+                    className="w-full px-3 py-2 bg-[#0E1528] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-sky-500"
                   >
-                    <option value="Emergency Responder">Emergency Responder (Ground Command)</option>
-                    <option value="Disaster Management Officer">Disaster Management Officer (NDMA / SDMA)</option>
-                    <option value="Meteorological Specialist">Meteorological Specialist (IMD Forecast)</option>
-                    <option value="Citizen / Volunteer">Citizen / Local Community Volunteer</option>
-                    <option value="Administrator">System Administrator</option>
+                    <option value="Emergency Responder">Ground Responder (ODRAF)</option>
+                    <option value="Disaster Management Officer">Disaster Officer (NDMA)</option>
+                    <option value="Meteorological Specialist">Meteorologist (IMD)</option>
+                    <option value="Citizen / Volunteer">Citizen Volunteer</option>
                   </select>
                 </div>
 
                 {/* Organization */}
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    Organization / Agency:
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    Organization / Agency
                   </label>
                   <div className="relative">
-                    <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <Building2 className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="text"
                       value={registerForm.organization}
                       onChange={(e) => setRegisterForm({ ...registerForm, organization: e.target.value })}
-                      placeholder="e.g. National Disaster Response Force"
-                      className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#00F2FE] font-mono"
+                      placeholder="ODRAF / NDMA"
+                      className="w-full pl-8 pr-3 py-2 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
                     />
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div>
-                  <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                    Emergency Phone:
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    Contact Phone
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="tel"
                       value={registerForm.phone}
                       onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
                       placeholder="+91 98765 43210"
-                      className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#00F2FE] font-mono"
+                      className="w-full pl-8 pr-3 py-2 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Location */}
+              {/* Deployment Location */}
               <div>
-                <label className="block text-xs font-mono text-slate-300 mb-1.5">
-                  Deployment Sector / Base Location:
+                <label className="block text-xs font-medium text-slate-300 mb-1">
+                  Sector / Base Station
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
                     value={registerForm.location}
                     onChange={(e) => setRegisterForm({ ...registerForm, location: e.target.value })}
-                    placeholder="e.g. Puri Coastal Belt, Odisha"
-                    className="w-full pl-9 pr-3 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#00F2FE] font-mono"
+                    placeholder="Puri Coastal Belt, Odisha"
+                    className="w-full pl-8 pr-3 py-2 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
                   />
                 </div>
               </div>
 
-              {/* Stored to MongoDB Notice */}
-              <div className="p-3 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-[11px] font-mono text-cyan-200 flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5 text-[#00F2FE]" />
-                  <span>Target DB: <code className="text-white">mongodb://localhost:27017/resona_db</code></span>
-                </span>
-                <span className="text-emerald-400 font-semibold">users collection</span>
-              </div>
-
-              {/* Register Submit Button */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-emerald-400 via-cyan-400 to-[#0077FE] hover:opacity-95 text-slate-950 font-bold font-mono text-xs rounded-xl shadow-[0_0_20px_rgba(0,245,155,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-[0.99] text-white font-medium text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-2 cursor-pointer"
               >
                 {loading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                    <span>SAVING ACCOUNT DIRECTLY TO MONGODB...</span>
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Registering Account...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4" />
-                    <span>REGISTER & SAVE TO MONGODB DATABASE</span>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Create Responder Account</span>
                   </>
                 )}
               </button>
             </form>
           )}
 
-          {/* MODE: DATABASE INSPECTOR */}
+          {/* MODE: DATABASE DIRECTORY */}
           {mode === 'database' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-                    <Database className="w-4 h-4 text-emerald-400" />
-                    LIVE MONGODB USERS DIRECTORY
-                  </h3>
-                  <p className="text-xs text-slate-400 font-mono mt-0.5">
-                    Direct live documents stored in MongoDB at <span className="text-cyan-300">mongodb://localhost:27017/resona_db</span>
-                  </p>
-                </div>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-semibold">
-                  {usersCount} Accounts Recorded
+            <div className="space-y-3">
+              <div className="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+                <span className="text-xs text-slate-400">
+                  Registered Personnel Directory
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  {usersCount} Records Synced
                 </span>
               </div>
 
-              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+              <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
                 {mongoUsers && mongoUsers.length > 0 ? (
                   mongoUsers.map((u, i) => (
                     <div 
                       key={u._id || u.id || i}
-                      className="p-3 rounded-xl bg-slate-900/80 border border-slate-700/60 flex items-center justify-between text-xs font-mono hover:border-cyan-500/40 transition-colors"
+                      className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-between text-xs hover:bg-white/[0.06] transition-colors"
                     >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white font-semibold">{u.name}</span>
-                          <span className="px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/30 text-[10px]">
-                            {u.badgeNumber || 'AUTH'}
-                          </span>
-                          <span className="text-slate-500 text-[10px]">
-                            ({u.role})
-                          </span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-7 h-7 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-[11px] font-bold text-slate-300 shrink-0">
+                          {u.name ? u.name.charAt(0).toUpperCase() : 'U'}
                         </div>
-                        <div className="text-slate-400 text-[11px] flex items-center gap-2">
-                          <span>{u.email}</span>
-                          <span>•</span>
-                          <span className="text-slate-300">{u.organization || 'Emergency Corps'}</span>
+                        <div className="min-w-0">
+                          <p className="font-medium text-white truncate">{u.name}</p>
+                          <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <span className="text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                          MONGODB STORED
+                      <div className="text-right shrink-0">
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] text-slate-300">
+                          {u.role || 'Member'}
                         </span>
-                        <p className="text-[10px] text-slate-500 mt-1">
-                          {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Active'}
-                        </p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-slate-400 font-mono py-4 text-center">
-                    No users loaded yet from MongoDB.
-                  </p>
+                  <p className="text-xs text-slate-500 text-center py-4">No records found</p>
                 )}
-              </div>
-
-              <div className="flex justify-between items-center pt-3 border-t border-slate-800 text-xs font-mono">
-                <span className="text-slate-400">
-                  Ready to sign in with any of these credentials?
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setMode('login')}
-                  className="px-3 py-1.5 rounded-lg bg-cyan-500/20 text-[#00F2FE] border border-cyan-500/40 hover:bg-cyan-500/30 flex items-center gap-1"
-                >
-                  <span>Go to Login</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
               </div>
             </div>
           )}
 
+        </div>
+
+        {/* Discrete Footer Status */}
+        <div className="px-5 py-2.5 bg-black/30 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-slate-400">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-slate-400">MongoDB Connected</span>
+            <span className="text-slate-600 font-mono hidden sm:inline">(resona_db)</span>
+          </div>
+          <span className="text-slate-500 text-[10px]">Resona Disaster Intelligence</span>
         </div>
 
       </div>

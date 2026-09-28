@@ -21,33 +21,33 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
       case 'flood':
         return { 
           icon: Waves, 
-          accentBorder: 'border-t-2 border-t-blue-500',
-          tint: 'bg-blue-500/15 text-blue-400' 
+          accentBorder: 'border-l-2 border-l-sky-400',
+          tint: 'bg-sky-500/10 text-sky-400' 
         };
       case 'thunderstorm':
         return { 
           icon: CloudLightning, 
-          accentBorder: 'border-t-2 border-t-amber-400',
-          tint: 'bg-amber-500/15 text-amber-400' 
+          accentBorder: 'border-l-2 border-l-amber-400',
+          tint: 'bg-amber-500/10 text-amber-400' 
         };
       case 'heatwave':
         return { 
           icon: Flame, 
-          accentBorder: 'border-t-2 border-t-orange-500',
-          tint: 'bg-orange-500/15 text-orange-400' 
+          accentBorder: 'border-l-2 border-l-orange-400',
+          tint: 'bg-orange-500/10 text-orange-400' 
         };
       case 'wind':
         return { 
           icon: Wind, 
-          accentBorder: 'border-t-2 border-t-teal-400',
-          tint: 'bg-teal-500/15 text-teal-400' 
+          accentBorder: 'border-l-2 border-l-teal-400',
+          tint: 'bg-teal-500/10 text-teal-400' 
         };
       case 'cyclone':
       default:
         return { 
           icon: Disc, 
-          accentBorder: 'border-t-2 border-t-red-500',
-          tint: 'bg-red-500/15 text-red-400' 
+          accentBorder: 'border-l-2 border-l-rose-500',
+          tint: 'bg-rose-500/10 text-rose-400' 
         };
     }
   };
@@ -59,17 +59,17 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
     const isFlood = e.categoryId === 'floods' || (e.category || '').toLowerCase().includes('flood');
     
     let cat = 'cyclone';
-    let sevColor = 'bg-rose-950/80 text-rose-300 border border-rose-500/50';
+    let sevColor = 'bg-rose-500/10 text-rose-300 border border-rose-500/25';
     let sev = 'Extreme';
     let isEmergency = true;
     if (isWildfire) {
       cat = 'heatwave';
-      sevColor = 'bg-orange-950/80 text-orange-300 border border-orange-500/50';
+      sevColor = 'bg-amber-500/10 text-amber-300 border border-amber-500/25';
       sev = 'High';
       isEmergency = false;
     } else if (isFlood) {
       cat = 'flood';
-      sevColor = 'bg-blue-950/80 text-blue-300 border border-blue-500/50';
+      sevColor = 'bg-sky-500/10 text-sky-300 border border-sky-500/25';
       sev = 'Severe';
       isEmergency = true;
     }
@@ -90,7 +90,7 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
       isEmergency,
       description: `NASA Live Event: ${e.category}`,
       coordinatesStr: locStr,
-      subtext: `Satellite Date: ${e.date ? new Date(e.date).toLocaleDateString() : 'Active'}`,
+      subtext: `Date: ${e.date ? new Date(e.date).toLocaleDateString() : 'Active'}`,
       validity: 'NASA Earth Observatory (Real-Time)',
       isNasaEonet: true,
       coordinates: e.coordinates,
@@ -116,15 +116,15 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
   });
 
   return (
-    <div className="weather-card rounded-2xl border border-[#1E2C4F] p-4 sm:p-4.5 flex flex-col h-[500px] shadow-2xl relative">
+    <div className="weather-card rounded-2xl border border-white/[0.08] p-4 flex flex-col h-[560px] shadow-2xl relative">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 mb-3">
+      <div className="flex items-center justify-between pb-2.5 border-b border-white/[0.06] mb-2.5">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-bold text-white tracking-wide">
+          <h3 className="text-xs font-semibold text-white tracking-wide">
             Live Hazard Feed
           </h3>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800/90 text-slate-300 font-mono font-bold border border-slate-700/50 animate-scale-bounce">
+          <span className="text-[10px] px-2 py-0.2 rounded-full bg-white/[0.05] text-slate-300 font-mono font-medium border border-white/[0.08]">
             <AnimatedCounter value={filtered.length} /> Active
           </span>
         </div>
@@ -132,36 +132,36 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
         {/* Continuous live pulsing status indicators */}
         <div className="flex items-center gap-2">
           {nasaAlerts.length > 0 && (
-            <span className="flex items-center gap-1.5 text-[9px] font-mono text-rose-300 bg-rose-950/70 px-2 py-0.5 rounded-full border border-rose-500/40 shadow-sm">
+            <span className="flex items-center gap-1.5 text-[9px] font-mono text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 live-pulse-dot-red"></span>
               <span>NASA LIVE</span>
             </span>
           )}
-          <div className="flex items-center gap-1.5 text-[9px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/30">
+          <div className="flex items-center gap-1.5 text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
-            <span>FEED SYNC</span>
+            <span>SYNCED</span>
           </div>
         </div>
       </div>
 
-      {/* Sub-Tabs: All / NASA Events / Regional Weather */}
-      <div className="flex items-center gap-1.5 mb-3 bg-[#0B132B]/80 backdrop-blur-md p-1 rounded-xl border border-[#1E2C4F]/60 text-[10px] font-medium">
+      {/* Sub-Tabs: Harmonious Segmented Control */}
+      <div className="flex items-center gap-1 mb-2.5 bg-white/[0.03] p-1 rounded-xl border border-white/[0.06] text-[10px] font-medium">
         <button
           onClick={() => setSourceFilter('all')}
-          className={`flex-1 py-1.5 rounded-lg text-center tab-transition ${
+          className={`flex-1 py-1 rounded-lg text-center transition-all ${
             sourceFilter === 'all' 
-              ? 'bg-[#38BDF8] text-slate-950 font-bold shadow-md shadow-sky-950/40' 
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-white/10 text-white font-semibold shadow-sm' 
+              : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           All (<AnimatedCounter value={combinedAlerts.length} />)
         </button>
         <button
           onClick={() => setSourceFilter('nasa')}
-          className={`flex-1 py-1.5 rounded-lg text-center tab-transition flex items-center justify-center gap-1 ${
+          className={`flex-1 py-1 rounded-lg text-center transition-all flex items-center justify-center gap-1 ${
             sourceFilter === 'nasa' 
-              ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold shadow-md shadow-rose-950/40' 
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-white/10 text-white font-semibold shadow-sm' 
+              : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Satellite className="w-3 h-3 text-rose-400" />
@@ -169,23 +169,23 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
         </button>
         <button
           onClick={() => setSourceFilter('imd')}
-          className={`flex-1 py-1.5 rounded-lg text-center tab-transition ${
+          className={`flex-1 py-1 rounded-lg text-center transition-all ${
             sourceFilter === 'imd' 
-              ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-950/40' 
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-white/10 text-white font-semibold shadow-sm' 
+              : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           Weather (<AnimatedCounter value={liveAlerts?.length || 0} />)
         </button>
       </div>
 
-      {/* Alert Cards List with slide/fade micro-motion */}
-      <div className="flex-1 overflow-y-auto space-y-2.5 pr-1">
+      {/* Alert Cards List */}
+      <div className="flex-1 overflow-y-auto space-y-2 pr-1">
         {filtered.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
-            <Disc className="w-9 h-9 text-emerald-500/40 mb-2 animate-soft-pulse" />
+            <Disc className="w-8 h-8 text-emerald-500/40 mb-2" />
             <p className="text-xs font-semibold text-slate-300">All Parameters Normal</p>
-            <p className="text-[11px] text-slate-500 mt-1 max-w-[200px]">
+            <p className="text-[10px] text-slate-500 mt-1 max-w-[200px]">
               No active warnings detected matching current filter criteria.
             </p>
           </div>
@@ -199,49 +199,45 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
                 key={alert.id || index}
                 onClick={() => onSelectAlert && onSelectAlert(alert)}
                 style={{ animationDelay: `${Math.min(index * 40, 200)}ms` }}
-                className={`p-3 rounded-xl border transition-all duration-200 cursor-pointer group card-hover-lift animate-slide-in relative overflow-hidden ${
+                className={`p-3 rounded-xl border border-white/[0.07] hover:border-white/[0.14] transition-all duration-150 cursor-pointer group bg-slate-900/50 hover:bg-slate-800/50 backdrop-blur-md relative overflow-hidden ${
                   accentBorder
-                } ${
-                  isRedEmergency
-                    ? 'animate-breathing-red bg-[#160C1F]/80 backdrop-blur-md'
-                    : 'bg-[#0D162E]/75 backdrop-blur-md border-[#1E2C4F] hover:border-[#38BDF8]/60'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2.5">
                   <div className="flex items-start gap-2.5 min-w-0 flex-1">
                     
-                    {/* Category Icon with tint even when inactive */}
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-110 ${tint}`}>
+                    {/* Category Icon */}
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-105 ${tint}`}>
                       <Icon className={`w-4 h-4 ${alert.category === 'cyclone' ? 'animate-cyclone-bob' : ''}`} />
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      {/* Wrapped title without ellipsis */}
+                      {/* Title & Tag */}
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="text-xs font-semibold text-slate-100 group-hover:text-[#38BDF8] transition-colors leading-snug break-words">
+                        <h4 className="text-xs font-semibold text-slate-100 group-hover:text-white transition-colors leading-snug break-words">
                           {alert.title}
                         </h4>
                         {alert.isNasaEonet && (
-                          <span className="text-[8px] font-mono px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-500/40">
+                          <span className="text-[8px] font-mono px-1.5 py-0.2 rounded bg-white/[0.06] text-slate-400 border border-white/10">
                             NASA EONET
                           </span>
                         )}
                       </div>
 
-                      <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
                         {alert.description}
                       </p>
 
-                      {/* Monospace telemetry readout for coordinates and timestamps */}
+                      {/* Technical Telemetry Readout */}
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap text-[10px] font-mono text-slate-400">
                         {alert.coordinatesStr && (
-                          <span className="text-cyan-300 bg-cyan-950/40 px-1 rounded border border-cyan-500/20">
+                          <span className="text-slate-300 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">
                             {alert.coordinatesStr}
                           </span>
                         )}
                         <span>{alert.subtext}</span>
                         {alert.magnitude && (
-                          <span className="text-rose-400 font-bold">
+                          <span className="text-rose-300 font-medium">
                             Intensity: {alert.magnitude}
                           </span>
                         )}
@@ -250,8 +246,8 @@ export default function ActiveAlertsList({ onSelectAlert, activeFilter }) {
                   </div>
 
                   {/* Severity Badge */}
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded font-mono shrink-0 ${
-                    alert.severityColor || 'bg-blue-950 text-blue-300 border border-blue-600/50'
+                  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded font-mono shrink-0 ${
+                    alert.severityColor || 'bg-white/[0.06] text-slate-300 border border-white/10'
                   }`}>
                     {alert.severity}
                   </span>
