@@ -509,16 +509,16 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
       
       {/* Top Map Header Controls */}
       <div className="px-4 py-2.5 bg-[#0A0F1F]/85 backdrop-blur-xl border-b border-white/[0.06] flex flex-wrap items-center justify-between gap-2 z-10">
-        <div className="flex items-center gap-2">
-          <h3 className="text-xs font-semibold text-white tracking-wide flex items-center gap-2">
-            Geospatial Threat Radar
+        <div className="flex items-center gap-2.5">
+          <h3 className="text-xs font-medium text-slate-200 tracking-normal flex items-center gap-2">
+            Geospatial threat radar
           </h3>
-          <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+          <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
             <span>Live WebGL</span>
           </span>
           {isLoadingLiveWeather && (
-            <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1 hidden sm:flex">
+            <span className="text-[11px] text-slate-400 font-sans flex items-center gap-1.5 hidden sm:flex">
               <RefreshCw className="w-2.5 h-2.5 animate-spin text-sky-400" />
               Syncing
             </span>
@@ -532,7 +532,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
           <select
             value={activeRegion}
             onChange={(e) => handleFlyToRegion(e.target.value)}
-            className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] rounded-lg px-2 py-1 text-[11px] text-slate-300 font-medium outline-none cursor-pointer"
+            className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-xl px-2.5 py-1 text-xs text-slate-300 font-medium outline-none cursor-pointer"
           >
             <option value="all" className="bg-[#0D1324] text-white">All India</option>
             <option value="east" className="bg-[#0D1324] text-white">East / Odisha</option>
@@ -543,12 +543,12 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
           </select>
 
           {/* Layer Filter Buttons - Harmonious Segmented Control */}
-          <div className="flex items-center gap-0.5 bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.06] text-[10px] font-medium">
+          <div className="flex items-center gap-0.5 bg-white/[0.04] p-1 rounded-xl border border-white/[0.08] text-xs font-medium">
             <button
               onClick={() => handleToggleLayer('all')}
-              className={`px-2.5 py-1 rounded-md transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                 activeLayer === 'all' 
-                  ? 'bg-white/15 text-white font-semibold shadow-sm' 
+                  ? 'bg-white/15 text-white font-medium shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -556,9 +556,9 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
             </button>
             <button
               onClick={() => handleToggleLayer('cyclone')}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeLayer === 'cyclone' 
-                  ? 'bg-white/15 text-white font-semibold shadow-sm' 
+                  ? 'bg-white/15 text-white font-medium shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -567,9 +567,9 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
             </button>
             <button
               onClick={() => handleToggleLayer('flood')}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeLayer === 'flood' 
-                  ? 'bg-white/15 text-white font-semibold shadow-sm' 
+                  ? 'bg-white/15 text-white font-medium shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -593,24 +593,24 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
                   }
                 }
               }}
-              className={`px-2.5 py-1 rounded-md flex items-center gap-1.5 transition-all ${
+              className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
                 showNasaLayer 
-                  ? 'bg-white/15 text-white font-semibold shadow-sm' 
+                  ? 'bg-white/15 text-white font-medium shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200'
               }`}
               title="Toggle NASA EONET Live Natural Events"
             >
-              <Satellite className="w-3 h-3 text-rose-400" />
+              <Satellite className="w-3.5 h-3.5 text-rose-300 stroke-[1.8]" />
               <span>NASA ({eonetEvents?.length || 0})</span>
             </button>
           </div>
 
           <button
             onClick={() => handleFlyToRegion('all')}
-            className="p-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-400 hover:text-white transition-all"
+            className="p-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-slate-400 hover:text-white transition-all cursor-pointer"
             title="Reset Map to All India"
           >
-            <Crosshair className="w-3 h-3" />
+            <Crosshair className="w-3.5 h-3.5 stroke-[1.8]" />
           </button>
         </div>
       </div>
@@ -621,55 +621,55 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
 
         {/* Floating Hazard Details Card (When clicked) */}
         {selectedHazardInfo && (
-          <div className="absolute top-3 left-3 z-10 max-w-xs bg-[#0B1020]/95 backdrop-blur-xl border border-white/10 rounded-xl p-3 shadow-2xl text-xs space-y-1.5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-white/10 pb-1">
+          <div className="absolute top-3 left-3 z-10 max-w-xs bg-[#0B1020]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-3.5 shadow-2xl text-xs space-y-2 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
               <span className="font-semibold text-white text-xs flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-400 stroke-[1.8]" />
                 {selectedHazardInfo.name}
               </span>
               <button 
                 onClick={() => setSelectedHazardInfo(null)}
-                className="text-slate-400 hover:text-white text-sm leading-none"
+                className="text-slate-400 hover:text-white text-base leading-none cursor-pointer"
               >
                 ×
               </button>
             </div>
             <p className="text-[11px] text-slate-300 leading-relaxed">{selectedHazardInfo.details}</p>
-            <div className="flex items-center justify-between pt-1 text-[10px] font-mono text-slate-400 border-t border-white/10">
-              <span>Severity: <strong className="text-rose-400">{selectedHazardInfo.severity}</strong></span>
-              <span>Winds: <strong className="text-white">{selectedHazardInfo.wind}</strong></span>
+            <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400 border-t border-white/10">
+              <span>Severity: <strong className="text-rose-300 font-semibold">{selectedHazardInfo.severity}</strong></span>
+              <span>Winds: <strong className="text-white font-mono">{selectedHazardInfo.wind}</strong></span>
             </div>
           </div>
         )}
 
         {/* Legend Overlay (Bottom Left) */}
-        <div className="absolute bottom-3 left-3 z-10 bg-[#0B1020]/80 backdrop-blur-xl border border-white/10 rounded-xl p-2.5 text-[10px] space-y-1.5 hidden sm:block shadow-lg">
-          <div className="font-semibold text-slate-300 uppercase tracking-wider text-[9px] mb-1">
-            Active Radar Layers
+        <div className="absolute bottom-3 left-3 z-10 bg-[#0B1020]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-3 text-xs space-y-2 hidden sm:block shadow-xl">
+          <div className="font-medium text-slate-300 text-[11px] tracking-normal font-sans mb-1">
+            Active radar layers
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
             <span className="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
             <span>Precipitation & Rain</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
             <span className="w-2.5 h-2.5 rounded-full bg-orange-400"></span>
             <span>Heavy Rain / Flood Risk</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
             <span>Severe Cyclone & Wind</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
             <span className="w-3 h-3 rounded-full bg-rose-600/80 border border-rose-400 flex items-center justify-center text-[8px]">🛰️</span>
             <span>NASA EONET Events (<AnimatedCounter value={eonetEvents?.length || 0} />)</span>
           </div>
         </div>
 
         {/* Live Stations Count Badge (Bottom Right) */}
-        <div className="absolute bottom-3 right-3 z-10 bg-[#0B1020]/80 backdrop-blur-xl border border-white/10 rounded-xl px-2.5 py-1 text-[10px] font-mono text-slate-400 shadow-xl flex items-center gap-2">
-          <span><strong className="text-emerald-400 font-bold"><AnimatedCounter value={liveCities.length || ALL_INDIA_CITIES.length} /></strong> Cities Online</span>
+        <div className="absolute bottom-3 right-3 z-10 bg-[#0B1020]/85 backdrop-blur-xl border border-white/10 rounded-full px-3 py-1 text-xs font-sans text-slate-400 shadow-xl flex items-center gap-2">
+          <span><strong className="text-emerald-400 font-semibold"><AnimatedCounter value={liveCities.length || ALL_INDIA_CITIES.length} /></strong> Cities Online</span>
           <span>•</span>
-          <span className="text-sky-400 font-bold"><AnimatedCounter value={eonetEvents?.length || 0} /> NASA Events</span>
+          <span className="text-sky-300 font-semibold"><AnimatedCounter value={eonetEvents?.length || 0} /> NASA Events</span>
         </div>
       </div>
 

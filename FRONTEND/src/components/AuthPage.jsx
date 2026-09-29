@@ -163,61 +163,61 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">
-              Access Control & Identity
+            <span className="px-3 py-1 rounded-full text-xs font-sans font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+              Access control & identity
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-slate-400 font-mono">Role-Gated Permissions</span>
+            <span className="text-xs text-slate-400 font-sans">Role permissions</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-1 flex items-center gap-2.5">
-            <span>Identity & Dispatch Authorization Portal</span>
+          <h2 className="text-xl sm:text-2xl font-semibold text-white tracking-tight mt-1.5 flex items-center gap-2.5">
+            <span>Identity & dispatch portal</span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Sign in as a <strong className="text-sky-300">Normal Citizen</strong> for personalized warnings and SOS reporting, or as a <strong className="text-emerald-300">Relief Volunteer</strong> with mass alert dispatch permissions.
+          <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+            Sign in as a <strong className="text-cyan-300 font-medium">Resident citizen</strong> for personalized warnings and SOS reporting, or as a <strong className="text-emerald-300 font-medium">Relief volunteer</strong> with mass alert dispatch permissions.
           </p>
         </div>
 
         {onNavigateToTab && (
           <button
             onClick={() => onNavigateToTab('dashboard')}
-            className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-300 transition-all flex items-center gap-1.5 border border-white/10"
+            className="px-3.5 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-200 transition-all flex items-center gap-1.5 border border-white/10 cursor-pointer shadow-sm"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+            <ArrowLeft className="w-3.5 h-3.5 text-slate-400" /> Back to dashboard
           </button>
         )}
       </div>
 
       {/* 2. Active Session Card (If Logged In) */}
       {isAuthenticated && currentUser && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0C152E]/90 to-[#0A1D3D]/80 border border-white/15 backdrop-blur-xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg ${
+        <div className="p-5 sm:p-6 rounded-2xl bg-[#091124]/90 border border-white/10 backdrop-blur-xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md ${
               isCurrentVolunteer 
                 ? 'bg-gradient-to-br from-emerald-500 to-teal-700 shadow-emerald-500/20' 
-                : 'bg-gradient-to-br from-sky-500 to-indigo-700 shadow-sky-500/20'
+                : 'bg-gradient-to-br from-cyan-500 to-blue-700 shadow-cyan-500/20'
             }`}>
-              {isCurrentVolunteer ? <ShieldCheck className="w-6 h-6 text-white" /> : <User className="w-6 h-6 text-white" />}
+              {isCurrentVolunteer ? <ShieldCheck className="w-6 h-6 text-white stroke-[1.8]" /> : <User className="w-6 h-6 text-white stroke-[1.8]" />}
             </div>
 
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-base font-bold text-white">{currentUser.name}</span>
-                <span className={`px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold border ${
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <span className="text-base font-semibold text-white font-sans">{currentUser.name}</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-sans font-medium ${
                   isCurrentVolunteer 
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' 
-                    : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                    ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/25' 
+                    : 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/25'
                 }`}>
-                  {isCurrentVolunteer ? '🛡️ Relief Volunteer / Dispatcher' : '👥 Normal Citizen'}
+                  {isCurrentVolunteer ? 'Relief volunteer' : 'Resident citizen'}
                 </span>
-                <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-white/[0.08] text-slate-300">
+                <span className="px-2 py-0.5 rounded-full text-[11px] font-mono bg-white/[0.06] text-slate-400 border border-white/10">
                   {currentUser.badgeNumber || 'VERIFIED-ID'}
                 </span>
               </div>
 
-              <p className="text-xs text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+              <p className="text-xs text-slate-400 mt-1 flex items-center gap-2 flex-wrap font-sans">
                 <span>{currentUser.email}</span>
                 <span>•</span>
-                <span>{currentUser.organization || 'Odisha'}</span>
+                <span>{currentUser.organization || 'Odisha Disaster Response'}</span>
                 <span>•</span>
                 <span className="text-slate-300">{currentUser.location || 'Bhubaneswar'}</span>
               </p>
@@ -225,21 +225,21 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
-            {/* Status Indicator */}
-            <div className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-2 ${
+            {/* Status Indicator Chip */}
+            <div className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 ${
               isCurrentVolunteer 
-                ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' 
-                : 'bg-amber-950/60 border-amber-500/40 text-amber-300'
+                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' 
+                : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
             }`}>
               {isCurrentVolunteer ? (
                 <>
-                  <Zap className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Public Broadcast: AUTHORIZED</span>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 stroke-[1.8]" />
+                  <span>Broadcast access: <strong className="font-semibold text-emerald-200">Authorized</strong></span>
                 </>
               ) : (
                 <>
-                  <Lock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Public Broadcast: RESTRICTED</span>
+                  <Lock className="w-3.5 h-3.5 text-amber-400 stroke-[1.8]" />
+                  <span>Broadcast access: <strong className="font-semibold text-amber-200">Restricted</strong></span>
                 </>
               )}
             </div>
@@ -247,9 +247,9 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
             {onNavigateToTab && isCurrentVolunteer && (
               <button
                 onClick={() => onNavigateToTab('multilingual')}
-                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 transition-all"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-medium text-xs shadow-md shadow-cyan-950/40 flex items-center gap-1.5 transition-all cursor-pointer"
               >
-                <Send className="w-3.5 h-3.5" /> Launch Dispatch AI
+                <Send className="w-3.5 h-3.5 stroke-[1.8]" /> Open alert engine
               </button>
             )}
 
@@ -259,9 +259,9 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
                 logout();
                 setSuccessMsg('You have been signed out.');
               }}
-              className="px-3.5 py-1.5 rounded-xl bg-white/[0.08] hover:bg-rose-500/20 hover:text-rose-300 text-slate-300 border border-white/10 text-xs font-medium transition-all flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl bg-white/[0.06] hover:bg-rose-500/15 hover:text-rose-300 text-slate-300 border border-white/10 text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              <LogOut className="w-3.5 h-3.5" /> Sign Out
+              <LogOut className="w-3.5 h-3.5 text-slate-400 stroke-[1.8]" /> Sign out
             </button>
           </div>
         </div>
@@ -276,76 +276,76 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
             sound.playBlip();
             setSelectedPersona('citizen');
           }}
-          className={`relative p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between overflow-hidden group ${
+          className={`relative p-6 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between overflow-hidden group shadow-lg ${
             selectedPersona === 'citizen'
-              ? 'bg-[#0B1428]/95 border-sky-400/60 shadow-xl shadow-sky-500/10 ring-1 ring-sky-400/40'
-              : 'bg-[#080D1C]/80 border-white/10 hover:border-white/20'
+              ? 'bg-[#0B152B]/95 border-cyan-500/40 shadow-cyan-500/10 ring-1 ring-cyan-400/30'
+              : 'bg-[#080E1E]/80 border-white/10 hover:border-white/20'
           }`}
         >
           {/* Top highlight glow */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/5 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
 
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-sky-400">
-                <Users className="w-5 h-5" />
+            <div className="flex items-center justify-between mb-3.5">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                <Users className="w-5 h-5 stroke-[1.8]" />
               </div>
-              <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold border ${
+              <span className={`text-xs font-sans px-3 py-1 rounded-full font-medium ${
                 selectedPersona === 'citizen'
-                  ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
-                  : 'bg-white/5 text-slate-400 border-white/10'
+                  ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
+                  : 'bg-white/5 text-slate-400 border border-white/10'
               }`}>
-                General Public
+                General public
               </span>
             </div>
 
-            <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <span>Normal Citizen (Public)</span>
+            <h3 className="text-lg font-semibold text-white tracking-normal font-sans flex items-center gap-2">
+              <span>Resident citizen</span>
               {selectedPersona === 'citizen' && (
-                <CheckCircle2 className="w-4 h-4 text-sky-400" />
+                <CheckCircle2 className="w-4 h-4 text-cyan-400 stroke-[1.8]" />
               )}
             </h3>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              Designed for residents, coastal villagers, and families seeking real-time vernacular storm alerts, safety protocols, and emergency shelter locations.
+            <p className="text-xs text-slate-300 mt-1.5 leading-relaxed font-sans">
+              Designed for residents, coastal communities, and families seeking real-time vernacular storm alerts, safety protocols, and emergency shelter locations.
             </p>
 
             {/* Permission Matrix for Citizen */}
-            <div className="mt-4 space-y-2 p-3 rounded-xl bg-black/30 border border-white/[0.06] text-xs">
+            <div className="mt-4 space-y-2.5 p-3.5 rounded-xl bg-black/30 border border-white/[0.06] text-xs font-sans">
               <div className="flex items-center justify-between text-slate-300">
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Vernacular Dialect Alerts (12+ Indic)
+                  Vernacular dialect alerts (12+ Indic)
                 </span>
-                <span className="text-emerald-400 font-bold text-[11px]">Active</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-medium border border-emerald-500/20">Active</span>
               </div>
               <div className="flex items-center justify-between text-slate-300">
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Cyclone Shelter Directory & Helplines
+                  Cyclone shelter directory & helplines
                 </span>
-                <span className="text-emerald-400 font-bold text-[11px]">Active</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-medium border border-emerald-500/20">Active</span>
               </div>
               <div className="flex items-center justify-between text-slate-300">
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Ground Incident & SOS Reporting
+                  Ground incident & SOS reporting
                 </span>
-                <span className="text-emerald-400 font-bold text-[11px]">Enabled</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-medium border border-emerald-500/20">Enabled</span>
               </div>
-              <div className="flex items-center justify-between text-slate-400 pt-1.5 border-t border-white/[0.06]">
-                <span className="flex items-center gap-1.5 text-amber-300 font-medium">
-                  <Lock className="w-3.5 h-3.5 text-amber-400" />
-                  Send Mass Messages to People
+              <div className="flex items-center justify-between text-slate-400 pt-2 border-t border-white/[0.06]">
+                <span className="flex items-center gap-2 text-slate-300">
+                  <Lock className="w-3.5 h-3.5 text-amber-400 stroke-[1.8]" />
+                  Mass alert broadcasting to public
                 </span>
-                <span className="text-amber-400 font-mono font-bold text-[10px] bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 text-[11px] font-medium border border-amber-500/25">
                   Restricted
                 </span>
               </div>
             </div>
           </div>
 
-          {/* 1-Click Quick Login for Citizen */}
-          <div className="mt-4 pt-3 border-t border-white/[0.08]">
+          {/* Friendly Account Badge Quick Login for Citizen */}
+          <div className="mt-4 pt-3.5 border-t border-white/[0.08]">
             <button
               type="button"
               onClick={(e) => {
@@ -353,15 +353,23 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
                 handleQuickLogin('citizen@resona.org', 'Password123!');
               }}
               disabled={loading}
-              className="w-full py-2.5 px-3 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-200 text-xs font-semibold flex items-center justify-between transition-all group-hover:border-sky-400/50"
+              className="w-full py-2.5 px-3.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/25 text-cyan-200 text-xs font-medium flex items-center justify-between transition-all group-hover:border-cyan-400/40 cursor-pointer"
             >
-              <div className="flex items-center gap-2">
-                <Zap className="w-3.5 h-3.5 text-sky-400" />
-                <span>1-Click Sign In as Citizen (Sunita Nayak)</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300 font-semibold text-xs">
+                  SN
+                </div>
+                <div className="text-left">
+                  <span className="text-white font-medium block">Sunita Nayak</span>
+                  <span className="text-[11px] text-slate-400">Resident Citizen</span>
+                </div>
               </div>
-              <span className="text-[10px] font-mono text-sky-300 bg-sky-950/60 px-1.5 py-0.5 rounded">
-                CIT-8821
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono text-cyan-300 bg-cyan-950/60 border border-cyan-500/20">
+                  ID: CIT-8821
+                </span>
+                <span className="text-xs text-cyan-400 font-medium">Sign in →</span>
+              </div>
             </button>
           </div>
         </div>
@@ -372,76 +380,78 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
             sound.playBlip();
             setSelectedPersona('volunteer');
           }}
-          className={`relative p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between overflow-hidden group ${
+          className={`relative p-6 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between overflow-hidden group shadow-lg ${
             selectedPersona === 'volunteer'
-              ? 'bg-[#0B1824]/95 border-emerald-400/60 shadow-xl shadow-emerald-500/10 ring-1 ring-emerald-400/40'
-              : 'bg-[#080D1C]/80 border-white/10 hover:border-white/20'
+              ? 'bg-[#0A1724]/95 border-emerald-500/40 shadow-emerald-500/10 ring-1 ring-emerald-400/30'
+              : 'bg-[#080E1E]/80 border-white/10 hover:border-white/20'
           }`}
         >
           {/* Top highlight glow */}
           <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
 
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-                <ShieldCheck className="w-5 h-5" />
+            <div className="flex items-center justify-between mb-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <ShieldCheck className="w-5 h-5 stroke-[1.8]" />
               </div>
-              <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold border ${
+              <span className={`text-xs font-sans px-3 py-1 rounded-full font-medium ${
                 selectedPersona === 'volunteer'
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                  : 'bg-white/5 text-slate-400 border-white/10'
+                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                  : 'bg-white/5 text-slate-400 border border-white/10'
               }`}>
-                Authorized Dispatcher
+                Authorized dispatcher
               </span>
             </div>
 
-            <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <span>Disaster Relief Volunteer</span>
+            <h3 className="text-lg font-semibold text-white tracking-normal font-sans flex items-center gap-2">
+              <span>Disaster relief volunteer</span>
               {selectedPersona === 'volunteer' && (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 stroke-[1.8]" />
               )}
             </h3>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-300 mt-1.5 leading-relaxed font-sans">
               Designated for field operatives, NGO volunteers, and first responders authorized to transmit disaster warning messages directly to citizens.
             </p>
 
             {/* Permission Matrix for Volunteer */}
-            <div className="mt-4 space-y-2 p-3 rounded-xl bg-black/30 border border-white/[0.06] text-xs">
+            <div className="mt-4 space-y-2.5 p-3.5 rounded-xl bg-black/30 border border-white/[0.06] text-xs font-sans">
               <div className="flex items-center justify-between text-slate-300">
-                <span className="flex items-center gap-1.5 font-medium text-emerald-300">
-                  <Send className="w-3.5 h-3.5 text-emerald-400" />
-                  Send Messages to People (Broadcast)
+                <span className="flex items-center gap-2 font-medium text-emerald-300">
+                  <Send className="w-3.5 h-3.5 text-emerald-400 stroke-[1.8]" />
+                  Mass emergency alert broadcasting
                 </span>
-                <span className="text-emerald-400 font-mono font-bold text-[10px] bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                  AUTHORIZED
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-medium border border-emerald-500/25">
+                  Authorized
                 </span>
               </div>
               <div className="flex items-center justify-between text-slate-300">
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Multi-Channel (SMS, WhatsApp, Cell, IVR)
+                  Multi-channel delivery (SMS, WhatsApp, Cell, IVR)
                 </span>
-                <span className="text-emerald-400 font-bold text-[11px]">Enabled</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-medium border border-emerald-500/20">Enabled</span>
               </div>
               <div className="flex items-center justify-between text-slate-300">
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Field Mesh Telemetry & Delivery Stats
+                  Delivery & Connection Status
                 </span>
-                <span className="text-emerald-400 font-bold text-[11px]">Active</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-medium border border-emerald-500/20">Active</span>
               </div>
-              <div className="flex items-center justify-between text-slate-300 pt-1.5 border-t border-white/[0.06]">
-                <span className="flex items-center gap-1.5">
+              <div className="flex items-center justify-between text-slate-300 pt-2 border-t border-white/[0.06]">
+                <span className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Volunteer ID & Ground Sector Badge
+                  Volunteer identity & sector verification
                 </span>
-                <span className="text-cyan-300 font-mono text-[11px]">VOL-XXXX</span>
+                <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 text-[11px] font-medium border border-cyan-500/20">
+                  Verified volunteer
+                </span>
               </div>
             </div>
           </div>
 
-          {/* 1-Click Quick Login for Volunteer */}
-          <div className="mt-4 pt-3 border-t border-white/[0.08]">
+          {/* Friendly Account Badge Quick Login for Volunteer */}
+          <div className="mt-4 pt-3.5 border-t border-white/[0.08]">
             <button
               type="button"
               onClick={(e) => {
@@ -449,15 +459,23 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
                 handleQuickLogin('volunteer@resona.org', 'Password123!');
               }}
               disabled={loading}
-              className="w-full py-2.5 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-200 text-xs font-semibold flex items-center justify-between transition-all group-hover:border-emerald-400/50"
+              className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-emerald-200 text-xs font-medium flex items-center justify-between transition-all group-hover:border-emerald-400/40 cursor-pointer"
             >
-              <div className="flex items-center gap-2">
-                <Zap className="w-3.5 h-3.5 text-emerald-400" />
-                <span>1-Click Sign In as Volunteer (Ramesh Das)</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 font-semibold text-xs">
+                  RD
+                </div>
+                <div className="text-left">
+                  <span className="text-white font-medium block">Ramesh Das</span>
+                  <span className="text-[11px] text-slate-400">Field Volunteer</span>
+                </div>
               </div>
-              <span className="text-[10px] font-mono text-emerald-300 bg-emerald-950/60 px-1.5 py-0.5 rounded">
-                VOL-4022
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono text-emerald-300 bg-emerald-950/60 border border-emerald-500/20">
+                  ID: VOL-4022
+                </span>
+                <span className="text-xs text-emerald-400 font-medium">Sign in →</span>
+              </div>
             </button>
           </div>
         </div>
@@ -465,30 +483,30 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
       </div>
 
       {/* 4. Interactive Credentials Form (Sign In / Register) */}
-      <div className="rounded-2xl p-5 sm:p-6 bg-[#090F22]/90 border border-white/10 backdrop-blur-xl shadow-2xl">
+      <div className="rounded-2xl p-6 sm:p-7 bg-[#091022]/90 border border-white/10 backdrop-blur-xl shadow-xl">
         
         {/* Switcher & Form Title */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.08]">
-          <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white ${
-              selectedPersona === 'volunteer' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
+          <div className="flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white ${
+              selectedPersona === 'volunteer' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25' : 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/25'
             }`}>
-              {selectedPersona === 'volunteer' ? <ShieldCheck className="w-4 h-4" /> : <User className="w-4 h-4" />}
+              {selectedPersona === 'volunteer' ? <ShieldCheck className="w-4.5 h-4.5 stroke-[1.8]" /> : <User className="w-4.5 h-4.5 stroke-[1.8]" />}
             </div>
             <div>
-              <h4 className="text-sm sm:text-base font-bold text-white tracking-wide">
-                {authMode === 'signin' ? 'Sign In Credentials' : `Register as New ${selectedPersona === 'volunteer' ? 'Relief Volunteer' : 'Citizen'}`}
+              <h4 className="text-sm sm:text-base font-semibold text-white tracking-normal font-sans">
+                {authMode === 'signin' ? 'Sign in with credentials' : `Register as new ${selectedPersona === 'volunteer' ? 'relief volunteer' : 'citizen'}`}
               </h4>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-xs text-slate-400 font-sans">
                 {selectedPersona === 'volunteer' 
-                  ? 'Volunteer credentials include broadcast dispatch authorization' 
+                  ? 'Volunteer credentials include mass broadcast dispatch authorization' 
                   : 'Citizen account provides personalized vernacular alerts and ground SOS reports'}
               </p>
             </div>
           </div>
 
           {/* Mode Switcher: Sign In vs Register */}
-          <div className="flex items-center bg-white/[0.04] p-1 rounded-xl border border-white/[0.08] text-xs">
+          <div className="flex items-center bg-white/[0.04] p-1 rounded-xl border border-white/[0.08] text-xs font-sans">
             <button
               type="button"
               onClick={() => {
@@ -497,11 +515,11 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
                 setErrorMsg('');
                 setSuccessMsg('');
               }}
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
-                authMode === 'signin' ? 'bg-white/10 text-white font-bold shadow-sm' : 'text-slate-400 hover:text-white'
+              className={`px-3.5 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
+                authMode === 'signin' ? 'bg-white/10 text-white font-semibold shadow-sm' : 'text-slate-400 hover:text-white'
               }`}
             >
-              Sign In
+              Sign in
             </button>
             <button
               type="button"
@@ -511,8 +529,8 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
                 setErrorMsg('');
                 setSuccessMsg('');
               }}
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
-                authMode === 'register' ? 'bg-white/10 text-white font-bold shadow-sm' : 'text-slate-400 hover:text-white'
+              className={`px-3.5 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
+                authMode === 'register' ? 'bg-white/10 text-white font-semibold shadow-sm' : 'text-slate-400 hover:text-white'
               }`}
             >
               Register
@@ -522,15 +540,15 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
 
         {/* Notifications */}
         {successMsg && (
-          <div className="mt-4 p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-2.5 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="mt-4 p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-200 text-xs flex items-center gap-2.5 animate-in fade-in font-sans">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 stroke-[1.8]" />
             <span>{successMsg}</span>
           </div>
         )}
 
         {errorMsg && (
-          <div className="mt-4 p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2.5 animate-in fade-in">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <div className="mt-4 p-3 rounded-xl bg-rose-950/60 border border-rose-500/30 text-rose-200 text-xs flex items-center gap-2.5 animate-in fade-in font-sans">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 stroke-[1.8]" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -541,67 +559,67 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
           {authMode === 'register' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Full Name *
+                <label className="block text-xs font-medium text-slate-300 mb-1.5 font-sans">
+                  Full name *
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-3 stroke-[1.8]" />
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder={selectedPersona === 'volunteer' ? 'Ramesh Das' : 'Sunita Nayak'}
-                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/30"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Contact Mobile Number *
+                <label className="block text-xs font-medium text-slate-300 mb-1.5 font-sans">
+                  Contact mobile number *
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3 stroke-[1.8]" />
                   <input
                     type="tel"
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+91 94370 12345"
-                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/30"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  {selectedPersona === 'volunteer' ? 'Volunteer Organization / NGO *' : 'Locality / Resident Community'}
+                <label className="block text-xs font-medium text-slate-300 mb-1.5 font-sans">
+                  {selectedPersona === 'volunteer' ? 'Volunteer organization / NGO *' : 'Locality / Resident community'}
                 </label>
                 <div className="relative">
-                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-3 stroke-[1.8]" />
                   <input
                     type="text"
                     value={formData.organization}
                     onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
                     placeholder={selectedPersona === 'volunteer' ? 'Odisha Coastal Volunteer Corps' : 'Puri Coastal Resident'}
-                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/30"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  District / Sector Location *
+                <label className="block text-xs font-medium text-slate-300 mb-1.5 font-sans">
+                  District / Sector location *
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3 stroke-[1.8]" />
                   <input
                     type="text"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder="Puri District, Odisha"
-                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/30"
                   />
                 </div>
               </div>
@@ -610,45 +628,45 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Email Address *
+              <label className="block text-xs font-medium text-slate-300 mb-1.5 font-sans">
+                Email address *
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3 stroke-[1.8]" />
                 <input
                   type="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder={selectedPersona === 'volunteer' ? 'volunteer@resona.org' : 'citizen@resona.org'}
-                  className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                  className="w-full pl-9 pr-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/30"
                 />
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-xs font-semibold text-slate-300">
+              <div className="flex justify-between items-center mb-1.5 font-sans">
+                <label className="block text-xs font-medium text-slate-300">
                   Password *
                 </label>
-                <span className="text-[10px] text-slate-500 font-mono">min 6 chars</span>
+                <span className="text-[10px] text-slate-400">min 6 chars</span>
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3 stroke-[1.8]" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="••••••••••••"
-                  className="w-full pl-9 pr-10 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
+                  className="w-full pl-9 pr-10 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/30 font-mono"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-4 h-4 stroke-[1.8]" /> : <Eye className="w-4 h-4 stroke-[1.8]" />}
                 </button>
               </div>
             </div>
@@ -656,12 +674,12 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
 
           {/* Submit Action */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
+            <div className="text-xs text-slate-400 flex items-center gap-1.5 font-sans">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span>
                 {selectedPersona === 'volunteer'
-                  ? 'Volunteer badge (VOL-XXXX) will be assigned automatically upon registration'
-                  : 'Citizen ID (CIT-XXXX) created with personalized vernacular profile'
+                  ? 'Volunteer badge assigned automatically upon registration'
+                  : 'Citizen ID created with personalized vernacular profile'
                 }
               </span>
             </div>
@@ -669,10 +687,10 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs text-white shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ${
+              className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-medium text-xs text-white shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ${
                 selectedPersona === 'volunteer'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 shadow-emerald-500/25'
-                  : 'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 shadow-sky-500/25'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-950/40'
+                  : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-950/40'
               }`}
             >
               {loading ? (
@@ -683,9 +701,9 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
               ) : (
                 <>
                   <span>
-                    {authMode === 'signin' ? `Sign In as ${selectedPersona === 'volunteer' ? 'Volunteer' : 'Citizen'}` : `Create ${selectedPersona === 'volunteer' ? 'Volunteer' : 'Citizen'} Account`}
+                    {authMode === 'signin' ? `Sign in as ${selectedPersona === 'volunteer' ? 'volunteer' : 'citizen'}` : `Create ${selectedPersona === 'volunteer' ? 'volunteer' : 'citizen'} account`}
                   </span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 stroke-[1.8]" />
                 </>
               )}
             </button>
@@ -696,20 +714,23 @@ export default function AuthPage({ onNavigateToTab, onOpenSafety }) {
       </div>
 
       {/* 5. Additional Commander / Admin Option & Personnel Sync */}
-      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2 text-slate-400">
-          <Database className="w-4 h-4 text-emerald-400" />
+      <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-sans">
+        <div className="flex items-center gap-2.5 text-slate-300">
+          <Database className="w-4 h-4 text-cyan-400 stroke-[1.8]" />
           <span>Need official state command access?</span>
           <button
             onClick={() => handleQuickLogin('commander@resona.gov.in', 'Password123!')}
-            className="text-cyan-400 hover:underline font-semibold font-mono"
+            className="text-cyan-300 hover:text-cyan-200 font-medium hover:underline flex items-center gap-1 cursor-pointer"
           >
-            Sign In as Commander Arjun Patel (CMD-1011) →
+            <span>Sign in as Commander Arjun Patel</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">CMD-1011</span>
+            <span>→</span>
           </button>
         </div>
 
-        <div className="text-[11px] font-mono text-slate-500">
-          MongoDB Store: {usersCount} Registered Personnel
+        <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span>Database connected: {usersCount} registered users</span>
         </div>
       </div>
 

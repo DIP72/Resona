@@ -124,36 +124,36 @@ export default function AlertBannerRow({ activeFilter, onSelectFilter }) {
     <div ref={containerRef} className="space-y-3">
       
       {/* Sleek, Single-Row Emergency Operations Bar */}
-      <div className={`rounded-xl border transition-all duration-300 px-4 py-3 flex flex-col xl:flex-row xl:items-center justify-between gap-4 shadow-xl relative overflow-hidden group ${
+      <div className={`rounded-2xl border transition-all duration-300 px-5 py-3.5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 shadow-xl relative overflow-hidden group ${
         hero.countNum > 0
-          ? 'bg-slate-900/80 backdrop-blur-2xl border-rose-500/40 shadow-[0_10px_30px_-15px_rgba(244,63,94,0.3)]'
-          : 'bg-slate-900/60 backdrop-blur-2xl border-white/10'
+          ? 'bg-slate-900/70 backdrop-blur-2xl border-rose-500/25 shadow-[0_12px_36px_-12px_rgba(244,63,94,0.22)]'
+          : 'bg-slate-900/60 backdrop-blur-2xl border-white/[0.08]'
       } ${
-        isFiltered ? 'ring-2 ring-rose-500/50 shadow-[0_0_20px_rgba(244,63,94,0.4)]' : ''
+        isFiltered ? 'ring-2 ring-rose-500/40 shadow-[0_0_24px_rgba(244,63,94,0.3)]' : ''
       }`}>
         
         {hero.countNum > 0 && (
-          <div className="absolute inset-0 bg-gradient-to-r from-rose-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-rose-500/8 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
         )}
 
         {/* Left: Active Emergency Threat Telemetry */}
-        <div className="flex items-center gap-4 min-w-0 flex-1 relative z-10">
+        <div className="flex items-center gap-3.5 min-w-0 flex-1 relative z-10 flex-wrap sm:flex-nowrap">
           
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-300 text-[11px] font-bold tracking-widest shrink-0 uppercase shadow-[0_0_10px_rgba(244,63,94,0.2)]">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
-            <span>Emergency Active</span>
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs font-semibold shrink-0 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.7)]" />
+            <span>EMERGENCY ACTIVE</span>
           </div>
 
-          <div className="flex items-center gap-3 min-w-0 truncate">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-rose-500/20 to-red-600/20 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0 shadow-inner">
-              <Disc className="w-5 h-5 animate-[spin_4s_linear_infinite]" />
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-rose-300 shrink-0">
+              <Disc className="w-4 h-4 animate-[spin_4s_linear_infinite]" />
             </div>
 
             <div className="flex flex-col min-w-0">
-                <span className="text-sm font-bold text-white tracking-wide shrink-0 drop-shadow-md">
+                <span className="text-sm font-semibold text-white tracking-normal">
                 {hero.type}
                 </span>
-                <span className="text-[11px] text-slate-300 font-medium truncate opacity-80">
+                <span className="text-xs text-slate-300/90 font-normal truncate">
                 {hero.subtitle}
                 </span>
             </div>
@@ -161,34 +161,34 @@ export default function AlertBannerRow({ activeFilter, onSelectFilter }) {
         </div>
 
         {/* Right: Active Count, Filter Button, and Inactive Baseline Chips */}
-        <div className="flex items-center justify-between xl:justify-end gap-4 shrink-0 pt-3 xl:pt-0 border-t xl:border-t-0 border-white/10 relative z-10">
+        <div className="flex items-center justify-between xl:justify-end gap-3.5 shrink-0 pt-3 xl:pt-0 border-t xl:border-t-0 border-white/10 relative z-10 flex-wrap sm:flex-nowrap">
           
           {/* Active Count & Filter Toggle */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-baseline gap-1.5 font-mono text-sm font-bold text-rose-300 bg-rose-500/20 px-3 py-1 rounded-lg border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.15)]">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5 font-sans text-xs font-semibold text-rose-200 bg-rose-500/15 px-3 py-1 rounded-full border border-rose-500/25 shadow-sm">
               <AnimatedCounter value={hero.countNum} />
-              <span className="text-[10px] font-semibold text-rose-300/80 uppercase tracking-widest">Active</span>
+              <span className="text-[10px] font-bold text-rose-200 uppercase">ACTIVE</span>
             </div>
 
             <button
               onClick={() => onSelectFilter(isFiltered ? null : hero.id)}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer ${
                 isFiltered 
-                  ? 'bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)] hover:bg-rose-600' 
-                  : 'bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10'
+                  ? 'bg-rose-500 text-white shadow-md shadow-rose-950/50 hover:bg-rose-600' 
+                  : 'bg-white/[0.06] hover:bg-white/[0.12] text-slate-200 border border-white/10'
               }`}
             >
               {isFiltered ? 'Active Filter' : 'Filter Feed'}
             </button>
           </div>
 
-          <div className="h-6 w-[1px] bg-white/10 hidden sm:block" />
+          <div className="h-5 w-[1px] bg-white/10 hidden sm:block" />
 
           {/* Inactive Hazards Chips with Checkmark Indicator */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-bold text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 hidden md:flex uppercase tracking-widest">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-medium text-emerald-300 flex items-center gap-1.5 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 hidden md:flex">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Normal</span>
+              <span>NORMAL</span>
             </span>
 
             {inactiveHazards.map((h) => {
@@ -197,16 +197,16 @@ export default function AlertBannerRow({ activeFilter, onSelectFilter }) {
                 <button
                   key={h.id}
                   onClick={() => setExpandedHazardId(isExpanded ? null : h.id)}
-                  className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
+                  className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 cursor-pointer ${
                     isExpanded 
                       ? 'bg-slate-700/80 text-white border border-white/20 shadow-md' 
-                      : 'bg-slate-800/50 hover:bg-slate-700/50 text-slate-400 hover:text-slate-200 border border-white/5'
+                      : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border border-white/[0.06]'
                   }`}
                   title={`Inspect ${h.type} status`}
                 >
-                  <h.icon className="w-3.5 h-3.5 opacity-70" />
+                  <h.icon className="w-3.5 h-3.5 opacity-70 stroke-[1.8]" />
                   <span className="hidden lg:inline">{h.shortLabel}</span>
-                  <span className="font-mono text-[10px] text-slate-500 bg-slate-900/50 px-1.5 rounded">0</span>
+                  <span className="font-mono text-[10px] text-slate-400 bg-slate-900/60 px-1.5 py-0.2 rounded-full">0</span>
                 </button>
               );
             })}
@@ -218,17 +218,17 @@ export default function AlertBannerRow({ activeFilter, onSelectFilter }) {
 
       {/* Expanded Popover / Panel for Inactive Hazard Telemetry */}
       {expandedHazard && (
-        <div className="p-4 rounded-xl border border-white/10 bg-slate-900/95 backdrop-blur-2xl shadow-2xl flex items-center justify-between gap-6 text-sm animate-in fade-in slide-in-from-top-2 duration-200 relative overflow-hidden">
+        <div className="p-4 rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-2xl shadow-2xl flex items-center justify-between gap-6 text-sm animate-in fade-in slide-in-from-top-2 duration-200 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent pointer-events-none"></div>
           <div className="flex items-center gap-4 relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-              <expandedHazard.icon className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/25 text-blue-300 flex items-center justify-center shrink-0 shadow-sm">
+              <expandedHazard.icon className="w-5 h-5 stroke-[1.8]" />
             </div>
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <span className="font-bold text-white tracking-wide">{expandedHazard.type}</span>
-                <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 uppercase tracking-widest">
-                  Normal Baseline
+                <span className="font-semibold text-white tracking-normal">{expandedHazard.type}</span>
+                <span className="text-[11px] font-sans font-medium text-emerald-300 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                  Normal baseline
                 </span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed max-w-2xl">{expandedHazard.details}</p>
@@ -236,7 +236,7 @@ export default function AlertBannerRow({ activeFilter, onSelectFilter }) {
           </div>
           <button
             onClick={() => setExpandedHazardId(null)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors relative z-10"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors relative z-10 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

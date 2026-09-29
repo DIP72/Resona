@@ -244,7 +244,7 @@ export default function App() {
             
             {/* VIEW 1: MAIN DASHBOARD (Only Map & Live Feed Cockpit, Clean & Uncluttered) */}
             {activeTab === 'dashboard' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-page-enter">
                 
                 {/* Top Hazard Alert Banner (Hero Card for Active Emergency + Slim Status Strip for Inactive) */}
                 <section>
@@ -287,22 +287,22 @@ export default function App() {
 
             {/* VIEW 2: VERNACULAR AI ALERT ENGINE */}
             {activeTab === 'multilingual' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-page-enter">
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
-                      <Globe className="w-5 h-5 text-cyan-400 animate-pulse" />
-                      <span>Vernacular AI Disaster Alert Engine</span>
+                    <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
+                      <Globe className="w-5 h-5 text-cyan-400 stroke-[1.8]" />
+                      <span>Vernacular AI alert engine</span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5 font-sans">
                       Multi-tier language translation, audio synthesis, visual infographic cards, and simulated citizen dispatch.
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab('dashboard')}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+                    <ArrowLeft className="w-3.5 h-3.5 text-slate-400" /> Back to dashboard
                   </button>
                 </div>
 
@@ -318,26 +318,26 @@ export default function App() {
 
             {/* VIEW 3: LIVE MAP (FULL-WIDTH IMMERSIVE) */}
             {activeTab === 'map' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-page-enter">
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
-                      <Map className="w-5 h-5 text-cyan-400" />
-                      <span>Geospatial Disaster Command Map</span>
+                    <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
+                      <Map className="w-5 h-5 text-cyan-400 stroke-[1.8]" />
+                      <span>Geospatial disaster map</span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5 font-sans">
                       Full-viewport interactive Web-GIS with NASA EONET events and Doppler precipitation layers.
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab('dashboard')}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+                    <ArrowLeft className="w-3.5 h-3.5 text-slate-400" /> Back to dashboard
                   </button>
                 </div>
 
-                <div className="w-full h-[720px] rounded-2xl overflow-hidden border border-[#1E2C4F] shadow-2xl">
+                <div className="w-full h-[720px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
                   <IndiaDisasterMap
                     onSelectAlertZone={(zone) => sound.playBlip()}
                     onSelectLocation={(loc) => {
@@ -351,22 +351,22 @@ export default function App() {
 
             {/* VIEW 4: ALERTS & THREAT ASSESSMENT CENTER */}
             {activeTab === 'alerts' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-page-enter">
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
-                      <Bell className="w-5 h-5 text-rose-400" />
-                      <span>Alert Command & Threat Assessment Center</span>
+                    <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
+                      <Bell className="w-5 h-5 text-rose-400 stroke-[1.8]" />
+                      <span>Alerts & threat assessment</span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5 font-sans">
                       Real-time NASA satellite events, IMD warnings, and composite danger index gauges.
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab('dashboard')}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+                    <ArrowLeft className="w-3.5 h-3.5 text-slate-400" /> Back to dashboard
                   </button>
                 </div>
 
@@ -387,22 +387,22 @@ export default function App() {
 
             {/* VIEW 5: FORECAST & METEOROLOGICAL INTELLIGENCE */}
             {activeTab === 'forecast' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-page-enter">
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
-                      <CloudRain className="w-5 h-5 text-[#38BDF8]" />
-                      <span>Atmospheric Telemetry & 5-Day Outlook</span>
+                    <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
+                      <CloudRain className="w-5 h-5 text-cyan-400 stroke-[1.8]" />
+                      <span>Atmospheric telemetry & 5-day outlook</span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5 font-sans">
                       Live ground station sensor measurements and 5-day predictive weather forecasting for {currentLocation.city}, {currentLocation.state}.
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab('dashboard')}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+                    <ArrowLeft className="w-3.5 h-3.5 text-slate-400" /> Back to dashboard
                   </button>
                 </div>
 
@@ -415,77 +415,77 @@ export default function App() {
 
             {/* VIEW 6: DISASTER REPORTS */}
             {activeTab === 'reports' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-page-enter">
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-amber-400" />
-                      <span>Disaster Incident Reports & Situation Logs</span>
+                    <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
+                      <FileText className="w-5 h-5 text-amber-400 stroke-[1.8]" />
+                      <span>Disaster incident reports & logs</span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5 font-sans">
                       File citizen SOS reports, inspect emergency logs, or download PDF bulletins for administrative record.
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab('dashboard')}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+                    <ArrowLeft className="w-3.5 h-3.5 text-slate-400" /> Back to dashboard
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="weather-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                      <div className="w-10 h-10 rounded-xl bg-rose-600/20 border border-rose-500/40 text-rose-400 flex items-center justify-center mb-3">
-                        <AlertTriangle className="w-5 h-5" />
+                      <div className="w-10 h-10 rounded-xl bg-rose-600/15 border border-rose-500/30 text-rose-400 flex items-center justify-center mb-3">
+                        <AlertTriangle className="w-5 h-5 stroke-[1.8]" />
                       </div>
-                      <h3 className="font-bold text-white text-sm">Citizen Incident / SOS</h3>
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      <h3 className="font-semibold text-white text-sm font-sans">Citizen incident & SOS</h3>
+                      <p className="text-xs text-slate-300 mt-1 leading-relaxed font-sans">
                         Submit real-time ground observations, road blockages, flash floods, or power outages directly to emergency dispatch.
                       </p>
                     </div>
                     <button
                       onClick={handleOpenReport}
-                      className="mt-4 py-2 px-4 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-rose-950/50"
+                      className="mt-4 py-2.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs rounded-xl transition-all shadow-md shadow-rose-950/40 cursor-pointer"
                     >
-                      Report Incident Now
+                      Report incident now
                     </button>
                   </div>
 
                   <div className="weather-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                      <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center mb-3">
-                        <Download className="w-5 h-5" />
+                      <div className="w-10 h-10 rounded-xl bg-cyan-600/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mb-3">
+                        <Download className="w-5 h-5 stroke-[1.8]" />
                       </div>
-                      <h3 className="font-bold text-white text-sm">Download PDF Bulletin</h3>
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                        Generate and download an official formatted PDF summary of all active warnings for offline transmission.
+                      <h3 className="font-semibold text-white text-sm font-sans">Download bulletin</h3>
+                      <p className="text-xs text-slate-300 mt-1 leading-relaxed font-sans">
+                        Generate and download a formatted PDF summary of all active warnings for offline transmission.
                       </p>
                     </div>
                     <button
                       onClick={handleDownloadAlerts}
-                      className="mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-blue-950/50 flex items-center justify-center gap-2"
+                      className="mt-4 py-2.5 px-4 bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs rounded-xl transition-all shadow-md shadow-cyan-950/40 flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <Download className="w-4 h-4" /> Download PDF
+                      <Download className="w-4 h-4 stroke-[1.8]" /> Download summary
                     </button>
                   </div>
 
                   <div className="weather-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                      <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mb-3">
-                        <ShieldAlert className="w-5 h-5" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-600/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-3">
+                        <ShieldAlert className="w-5 h-5 stroke-[1.8]" />
                       </div>
-                      <h3 className="font-bold text-white text-sm">Emergency Protocols</h3>
-                      <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                        Review NDMA and Odisha Disaster Management Authority safety dos & don'ts, evacuation guidelines, and shelter maps.
+                      <h3 className="font-semibold text-white text-sm font-sans">Emergency safety protocols</h3>
+                      <p className="text-xs text-slate-300 mt-1 leading-relaxed font-sans">
+                        Review NDMA and Odisha Disaster Management Authority safety guidelines, evacuation procedures, and shelter maps.
                       </p>
                     </div>
                     <button
                       onClick={handleOpenSafety}
-                      className="mt-4 py-2 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-emerald-950/50"
+                      className="mt-4 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs rounded-xl transition-all shadow-md shadow-emerald-950/40 cursor-pointer"
                     >
-                      View Instructions
+                      View instructions
                     </button>
                   </div>
                 </div>
@@ -494,46 +494,46 @@ export default function App() {
 
             {/* VIEW 7: RESOURCES & SHELTERS */}
             {activeTab === 'resources' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-page-enter">
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
-                      <Layers className="w-5 h-5 text-indigo-400" />
-                      <span>Emergency Resources & Safe Shelters</span>
+                    <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
+                      <Layers className="w-5 h-5 text-indigo-400 stroke-[1.8]" />
+                      <span>Emergency resources & safe shelters</span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5 font-sans">
                       Nearest certified cyclone shelters, medical response contacts, and survival supplies checklist.
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab('dashboard')}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+                    <ArrowLeft className="w-3.5 h-3.5 text-slate-400" /> Back to dashboard
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Emergency Helplines */}
                   <div className="weather-card p-5 rounded-2xl space-y-3">
-                    <h3 className="text-xs font-bold text-white uppercase font-mono flex items-center gap-2">
-                      <PhoneCall className="w-4 h-4 text-emerald-400" />
-                      <span>National Emergency Helplines (24x7)</span>
+                    <h3 className="text-xs font-semibold text-white font-sans flex items-center gap-2">
+                      <PhoneCall className="w-4 h-4 text-emerald-400 stroke-[1.8]" />
+                      <span>National emergency helplines (24x7)</span>
                     </h3>
-                    <div className="space-y-2 text-xs">
+                    <div className="space-y-2 text-xs font-sans">
                       {[
-                        { label: 'NDMA Central Control Room', num: '1070', desc: 'National Disaster Management Toll-Free' },
-                        { label: 'NDRF Disaster Response Force', num: '1078', desc: 'Search and Rescue Dispatch' },
-                        { label: 'All-in-One Emergency Responder', num: '112', desc: 'Police, Fire, Ambulance' },
-                        { label: 'Medical Emergency & Trauma', num: '108', desc: 'Government Ambulance Dispatch' },
-                        { label: 'Indian Coast Guard SAR', num: '1554', desc: 'Maritime & Sea Rescue' },
+                        { label: 'NDMA central control room', num: '1070', desc: 'National Disaster Management Toll-Free' },
+                        { label: 'NDRF disaster response force', num: '1078', desc: 'Search and Rescue Dispatch' },
+                        { label: 'All-in-one emergency responder', num: '112', desc: 'Police, Fire, Ambulance' },
+                        { label: 'Medical emergency & trauma', num: '108', desc: 'Government Ambulance Dispatch' },
+                        { label: 'Indian coast guard SAR', num: '1554', desc: 'Maritime & Sea Rescue' },
                       ].map((h) => (
-                        <div key={h.num} className="p-2.5 rounded-xl bg-[#0D162E]/70 border border-[#1E2C4F] flex items-center justify-between">
+                        <div key={h.num} className="p-2.5 rounded-xl bg-[#0D162E]/70 border border-white/10 flex items-center justify-between">
                           <div>
-                            <span className="font-semibold text-white block">{h.label}</span>
-                            <span className="text-[10px] text-slate-400">{h.desc}</span>
+                            <span className="font-medium text-white block">{h.label}</span>
+                            <span className="text-[11px] text-slate-400">{h.desc}</span>
                           </div>
-                          <a href={`tel:${h.num}`} className="font-mono text-cyan-300 font-bold text-sm hover:underline bg-cyan-950/60 px-2.5 py-1 rounded-lg border border-cyan-500/30">
+                          <a href={`tel:${h.num}`} className="font-mono text-cyan-300 font-semibold text-sm hover:underline bg-cyan-950/60 px-2.5 py-1 rounded-lg border border-cyan-500/20">
                             {h.num}
                           </a>
                         </div>
@@ -543,23 +543,23 @@ export default function App() {
 
                   {/* Multipurpose Cyclone Shelters Directory */}
                   <div className="weather-card p-5 rounded-2xl space-y-3">
-                    <h3 className="text-xs font-bold text-white uppercase font-mono flex items-center gap-2">
-                      <ShieldAlert className="w-4 h-4 text-blue-400" />
-                      <span>Certified Coastal Cyclone Shelters</span>
+                    <h3 className="text-xs font-semibold text-white font-sans flex items-center gap-2">
+                      <ShieldAlert className="w-4 h-4 text-cyan-400 stroke-[1.8]" />
+                      <span>Certified coastal cyclone shelters</span>
                     </h3>
-                    <div className="space-y-2 text-xs">
+                    <div className="space-y-2 text-xs font-sans">
                       {[
                         { name: 'Puri District Multipurpose Cyclone Center', cap: '2,500 Capacity', dist: '1.2 km away', status: 'Open' },
                         { name: 'Bhubaneswar EOC Community Center', cap: '1,800 Capacity', dist: '3.4 km away', status: 'Open' },
                         { name: 'Paradip Port High-Elevation Pucca Shelter', cap: '3,200 Capacity', dist: '5.1 km away', status: 'Open' },
                         { name: 'Ganjam Coastal Community Safe Complex', cap: '1,500 Capacity', dist: '7.8 km away', status: 'Open' },
                       ].map((s) => (
-                        <div key={s.name} className="p-2.5 rounded-xl bg-[#0D162E]/70 border border-[#1E2C4F] flex items-center justify-between">
+                        <div key={s.name} className="p-2.5 rounded-xl bg-[#0D162E]/70 border border-white/10 flex items-center justify-between">
                           <div>
-                            <span className="font-semibold text-white block">{s.name}</span>
-                            <span className="text-[10px] text-slate-400">{s.cap} • {s.dist}</span>
+                            <span className="font-medium text-white block">{s.name}</span>
+                            <span className="text-[11px] text-slate-400">{s.cap} • {s.dist}</span>
                           </div>
-                          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
+                          <span className="text-xs font-sans text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-medium">
                             {s.status}
                           </span>
                         </div>
@@ -572,30 +572,30 @@ export default function App() {
 
             {/* VIEW 8: SETTINGS & SYSTEM PREFERENCES */}
             {activeTab === 'settings' && (
-              <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-page-enter">
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
-                      <Settings className="w-5 h-5 text-slate-400" />
-                      <span>System Settings & Data Sync</span>
+                    <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
+                      <Settings className="w-5 h-5 text-slate-400 stroke-[1.8]" />
+                      <span>System settings & data connection</span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-300 mt-0.5 font-sans">
                       Configure telemetry ingest sources, MongoDB backend connections, and audio alerts.
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab('dashboard')}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5 border border-white/10 cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+                    <ArrowLeft className="w-3.5 h-3.5 text-slate-400" /> Back to dashboard
                   </button>
                 </div>
 
                 <div className="weather-card p-5 rounded-2xl max-w-2xl space-y-4">
-                  <div className="p-3.5 rounded-xl bg-[#0B132B] border border-[#1E2C4F] space-y-2">
+                  <div className="p-3.5 rounded-xl bg-[#0B132B] border border-white/10 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-white">MongoDB Data Store</span>
-                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
+                      <span className="text-xs font-medium text-white font-sans">MongoDB data store</span>
+                      <span className="text-xs font-sans text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-medium">
                         Connected
                       </span>
                     </div>
@@ -604,22 +604,22 @@ export default function App() {
                     </p>
                     <button
                       onClick={() => handleOpenAuth('database')}
-                      className="text-xs text-[#38BDF8] hover:underline font-mono"
+                      className="text-xs text-cyan-400 hover:underline font-sans cursor-pointer"
                     >
-                      Inspect Database Users Collection →
+                      Inspect database users collection →
                     </button>
                   </div>
 
-                  <div className="p-3.5 rounded-xl bg-[#0B132B] border border-[#1E2C4F] space-y-2">
-                    <span className="text-xs font-semibold text-white block">Telemetry API Feeds</span>
-                    <ul className="text-xs text-slate-300 space-y-1.5 font-mono text-[11px]">
+                  <div className="p-3.5 rounded-xl bg-[#0B132B] border border-white/10 space-y-2">
+                    <span className="text-xs font-medium text-white block font-sans">Telemetry API feeds</span>
+                    <ul className="text-xs text-slate-300 space-y-1.5 font-sans">
                       <li className="flex items-center justify-between">
                         <span>NASA Earth Observatory (EONET v3):</span>
-                        <span className="text-cyan-400 font-bold">Active Live Stream</span>
+                        <span className="text-cyan-400 font-medium font-mono text-[11px]">Active live stream</span>
                       </li>
                       <li className="flex items-center justify-between">
-                        <span>OpenWeatherMap Sensor Network:</span>
-                        <span className="text-cyan-400 font-bold">Real-Time Ingestion</span>
+                        <span>OpenWeatherMap sensor network:</span>
+                        <span className="text-cyan-400 font-medium font-mono text-[11px]">Real-time ingestion</span>
                       </li>
                     </ul>
                   </div>
@@ -629,13 +629,15 @@ export default function App() {
 
             {/* VIEW 9: IDENTITY & ROLE PORTAL (CITIZEN VS VOLUNTEER) */}
             {activeTab === 'auth' && (
-              <AuthPage
-                onNavigateToTab={(tab) => {
-                  sound.playBlip();
-                  setActiveTab(tab);
-                }}
-                onOpenSafety={handleOpenSafety}
-              />
+              <div className="animate-page-enter">
+                <AuthPage
+                  onNavigateToTab={(tab) => {
+                    sound.playBlip();
+                    setActiveTab(tab);
+                  }}
+                  onOpenSafety={handleOpenSafety}
+                />
+              </div>
             )}
 
           </main>
