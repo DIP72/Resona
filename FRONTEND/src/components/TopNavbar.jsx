@@ -15,11 +15,13 @@ import {
   Globe,
   RefreshCw,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  BellRing
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWeather } from '../context/WeatherContext';
 import AnimatedCounter from './AnimatedCounter';
+import { notificationService } from '../utils/notificationService';
 
 export const INDIAN_LOCATIONS = [
   { city: 'Bhubaneswar', state: 'Odisha', risk: 'Low', temp: 24, condition: 'Clouds', wind: '10 km/h' },
@@ -112,6 +114,36 @@ export default function TopNavbar({
     loc.state.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const [broadcastNotifs, setBroadcastNotifs] = useState([]);
+  const [notifPermission, setNotifPermission] = useState(() => {
+    return typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported';
+  });
+
+  useEffect(() => {
+    const handleBroadcastEvent = (e) => {
+      if (e.detail) {
+        setBroadcastNotifs(prev => [
+          {
+            id: 'BCAST-' + Date.now(),
+            title: e.detail.title || '🚨 Emergency Broadcast Alert',
+            time: 'Just now',
+            severity: 'red',
+            text: e.detail.body || 'Disaster warning issued.',
+            isBroadcast: true
+          },
+          ...prev
+        ]);
+      }
+    };
+    window.addEventListener('resona-emergency-broadcast', handleBroadcastEvent);
+    return () => window.removeEventListener('resona-emergency-broadcast', handleBroadcastEvent);
+  }, []);
+
+  const handleEnableNotifs = async () => {
+    const perm = await notificationService.requestPermission();
+    setNotifPermission(perm);
+  };
+
   const notifications = liveAlerts?.length > 0 
     ? liveAlerts.slice(0, 5).map(a => ({
         id: a.id,
@@ -123,6 +155,8 @@ export default function TopNavbar({
     : [
         { id: 1, title: 'OpenWeather Sensor Feed Active', time: 'Live', severity: 'green', text: 'Telemetry synced with IMD / OpenWeather network.' }
       ];
+
+  const allNotifications = [...broadcastNotifs, ...notifications];
 
   return (
     <header className="sticky top-0 z-30 h-16 bg-slate-950/40 backdrop-blur-2xl border-b border-white/5 px-6 flex items-center justify-between gap-6 transition-all duration-300">
@@ -147,7 +181,7 @@ export default function TopNavbar({
       {/* Center: Search Location Bar */}
       <div className="flex-1 max-w-xl relative hidden lg:block" ref={searchRef}>
         <div className="relative group">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors group-hover:text-sky-400 stroke-[1.8]" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors group-hover:text-teal-400 stroke-[1.8]" />
           <input
             type="text"
             value={searchQuery}
@@ -156,10 +190,10 @@ export default function TopNavbar({
               setSearchOpen(true);
             }}
             onFocus={() => setSearchOpen(true)}
-            placeholder="Search monitoring zone or station..."
-            className="w-full pl-10 pr-12 py-2 bg-slate-900/60 border border-white/10 hover:border-white/20 focus:border-sky-500/50 focus:bg-slate-900/80 rounded-xl text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none transition-all duration-300 shadow-inner"
+            placeholder="Search city or district in India..."
+            className="w-full pl-10 pr-12 py-2 bg-slate-900/60 border border-white/10 hover:border-white/20 focus:border-teal-500/50 focus:bg-slate-900/80 rounded-xl text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none transition-all duration-300 shadow-inner"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono font-medium text-slate-400 bg-white/5 px-2 py-0.5 rounded-lg border border-white/10">
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-sans font-medium text-slate-400 bg-white/5 px-2 py-0.5 rounded-lg border border-white/10">
             ⌘K
           </kbd>
         </div>
@@ -168,8 +202,8 @@ export default function TopNavbar({
         {searchOpen && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="px-3.5 py-2.5 bg-slate-800/40 border-b border-white/5 text-xs font-medium text-slate-300 font-sans flex justify-between items-center">
-              <span>Target disaster hubs</span>
-              <span className="text-sky-300 bg-sky-400/10 px-2.5 py-0.5 rounded-full text-[11px] font-medium border border-sky-400/20">10 cities</span>
+              <span>Select your city</span>
+              <span className="text-teal-300 bg-teal-400/10 px-2.5 py-0.5 rounded-full text-[11px] font-medium border border-teal-400/20">10 monitored cities</span>
             </div>
             <div className="max-h-64 overflow-y-auto no-scrollbar">
               {filteredLocations.map((loc) => (
@@ -183,14 +217,14 @@ export default function TopNavbar({
                   className="w-full px-4 py-2.5 text-left text-sm flex items-center justify-between hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 group cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-sky-500/20 group-hover:text-sky-400 transition-colors">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-400 stroke-[1.8]" />
+                    <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-teal-500/20 group-hover:text-teal-400 transition-colors">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-400 stroke-[1.8]" />
                     </div>
                     <span className="font-medium text-slate-200 group-hover:text-white transition-colors">{loc.city}</span>
                     <span className="text-slate-400 text-xs font-normal">({loc.state})</span>
                   </div>
                   <div className="flex items-center gap-2 bg-slate-950/60 px-2.5 py-1 rounded-lg border border-white/5">
-                    <span className="text-slate-300 font-mono text-xs">{loc.temp}°C</span>
+                    <span className="text-slate-300 font-sans text-xs">{loc.temp}°C</span>
                   </div>
                 </button>
               ))}
@@ -208,9 +242,9 @@ export default function TopNavbar({
             onClick={() => setLocationMenuOpen(!locationMenuOpen)}
             className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 border border-white/10 text-sm text-slate-200 transition-all duration-300 shadow-sm cursor-pointer"
           >
-            <MapPin className="w-4 h-4 text-sky-400 stroke-[1.8]" />
+            <MapPin className="w-4 h-4 text-teal-400 stroke-[1.8]" />
             <span className="font-medium text-white">{currentLocation.city}</span>
-            <span className="font-mono text-sky-300 text-xs font-medium bg-sky-500/10 px-2 py-0.5 rounded-lg border border-sky-500/20">
+            <span className="text-teal-300 text-xs font-medium bg-teal-500/10 px-2 py-0.5 rounded-lg border border-teal-500/20">
               {current?.temp ?? currentLocation.temp}°C
             </span>
           </button>
@@ -218,8 +252,8 @@ export default function TopNavbar({
           {locationMenuOpen && (
             <div className="absolute right-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="px-3.5 py-2.5 bg-slate-800/40 border-b border-white/5 text-xs font-medium text-slate-300 font-sans flex items-center justify-between">
-                <span>Active ground stations</span>
-                <span className="text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-0.5 rounded-full text-[11px] font-medium border border-emerald-500/20"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Live</span>
+                <span>Select active city</span>
+                <span className="text-teal-300 flex items-center gap-1.5 bg-teal-500/10 px-2.5 py-0.5 rounded-full text-[11px] font-medium border border-teal-500/20"><span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>Live</span>
               </div>
               <div className="max-h-64 overflow-y-auto no-scrollbar py-1">
                 {locationsWithLiveData.map((loc) => (
@@ -271,25 +305,54 @@ export default function TopNavbar({
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="w-[38px] h-[38px] flex items-center justify-center rounded-xl bg-slate-900/50 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white transition-all relative shadow-sm"
+            className="w-[38px] h-[38px] flex items-center justify-center rounded-xl bg-slate-900/50 hover:bg-slate-800 border border-white/10 text-slate-300 hover:text-white transition-all relative shadow-sm cursor-pointer"
             title="Alert Notifications"
           >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-slate-900 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
+            {broadcastNotifs.length > 0 ? (
+              <BellRing className="w-4 h-4 text-rose-400 animate-bounce" />
+            ) : (
+              <Bell className="w-4 h-4" />
+            )}
+            {broadcastNotifs.length > 0 ? (
+              <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-bold ring-2 ring-slate-900 shadow-[0_0_8px_rgba(244,63,94,0.9)] animate-pulse">
+                {broadcastNotifs.length}
+              </span>
+            ) : (
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-slate-900 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
+            )}
           </button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="absolute right-0 mt-2 w-84 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="px-4 py-3 bg-slate-800/40 border-b border-white/5 flex items-center justify-between">
                 <span className="font-semibold text-sm text-white">Emergency broadcasts</span>
-                <span className="text-[10px] text-rose-300 font-sans font-bold bg-rose-500/15 px-2.5 py-0.5 rounded-full border border-rose-500/30">LIVE</span>
+                <span className="text-[10px] text-rose-300 font-sans font-bold bg-rose-500/15 px-2.5 py-0.5 rounded-full border border-rose-500/30">
+                  {allNotifications.length} ALERTS
+                </span>
               </div>
+
+              {/* Notification Permission Toggle */}
+              {notifPermission !== 'granted' && (
+                <div className="p-3 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between text-xs">
+                  <span className="text-amber-200 text-[11px]">System popup notifications disabled</span>
+                  <button
+                    onClick={handleEnableNotifs}
+                    className="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px] transition-colors cursor-pointer"
+                  >
+                    Enable
+                  </button>
+                </div>
+              )}
+
               <div className="divide-y divide-white/5 max-h-72 overflow-y-auto no-scrollbar">
-                {notifications.map((n) => (
-                  <div key={n.id} className="p-3.5 hover:bg-white/5 transition-colors group cursor-default">
+                {allNotifications.map((n) => (
+                  <div key={n.id} className={`p-3.5 hover:bg-white/5 transition-colors group cursor-default ${n.isBroadcast ? 'bg-rose-950/20 border-l-2 border-rose-500' : ''}`}>
                     <div className="flex justify-between items-start mb-1">
-                        <span className="text-sm font-semibold text-rose-200 group-hover:text-rose-100 transition-colors">{n.title}</span>
-                        <span className="text-[10px] text-slate-400 font-mono font-medium">{n.time}</span>
+                      <span className="text-sm font-semibold text-rose-200 group-hover:text-rose-100 transition-colors flex items-center gap-1.5">
+                        {n.isBroadcast && <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />}
+                        {n.title}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono font-medium shrink-0 ml-2">{n.time}</span>
                     </div>
                     <p className="text-xs text-slate-400 leading-relaxed">{n.text}</p>
                   </div>
@@ -346,7 +409,7 @@ export default function TopNavbar({
                 <div className="absolute right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="p-4 bg-slate-800/40 border-b border-white/5">
                     <div className="font-semibold text-sm text-white truncate">{currentUser?.name}</div>
-                    <div className="text-[11px] text-slate-400 truncate mt-0.5">{currentUser?.email}</div>
+                    <a href={`mailto:${currentUser?.email}`} className="block text-[11px] text-slate-400 truncate mt-0.5 hover:text-cyan-400 hover:underline">{currentUser?.email}</a>
                     <div className="mt-2 inline-block">
                       <span className="text-[10px] font-sans font-medium px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-300 border border-sky-500/20">
                         {currentUser?.role || 'Citizen'}

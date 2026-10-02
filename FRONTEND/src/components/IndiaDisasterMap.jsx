@@ -24,7 +24,20 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
 import { ALL_INDIA_CITIES } from '../data/indiaCities';
 import { useWeather } from '../context/WeatherContext';
-import AnimatedCounter from './AnimatedCounter';
+import CountUp from './CountUp';
+
+function makeCirclePolygon(lon, lat, radiusKm = 65, points = 32) {
+  const coords = [];
+  const kmPerDegLat = 111.32;
+  const kmPerDegLon = 111.32 * Math.cos((lat * Math.PI) / 180);
+  for (let i = 0; i <= points; i++) {
+    const angle = (i * 2 * Math.PI) / points;
+    const dx = (radiusKm * Math.cos(angle)) / kmPerDegLon;
+    const dy = (radiusKm * Math.sin(angle)) / kmPerDegLat;
+    coords.push([lon + dx, lat + dy]);
+  }
+  return [coords];
+}
 
 /**
  * Build hazard zones GeoJSON dynamically from live city weather data.
@@ -32,7 +45,6 @@ import AnimatedCounter from './AnimatedCounter';
  */
 function buildLiveHazardZones(cities) {
   const features = [];
-  const R = 0.8; // approximate radius in degrees (~80 km)
 
   cities.forEach(city => {
     const cond = (city.condition || '').toLowerCase();
@@ -90,13 +102,7 @@ function buildLiveHazardZones(cities) {
         },
         geometry: {
           type: 'Polygon',
-          coordinates: [[
-            [lon - R, lat - R * 0.7],
-            [lon + R, lat - R * 0.7],
-            [lon + R, lat + R * 0.7],
-            [lon - R, lat + R * 0.7],
-            [lon - R, lat - R * 0.7],
-          ]]
+          coordinates: makeCirclePolygon(lon, lat, hazardType === 'cyclone' ? 95 : 65)
         }
       });
     }
@@ -105,7 +111,22 @@ function buildLiveHazardZones(cities) {
   return { type: 'FeatureCollection', features };
 }
 
-export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }) {
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return null;
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
+
+export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation, currentLocation }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
@@ -211,6 +232,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
       zoom: 4.1,
       minZoom: 3.5,
       maxZoom: 12,
+      projection: 'mercator',
       attributionControl: false
     });
 
@@ -229,19 +251,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         source: 'hazard-zones',
         paint: {
           'fill-color': ['get', 'color'],
-          'fill-opacity': 0.28
-        }
-      });
-
-      map.addLayer({
-        id: 'hazard-zones-line',
-        type: 'line',
-        source: 'hazard-zones',
-        paint: {
-          'line-color': ['get', 'color'],
-          'line-width': 2.5,
-          'line-opacity': 0.9,
-          'line-dasharray': [2, 1]
+          'fill-opacity': 0.22
         }
       });
 
@@ -310,31 +320,45 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
       return 'border-emerald-500 shadow-emerald-500/20';
     };
 
+    const userCityName = currentLocation?.city || 'Bhubaneswar';
+    const userLat = currentLocation?.lat ?? 20.2961;
+    const userLon = currentLocation?.lon ?? 85.8245;
+
     liveCities.forEach(city => {
-      const isKeyHub = ['Bhubaneswar', 'New Delhi', 'Kolkata', 'Mumbai', 'Chennai', 'Puri'].includes(city.city);
+      const isUserCity = (city.city || '').toLowerCase() === userCityName.toLowerCase();
       const isSevere = city.risk === 'Very High' || city.risk === 'High' || city.condition === 'Thunderstorm' || (city.rain_1h || 0) > 0;
       
       const el = document.createElement('div');
       el.style.width = '0px';
       el.style.height = '0px';
-      el.className = 'cursor-pointer z-10';
+      el.className = isUserCity ? 'cursor-pointer z-30' : 'cursor-pointer z-10';
       
-      const dotColor = isSevere ? 'bg-rose-400 ring-rose-400/40' : 'bg-sky-400 ring-sky-400/30';
-      
-      el.innerHTML = `
-        <div class="absolute -left-1.5 -top-1.5 w-3 h-3 group flex items-center justify-center">
-          <span class="absolute w-2.5 h-2.5 rounded-full ${dotColor} ring-4 shadow-md transition-transform duration-150 group-hover:scale-110"></span>
-          ${(isKeyHub || isSevere) ? `
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-medium text-slate-200 bg-slate-950/80 backdrop-blur border border-white/10 px-1.5 py-0.5 rounded shadow whitespace-nowrap hidden sm:inline">
-              ${city.city} <strong class="text-white">${city.temp || '--'}°</strong>
+      if (isUserCity) {
+        // Distinct, friendly user location pin with a gentle, soft pulse
+        el.innerHTML = `
+          <div class="absolute -left-3.5 -top-3.5 w-7 h-7 group flex items-center justify-center">
+            <span class="absolute -left-2 -top-2 w-11 h-11 rounded-full bg-teal-400/20 animate-ping pointer-events-none"></span>
+            <div class="relative w-5 h-5 rounded-full bg-teal-400 border-2 border-white shadow-[0_2px_12px_rgba(20,184,166,0.6)] flex items-center justify-center text-[10px] text-slate-900 font-bold">
+              📍
+            </div>
+            <span class="absolute left-7 top-1/2 -translate-y-1/2 text-xs font-medium text-white bg-slate-900/95 backdrop-blur-md border border-teal-400/40 px-3 py-1 rounded-full shadow-xl whitespace-nowrap z-40 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+              <span>You are here • ${city.city} (${city.temp || '--'}°)</span>
             </span>
-          ` : `
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-medium text-slate-200 bg-slate-950/90 backdrop-blur border border-white/10 px-1.5 py-0.5 rounded shadow whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+          </div>
+        `;
+      } else {
+        // Decluttered calm city dot; label appears ONLY on hover
+        const dotBg = isSevere ? 'bg-amber-400' : 'bg-slate-400/70';
+        el.innerHTML = `
+          <div class="absolute -left-1.5 -top-1.5 w-3 h-3 group flex items-center justify-center">
+            <span class="w-2 h-2 rounded-full ${dotBg} ring-2 ring-white/10 shadow-sm transition-transform duration-150 group-hover:scale-150"></span>
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[11px] font-medium text-slate-200 bg-[#0E1528]/95 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded-md shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
               ${city.city} ${city.temp || '--'}°
             </span>
-          `}
-        </div>
-      `;
+          </div>
+        `;
+      }
 
       el.addEventListener('click', () => {
         if (onSelectLocation) {
@@ -344,20 +368,20 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
 
       const popup = new mapboxgl.Popup({ offset: 14, maxWidth: '240px' })
         .setHTML(`
-          <div class="text-xs p-2 space-y-1 min-w-[180px] bg-[#0E1528] text-slate-200 border border-white/10 rounded-lg">
+          <div class="text-xs p-3 space-y-1.5 min-w-[180px] bg-[#0E1528] text-slate-200 border border-white/10 rounded-xl shadow-xl font-sans">
             <div class="font-semibold text-white border-b border-white/10 pb-1 flex items-center justify-between">
               <span>${city.city}, ${city.state}</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded font-mono ${
-                city.isLive ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
-              }">${city.isLive ? 'LIVE' : 'Forecast'}</span>
+              <span class="text-[9px] px-2 py-0.5 rounded-full font-medium ${
+                city.isLive ? 'bg-teal-950/80 text-teal-300 border border-teal-500/30' : 'bg-slate-800 text-slate-400'
+              }">${city.isLive ? 'Live' : 'Forecast'}</span>
             </div>
             <div class="text-slate-300 pt-0.5">Temperature: <strong class="text-white">${city.temp || '--'}°C</strong></div>
             <div class="text-slate-300">Conditions: <strong class="text-white">${city.description || city.condition || '--'}</strong></div>
             <div class="text-slate-300">Wind: <strong class="text-white">${city.wind_speed || 0} km/h</strong></div>
             <div class="text-slate-300">Humidity: <strong class="text-white">${city.humidity || '--'}%</strong></div>
-            <div class="text-slate-300">Threat Index: <strong class="${
-              (city.risk === 'Very High' || city.risk === 'High') ? 'text-rose-400' : 'text-emerald-400'
-            }">${city.risk || 'Low'} ${city.riskScore ? `(${city.riskScore})` : ''}</strong></div>
+            <div class="text-slate-300">Safety Status: <strong class="${
+              (city.risk === 'Very High' || city.risk === 'High') ? 'text-amber-400' : 'text-teal-400'
+            }">${city.risk || 'Normal'}</strong></div>
           </div>
         `);
 
@@ -368,7 +392,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
 
       markersRef.current.push(marker);
     });
-  }, [liveCities, mapLoaded, onSelectLocation]);
+  }, [liveCities, mapLoaded, onSelectLocation, currentLocation]);
 
   // 4. Render NASA EONET Live Natural Disaster Markers on Map
   useEffect(() => {
@@ -381,66 +405,76 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
 
     if (!showNasaLayer || !eonetEvents || eonetEvents.length === 0) return;
 
+    const userLat = currentLocation?.lat ?? 20.2961;
+    const userLon = currentLocation?.lon ?? 85.8245;
+    const userCityName = currentLocation?.city || 'Bhubaneswar';
+
     eonetEvents.forEach(event => {
       const lon = event.coordinates?.longitude;
       const lat = event.coordinates?.latitude;
       if (lon == null || lat == null) return;
 
-      const isSevereStorm = event.categoryId === 'severeStorms' || (event.category || '').toLowerCase().includes('storm') || (event.title || '').toLowerCase().includes('cyclone') || (event.title || '').toLowerCase().includes('typhoon') || (event.title || '').toLowerCase().includes('hurricane');
       const isFire = event.categoryId === 'wildfires' || (event.category || '').toLowerCase().includes('fire');
       const isVolcano = event.categoryId === 'volcanoes' || (event.category || '').toLowerCase().includes('volcano');
 
+      const dist = getDistanceKm(userLat, userLon, lat, lon);
+      const isDistant = dist != null && dist > 1200;
+
       let icon = '🌀';
-      let ringColor = 'border-rose-500/70 bg-rose-950/80 text-rose-300 shadow-rose-950/50';
-      if (isFire) {
-        icon = '🔥';
-        ringColor = 'border-amber-500/70 bg-amber-950/80 text-amber-300';
-      } else if (isVolcano) {
-        icon = '🌋';
-        ringColor = 'border-orange-500/70 bg-orange-950/80 text-orange-300';
-      }
+      if (isFire) icon = '🔥';
+      else if (isVolcano) icon = '🌋';
 
       const el = document.createElement('div');
       el.style.width = '0px';
       el.style.height = '0px';
-      el.className = 'cursor-pointer z-30';
-      el.innerHTML = `
-        <div class="absolute -left-4 -top-4 w-8 h-8 group flex items-center justify-center">
-          <span class="absolute w-8 h-8 rounded-full bg-rose-500/25 animate-ping"></span>
-          <div class="absolute w-8 h-8 rounded-full ${ringColor} border flex items-center justify-center text-sm shadow-xl backdrop-blur-md transition-transform group-hover:scale-125 ${isSevereStorm ? 'animate-cyclone-bob' : ''}">
-            ${icon}
+      el.className = isDistant ? 'cursor-pointer z-15 opacity-80' : 'cursor-pointer z-25';
+
+      if (isDistant) {
+        // Quieter, smaller marker for distant Pacific events
+        el.innerHTML = `
+          <div class="absolute -left-3 -top-3 w-6 h-6 group flex items-center justify-center">
+            <div class="w-6 h-6 rounded-full bg-slate-900/90 border border-slate-600/50 flex items-center justify-center text-xs shadow-md backdrop-blur-sm transition-transform group-hover:scale-110">
+              ${icon}
+            </div>
+            <span class="text-[10px] font-sans font-medium text-slate-200 bg-[#091124]/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-md mt-1 max-w-[160px] truncate text-center border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity absolute top-7 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap z-30">
+              ${event.title} (Distant • ${dist ? Math.round(dist).toLocaleString() + ' km' : ''})
+            </span>
           </div>
-          <span class="absolute -top-2 -right-2 text-[8px] font-mono px-1 rounded-full bg-rose-950 text-rose-300 border border-rose-500/40 z-10">
-            NASA
-          </span>
-          <span class="text-[9px] font-medium text-white bg-slate-950/90 px-1.5 py-0.5 rounded shadow mt-1 max-w-[120px] truncate text-center border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity absolute top-8 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap z-30">
-            ${event.title}
-          </span>
-        </div>
-      `;
+        `;
+      } else {
+        // Closer regional event
+        el.innerHTML = `
+          <div class="absolute -left-3.5 -top-3.5 w-7 h-7 group flex items-center justify-center">
+            <span class="radiating-status-ring bg-amber-500/30 w-9 h-9 -left-1 -top-1 pointer-events-none"></span>
+            <div class="w-7 h-7 rounded-full bg-amber-950/90 border border-amber-500/60 flex items-center justify-center text-xs shadow-lg backdrop-blur-md transition-transform group-hover:scale-110">
+              ${icon}
+            </div>
+            <span class="text-[10px] font-sans font-medium text-white bg-[#091124]/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-lg mt-1 max-w-[150px] truncate text-center border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity absolute top-7 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap z-30">
+              ${event.title}
+            </span>
+          </div>
+        `;
+      }
+
+      const distMsg = isDistant 
+        ? `<div class="text-teal-300 text-[11px] pt-1">Distance: ~${dist?.toLocaleString()} km away. No impact on ${userCityName}.</div>`
+        : `<div class="text-amber-300 text-[11px] pt-1">Active regional event (${dist?.toLocaleString()} km away).</div>`;
 
       const popup = new mapboxgl.Popup({ offset: 16, maxWidth: '280px' })
         .setHTML(`
-          <div class="text-xs p-2.5 space-y-1.5 min-w-[210px] bg-[#0B1020] text-slate-200 border border-white/10 rounded-xl shadow-2xl">
+          <div class="text-xs p-3 space-y-1.5 min-w-[210px] bg-[#0B1020] text-slate-200 border border-white/10 rounded-2xl shadow-2xl font-sans">
             <div class="font-semibold text-white border-b border-white/10 pb-1 flex items-center justify-between">
-              <span class="flex items-center gap-1.5 text-sky-400 font-medium">
-                🛰️ NASA EONET Ingest
+              <span class="flex items-center gap-1.5 text-teal-300 font-medium">
+                🛰️ Global satellite observation
               </span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-500/40 font-mono">
-                REAL-TIME
+              <span class="text-[9px] px-2 py-0.5 rounded-full ${isDistant ? 'bg-slate-800 text-slate-300' : 'bg-amber-950 text-amber-300'} font-medium">
+                ${isDistant ? 'Distant' : 'Active'}
               </span>
             </div>
-            <div class="font-bold text-sm text-white">${event.title}</div>
-            <div class="text-slate-300">Category: <strong class="text-amber-300">${event.category}</strong></div>
-            <div class="text-slate-300">Coordinates: <strong class="text-sky-300 font-mono">${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E</strong></div>
-            <div class="text-slate-300">Date: <strong class="text-white">${event.date ? new Date(event.date).toLocaleDateString() : 'Live'}</strong></div>
-            ${event.magnitudeValue ? `<div class="text-slate-300">Intensity: <strong class="text-rose-400">${event.magnitudeValue} ${event.magnitudeUnit || ''}</strong></div>` : ''}
-            <div class="pt-1.5 flex items-center justify-between border-t border-white/10">
-              <span class="text-[9px] text-slate-500">Source: NASA GSFC</span>
-              <a href="${event.link || '#'}" target="_blank" rel="noreferrer" class="text-[10px] text-sky-400 hover:underline flex items-center gap-1 font-mono">
-                Official NASA Registry ↗
-              </a>
-            </div>
+            <div class="font-medium text-sm text-white">${event.title}</div>
+            <div class="text-slate-300">Category: <strong class="text-slate-200">${event.category}</strong></div>
+            <div class="text-slate-300">Coordinates: <strong class="text-slate-300">${lat.toFixed(1)}°N, ${lon.toFixed(1)}°E</strong></div>
+            ${distMsg}
           </div>
         `);
 
@@ -451,7 +485,7 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
 
       nasaMarkersRef.current.push(marker);
     });
-  }, [eonetEvents, mapLoaded, showNasaLayer]);
+  }, [eonetEvents, mapLoaded, showNasaLayer, currentLocation]);
 
   // Region Quick-Fly Controller
   const handleFlyToRegion = (region) => {
@@ -491,16 +525,12 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
 
     if (layerType === 'all') {
       map.setFilter('hazard-zones-fill', null);
-      map.setFilter('hazard-zones-line', null);
     } else if (layerType === 'cyclone') {
       map.setFilter('hazard-zones-fill', ['==', ['get', 'type'], 'cyclone']);
-      map.setFilter('hazard-zones-line', ['==', ['get', 'type'], 'cyclone']);
     } else if (layerType === 'flood') {
       map.setFilter('hazard-zones-fill', ['any', ['==', ['get', 'type'], 'rain'], ['==', ['get', 'type'], 'flood']]);
-      map.setFilter('hazard-zones-line', ['any', ['==', ['get', 'type'], 'rain'], ['==', ['get', 'type'], 'flood']]);
     } else if (layerType === 'weather') {
       map.setFilter('hazard-zones-fill', ['any', ['==', ['get', 'type'], 'thunderstorm'], ['==', ['get', 'type'], 'heatwave']]);
-      map.setFilter('hazard-zones-line', ['any', ['==', ['get', 'type'], 'thunderstorm'], ['==', ['get', 'type'], 'heatwave']]);
     }
   };
 
@@ -511,11 +541,11 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
       <div className="px-4 py-2.5 bg-[#0A0F1F]/85 backdrop-blur-xl border-b border-white/[0.06] flex flex-wrap items-center justify-between gap-2 z-10">
         <div className="flex items-center gap-2.5">
           <h3 className="text-xs font-medium text-slate-200 tracking-normal flex items-center gap-2">
-            Geospatial threat radar
+            Live map
           </h3>
-          <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse-dot-green"></span>
-            <span>Live WebGL</span>
+          <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium bg-teal-500/10 border border-teal-500/20 text-teal-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+            <span>Live observation</span>
           </span>
           {isLoadingLiveWeather && (
             <span className="text-[11px] text-slate-400 font-sans flex items-center gap-1.5 hidden sm:flex">
@@ -581,16 +611,20 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
                 const next = !showNasaLayer;
                 setShowNasaLayer(next);
                 if (next && eonetEvents?.length && mapRef.current) {
-                  const cycloneOrStorm = eonetEvents.find(e => 
-                    e.categoryId === 'severeStorms' || (e.title || '').toLowerCase().includes('cyclone')
-                  ) || eonetEvents[0];
-                  if (cycloneOrStorm && cycloneOrStorm.coordinates?.longitude != null) {
+                  // Only fly if there is a severe event in or near the Indian subcontinent / Indian Ocean basin
+                  const regionalEvent = eonetEvents.find(e => {
+                    const lon = e.coordinates?.longitude;
+                    const lat = e.coordinates?.latitude;
+                    return lon != null && lat != null && lon >= 50 && lon <= 100 && lat >= 0 && lat <= 36;
+                  });
+                  if (regionalEvent && regionalEvent.coordinates?.longitude != null) {
                     mapRef.current.flyTo({ 
-                      center: [cycloneOrStorm.coordinates.longitude, cycloneOrStorm.coordinates.latitude], 
+                      center: [regionalEvent.coordinates.longitude, regionalEvent.coordinates.latitude], 
                       zoom: 5.5, 
                       duration: 1500 
                     });
                   }
+                  // Otherwise retain the current India map view
                 }
               }}
               className={`px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
@@ -615,15 +649,17 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         </div>
       </div>
 
-      {/* Main Mapbox WebGL Canvas */}
-      <div className="flex-1 relative w-full h-full bg-[#070B19]">
+      {/* Main Mapbox WebGL Canvas with Live Animated Radar Sweep Overlay */}
+      <div className="flex-1 relative w-full h-full bg-[#070B19] overflow-hidden">
         <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
+
+
 
         {/* Floating Hazard Details Card (When clicked) */}
         {selectedHazardInfo && (
           <div className="absolute top-3 left-3 z-10 max-w-xs bg-[#0B1020]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-3.5 shadow-2xl text-xs space-y-2 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
-              <span className="font-semibold text-white text-xs flex items-center gap-1.5">
+              <span className="font-semibold text-white text-xs flex items-center gap-1.5 font-sans">
                 <AlertTriangle className="w-3.5 h-3.5 text-rose-400 stroke-[1.8]" />
                 {selectedHazardInfo.name}
               </span>
@@ -634,8 +670,8 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
                 ×
               </button>
             </div>
-            <p className="text-[11px] text-slate-300 leading-relaxed">{selectedHazardInfo.details}</p>
-            <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400 border-t border-white/10">
+            <p className="text-[11px] text-slate-300 leading-relaxed font-sans">{selectedHazardInfo.details}</p>
+            <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400 border-t border-white/10 font-sans">
               <span>Severity: <strong className="text-rose-300 font-semibold">{selectedHazardInfo.severity}</strong></span>
               <span>Winds: <strong className="text-white font-mono">{selectedHazardInfo.wind}</strong></span>
             </div>
@@ -643,33 +679,33 @@ export default function IndiaDisasterMap({ onSelectAlertZone, onSelectLocation }
         )}
 
         {/* Legend Overlay (Bottom Left) */}
-        <div className="absolute bottom-3 left-3 z-10 bg-[#0B1020]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-3 text-xs space-y-2 hidden sm:block shadow-xl">
+        <div className="absolute bottom-3 left-3 z-10 bg-[#0B1020]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-3.5 text-xs space-y-2 hidden sm:block shadow-xl">
           <div className="font-medium text-slate-300 text-[11px] tracking-normal font-sans mb-1">
             Active radar layers
           </div>
-          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
-            <span className="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+          <div className="flex items-center gap-2 text-slate-300 text-[11px] font-sans">
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
             <span>Precipitation & Rain</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
-            <span className="w-2.5 h-2.5 rounded-full bg-orange-400"></span>
+          <div className="flex items-center gap-2 text-slate-300 text-[11px] font-sans">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
             <span>Heavy Rain / Flood Risk</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
+          <div className="flex items-center gap-2 text-slate-300 text-[11px] font-sans">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
             <span>Severe Cyclone & Wind</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300 text-[11px]">
+          <div className="flex items-center gap-2 text-slate-300 text-[11px] font-sans">
             <span className="w-3 h-3 rounded-full bg-rose-600/80 border border-rose-400 flex items-center justify-center text-[8px]">🛰️</span>
-            <span>NASA EONET Events (<AnimatedCounter value={eonetEvents?.length || 0} />)</span>
+            <span>NASA EONET Events (<CountUp value={eonetEvents?.length || 0} />)</span>
           </div>
         </div>
 
         {/* Live Stations Count Badge (Bottom Right) */}
-        <div className="absolute bottom-3 right-3 z-10 bg-[#0B1020]/85 backdrop-blur-xl border border-white/10 rounded-full px-3 py-1 text-xs font-sans text-slate-400 shadow-xl flex items-center gap-2">
-          <span><strong className="text-emerald-400 font-semibold"><AnimatedCounter value={liveCities.length || ALL_INDIA_CITIES.length} /></strong> Cities Online</span>
+        <div className="absolute bottom-3 right-3 z-10 bg-[#0B1020]/85 backdrop-blur-xl border border-white/10 rounded-full px-3.5 py-1.5 text-xs font-sans text-slate-400 shadow-xl flex items-center gap-2">
+          <span><strong className="text-emerald-400 font-semibold"><CountUp value={liveCities.length || ALL_INDIA_CITIES.length} /></strong> Cities Online</span>
           <span>•</span>
-          <span className="text-sky-300 font-semibold"><AnimatedCounter value={eonetEvents?.length || 0} /> NASA Events</span>
+          <span className="text-cyan-300 font-semibold"><CountUp value={eonetEvents?.length || 0} /> NASA Events</span>
         </div>
       </div>
 

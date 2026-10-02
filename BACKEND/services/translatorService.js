@@ -11,6 +11,7 @@ const STATE_LANGUAGE_MAP = {
   'west bengal': { langCode: 'bn', langName: 'Bengali', nativeName: 'বাংলা', speechCode: 'bn-IN', fallbackSpeech: 'bn-IN' },
   'bihar': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
   'jharkhand': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
+  'sikkim': { langCode: 'ne', langName: 'Nepali', nativeName: 'नेपाली', speechCode: 'ne-NP', fallbackSpeech: 'hi-IN' },
 
   // Southern India
   'tamil nadu': { langCode: 'ta', langName: 'Tamil', nativeName: 'தமிழ்', speechCode: 'ta-IN', fallbackSpeech: 'ta-IN' },
@@ -18,29 +19,41 @@ const STATE_LANGUAGE_MAP = {
   'telangana': { langCode: 'te', langName: 'Telugu', nativeName: 'తెలుగు', speechCode: 'te-IN', fallbackSpeech: 'te-IN' },
   'karnataka': { langCode: 'kn', langName: 'Kannada', nativeName: 'ಕನ್ನಡ', speechCode: 'kn-IN', fallbackSpeech: 'kn-IN' },
   'kerala': { langCode: 'ml', langName: 'Malayalam', nativeName: 'മലയാളം', speechCode: 'ml-IN', fallbackSpeech: 'ml-IN' },
+  'puducherry': { langCode: 'ta', langName: 'Tamil', nativeName: 'தமிழ்', speechCode: 'ta-IN', fallbackSpeech: 'ta-IN' },
+  'lakshadweep': { langCode: 'ml', langName: 'Malayalam', nativeName: 'മലയാളം', speechCode: 'ml-IN', fallbackSpeech: 'ml-IN' },
 
   // Western India
   'maharashtra': { langCode: 'mr', langName: 'Marathi', nativeName: 'मराठी', speechCode: 'mr-IN', fallbackSpeech: 'mr-IN' },
   'gujarat': { langCode: 'gu', langName: 'Gujarati', nativeName: 'ગુજરાતી', speechCode: 'gu-IN', fallbackSpeech: 'gu-IN' },
-  'goa': { langCode: 'mr', langName: 'Marathi', nativeName: 'मराठी', speechCode: 'mr-IN', fallbackSpeech: 'mr-IN' },
+  'goa': { langCode: 'kok', langName: 'Konkani', nativeName: 'कोंकणी', speechCode: 'kok-IN', fallbackSpeech: 'mr-IN' },
+  'daman and diu': { langCode: 'gu', langName: 'Gujarati', nativeName: 'ગુજરાતી', speechCode: 'gu-IN', fallbackSpeech: 'gu-IN' },
+  'dadra and nagar haveli': { langCode: 'gu', langName: 'Gujarati', nativeName: 'ગુજરાતી', speechCode: 'gu-IN', fallbackSpeech: 'gu-IN' },
 
   // Northern & Central India
   'delhi': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
   'delhi ncr': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
-  'rajasthan': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
+  'rajasthan': { langCode: 'mwr', langName: 'Marwari', nativeName: 'मारवाड़ी', speechCode: 'mwr-IN', fallbackSpeech: 'hi-IN' },
   'uttar pradesh': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
   'madhya pradesh': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
   'chhattisgarh': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
   'haryana': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
   'punjab': { langCode: 'pa', langName: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', speechCode: 'pa-IN', fallbackSpeech: 'hi-IN' },
   'punjab/haryana': { langCode: 'pa', langName: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', speechCode: 'pa-IN', fallbackSpeech: 'hi-IN' },
-  'himachal pradesh': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
+  'himachal pradesh': { langCode: 'doi', langName: 'Dogri', nativeName: 'डोगरी', speechCode: 'doi-IN', fallbackSpeech: 'hi-IN' },
   'uttarakhand': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
-  'jammu & kashmir': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
+  'jammu & kashmir': { langCode: 'ks', langName: 'Kashmiri', nativeName: 'کٲشُر', speechCode: 'ks-IN', fallbackSpeech: 'ur-IN' },
+  'jammu and kashmir': { langCode: 'ks', langName: 'Kashmiri', nativeName: 'کٲشُر', speechCode: 'ks-IN', fallbackSpeech: 'ur-IN' },
+  'ladakh': { langCode: 'ks', langName: 'Kashmiri', nativeName: 'کٲشُر', speechCode: 'ks-IN', fallbackSpeech: 'ur-IN' },
 
   // Northeastern India
   'assam': { langCode: 'as', langName: 'Assamese', nativeName: 'অসমীয়া', speechCode: 'as-IN', fallbackSpeech: 'bn-IN' },
-  'meghalaya': { langCode: 'as', langName: 'Assamese', nativeName: 'অসমীয়া', speechCode: 'as-IN', fallbackSpeech: 'en-IN' },
+  'meghalaya': { langCode: 'kha', langName: 'Khasi', nativeName: 'Ka Ktien Khasi', speechCode: 'kha-IN', fallbackSpeech: 'en-IN' },
+  'manipur': { langCode: 'mni', langName: 'Manipuri', nativeName: 'মৈতৈলোন্', speechCode: 'mni-IN', fallbackSpeech: 'bn-IN' },
+  'mizoram': { langCode: 'lus', langName: 'Mizo', nativeName: 'Mizo ṭawng', speechCode: 'lus-IN', fallbackSpeech: 'en-IN' },
+  'tripura': { langCode: 'bn', langName: 'Bengali', nativeName: 'বাংলা', speechCode: 'bn-IN', fallbackSpeech: 'bn-IN' },
+  'nagaland': { langCode: 'en', langName: 'English (Plain)', nativeName: 'English', speechCode: 'en-IN', fallbackSpeech: 'en-IN' },
+  'arunachal pradesh': { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', speechCode: 'hi-IN', fallbackSpeech: 'hi-IN' },
+  'andaman and nicobar': { langCode: 'bn', langName: 'Bengali', nativeName: 'বাংলা', speechCode: 'bn-IN', fallbackSpeech: 'hi-IN' },
 };
 
 // City lookup mapping for quick resolution
@@ -53,6 +66,8 @@ const CITY_LANGUAGE_MAP = {
   'kolkata': 'bn',
   'howrah': 'bn',
   'siliguri': 'bn',
+  'darjeeling': 'ne',
+  'gangtok': 'ne',
   'chennai': 'ta',
   'coimbatore': 'ta',
   'madurai': 'ta',
@@ -62,6 +77,9 @@ const CITY_LANGUAGE_MAP = {
   'mumbai': 'mr',
   'pune': 'mr',
   'nagpur': 'mr',
+  'panaji': 'kok',
+  'margao': 'kok',
+  'vasco': 'kok',
   'ahmedabad': 'gu',
   'surat': 'gu',
   'vadodara': 'gu',
@@ -72,30 +90,58 @@ const CITY_LANGUAGE_MAP = {
   'chandigarh': 'pa',
   'amritsar': 'pa',
   'guwahati': 'as',
-  'shillong': 'as',
+  'dibrugarh': 'as',
+  'shillong': 'kha',
+  'imphal': 'mni',
+  'aizawl': 'lus',
+  'srinagar': 'ks',
+  'jammu': 'doi',
+  'leh': 'ks',
+  'patna': 'bho',
+  'gaya': 'bho',
+  'darbhanga': 'mai',
+  'muzaffarpur': 'mai',
+  'ranchi': 'hi',
+  'jamshedpur': 'sat',
   'delhi': 'hi',
   'new delhi': 'hi',
-  'jaipur': 'hi',
-  'patna': 'hi',
-  'lucknow': 'hi',
+  'jaipur': 'mwr',
+  'jodhpur': 'mwr',
+  'bikaner': 'mwr',
+  'lucknow': 'ur',
+  'varanasi': 'bho',
   'bhopal': 'hi',
-  'ranchi': 'hi',
   'raipur': 'hi',
 };
 
-// All supported languages list with metadata
+// All supported languages list with metadata (All 22 Scheduled Languages of India + Dialects + English)
 const SUPPORTED_LANGUAGES = [
   { langCode: 'or', langName: 'Odia', nativeName: 'ଓଡ଼ିଆ', state: 'Odisha', speechCode: 'or-IN' },
-  { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', state: 'National / North India', speechCode: 'hi-IN' },
-  { langCode: 'bn', langName: 'Bengali', nativeName: 'বাংলা', state: 'West Bengal', speechCode: 'bn-IN' },
-  { langCode: 'ta', langName: 'Tamil', nativeName: 'தமிழ்', state: 'Tamil Nadu', speechCode: 'ta-IN' },
+  { langCode: 'hi', langName: 'Hindi', nativeName: 'हिन्दी', state: 'North / Central India', speechCode: 'hi-IN' },
+  { langCode: 'bn', langName: 'Bengali', nativeName: 'বাংলা', state: 'West Bengal & Tripura', speechCode: 'bn-IN' },
+  { langCode: 'ta', langName: 'Tamil', nativeName: 'தமிழ்', state: 'Tamil Nadu & Puducherry', speechCode: 'ta-IN' },
   { langCode: 'te', langName: 'Telugu', nativeName: 'తెలుగు', state: 'Andhra Pradesh & Telangana', speechCode: 'te-IN' },
   { langCode: 'mr', langName: 'Marathi', nativeName: 'मराठी', state: 'Maharashtra', speechCode: 'mr-IN' },
   { langCode: 'gu', langName: 'Gujarati', nativeName: 'ગુજરાતી', state: 'Gujarat', speechCode: 'gu-IN' },
   { langCode: 'kn', langName: 'Kannada', nativeName: 'ಕನ್ನಡ', state: 'Karnataka', speechCode: 'kn-IN' },
-  { langCode: 'ml', langName: 'Malayalam', nativeName: 'മലയാളം', state: 'Kerala', speechCode: 'ml-IN' },
-  { langCode: 'as', langName: 'Assamese', nativeName: 'অসমীয়া', state: 'Assam & NE', speechCode: 'as-IN' },
-  { langCode: 'pa', langName: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', state: 'Punjab', speechCode: 'pa-IN' },
+  { langCode: 'ml', langName: 'Malayalam', nativeName: 'മലയാളം', state: 'Kerala & Lakshadweep', speechCode: 'ml-IN' },
+  { langCode: 'as', langName: 'Assamese', nativeName: 'অসমীয়া', state: 'Assam & Northeast', speechCode: 'as-IN' },
+  { langCode: 'pa', langName: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', state: 'Punjab & Delhi', speechCode: 'pa-IN' },
+  { langCode: 'ur', langName: 'Urdu', nativeName: 'اردو', state: 'Pan-India & Telangana', speechCode: 'ur-IN' },
+  { langCode: 'ks', langName: 'Kashmiri', nativeName: 'کٲشُر', state: 'Jammu & Kashmir', speechCode: 'ks-IN' },
+  { langCode: 'ne', langName: 'Nepali', nativeName: 'नेपाली', state: 'Sikkim & West Bengal', speechCode: 'ne-NP' },
+  { langCode: 'kok', langName: 'Konkani', nativeName: 'कोंकणी', state: 'Goa & West Coast', speechCode: 'kok-IN' },
+  { langCode: 'mai', langName: 'Maithili', nativeName: 'मैथिली', state: 'Bihar & Jharkhand', speechCode: 'mai-IN' },
+  { langCode: 'sat', langName: 'Santali', nativeName: 'ᱥᱟᱱᱛᱟᱲᱤ', state: 'Jharkhand & Odisha', speechCode: 'sat-IN' },
+  { langCode: 'brx', langName: 'Bodo', nativeName: 'बड़ो', state: 'Bodoland & Assam', speechCode: 'brx-IN' },
+  { langCode: 'mni', langName: 'Manipuri', nativeName: 'মৈতৈলোন্', state: 'Manipur & NE', speechCode: 'mni-IN' },
+  { langCode: 'doi', langName: 'Dogri', nativeName: 'डोगरी', state: 'Jammu & Himachal', speechCode: 'doi-IN' },
+  { langCode: 'sd', langName: 'Sindhi', nativeName: 'سنڌي', state: 'Gujarat & Maharashtra', speechCode: 'sd-IN' },
+  { langCode: 'sa', langName: 'Sanskrit', nativeName: 'संस्कृतम्', state: 'All-India Classical', speechCode: 'sa-IN' },
+  { langCode: 'bho', langName: 'Bhojpuri', nativeName: 'भोजपुरी', state: 'Bihar & Eastern UP', speechCode: 'bho-IN' },
+  { langCode: 'mwr', langName: 'Marwari', nativeName: 'मारवाड़ी', state: 'Rajasthan', speechCode: 'mwr-IN' },
+  { langCode: 'lus', langName: 'Mizo', nativeName: 'Mizo ṭawng', state: 'Mizoram', speechCode: 'lus-IN' },
+  { langCode: 'kha', langName: 'Khasi', nativeName: 'Ka Ktien Khasi', state: 'Meghalaya', speechCode: 'kha-IN' },
   { langCode: 'en', langName: 'English (Plain)', nativeName: 'English', state: 'All-India Universal', speechCode: 'en-IN' },
 ];
 
@@ -300,6 +346,231 @@ const VERNACULAR_TEMPLATES = {
       whatsappHeader: '🚨 *ਪੰਜਾਬ ਆਫ਼ਤ ਪ੍ਰਬੰਧਨ ਅਥਾਰਟੀ*',
       emergencyCallout: 'ਐਮਰਜੈਂਸੀ ਹੈਲਪਲਾਈਨ: 112, 1070',
       audioAnnouncement: 'ਧਿਆਨ ਦਿਓ! ਅਤਿ ਗੰਭੀਰ ਤੂਫ਼ਾਨ ਦੀ ਚੇਤਾਵਨੀ ਜਾਰੀ ਕੀਤੀ ਗਈ ਹੈ। ਸਾਰੇ ਲੋਕ ਤੁਰੰਤ ਸੁਰੱਖਿਅਤ ਥਾਵਾਂ ਉੱਤੇ ਪਹੁੰਚਣ।'
+    },
+    ur: {
+      hazardLabel: 'شدید سمندری طوفان',
+      title: 'شدید سمندری طوفان کا ریڈ الرٹ — فوری طور پر پکے شیلٹر میں منتقل ہوں',
+      threat: 'ساحل کی طرف تباہ کن سمندری طوفان بڑھ رہا ہے۔ 130 سے 150 کلومیٹر فی گھنٹہ کی رفتار سے طوفانی ہوائیں اور موسلا دھار بارش متوقع ہے۔ کچے مکانات کو شدید نقصان کا اندیشہ ہے۔',
+      actionableSteps: [
+        'فوری طور پر قریبی پکے طوفان شیلٹر میں پناہ لیں۔',
+        'ساحل سمندر اور ندی نالوں سے مکمل طور پر دور رہیں۔',
+        '3 دن کے لیے پینے کا پانی، خشک خوراک اور ٹارچ تیار رکھیں۔',
+        'گھر کا مین بجلی کا سوئچ اور گیس سلنڈر بند کر دیں۔'
+      ],
+      smsText: '🚨 [این ڈی ایم اے طوفان الرٹ] شدید سمندری طوفان کی وارننگ! فوری پکے شیلٹر میں جائیں۔ ہیلپ لائن: 112 / 1070',
+      whatsappHeader: '🚨 *قومی ڈیزاسٹر مینجمنٹ اتھارٹی — ہنگامی طوفان بلیٹن*',
+      emergencyCallout: 'ہنگامی ہیلپ لائن: 112، 1070',
+      audioAnnouncement: 'توجہ فرمائیں! یہ ایک ہنگامی وارننگ ہے۔ شدید سمندری طوفان کے پیش نظر تمام شہری فوری محفوظ مقامات پر منتقل ہو جائیں۔'
+    },
+    ks: {
+      hazardLabel: 'خطرناک سمندری طوفان',
+      title: 'شدید طوفانٕچ انتباہ — فوری محفوظ شیلٹرس منٛز گژھِو',
+      threat: 'ساحلس کُن چھُ تباہ کن طوفان پکوان۔ ۱৩০ پؠٹھ ۱۵۰ کلومیٹر رفتار واو تہٕ طوفانی رُدٕک اندیشہٕ۔',
+      actionableSteps: [
+        'فوری طور گژھِو نزدیٖکی پکے شیلٹرس منٛز۔',
+        'دریاو تہٕ ساحلو نِش روٗزیو مکمل طور دور۔',
+        'تریہَن دۄہَن خٲطرٕ آب تہٕ کھؠن تھاوو تیّار۔',
+        'بجلی تہٕ گیس گژھہِ فوری بند کَرُن۔'
+      ],
+      smsText: '🚨 [کشمیر ڈیزاسٹر الرٹ] شدید طوفانٕچ وارننگ! پکے شیلٹرس منٛز گژھِو۔ ہیلپ لائن: 112',
+      whatsappHeader: '🚨 *جموں و کشمیر ڈیزاسٹر مینجمنٹ*',
+      emergencyCallout: 'ہنگامی رابطہ: 112 / 1070',
+      audioAnnouncement: 'خبردار! شدید طوفانٕچ وارننگ۔ تمام شَہَری گژھَن فوری محفوظ شیلٹرن منٛز پناہ نِن۔'
+    },
+    ne: {
+      hazardLabel: 'अत्यन्त खतरनाक चक्रवात',
+      title: 'अति भीषण चक्रवातको चेतावनी — तुरुन्त सुरक्षित चक्रवात आश्रयस्थलमा जानुहोस्',
+      threat: 'तटीय क्षेत्रमा विनाशकारी चक्रवात तीव्र गतिमा अगाडि बढ्दैछ। १३०–१५० किमी प्रति घण्टाको हावाहुरी र भारी वर्षाको उच्च जोखिम छ।',
+      actionableSteps: [
+        'तुरुन्तै नजिकको पक्की चक्रवात सेल्टरमा जानुहोस्।',
+        'समुद्र तट र नदी किनारबाट पूर्ण रूपमा टाढा रहनुहोस्।',
+        '३ दिनका लागि पिउने पानी, सुक्खा खाना र टर्च सुरक्षित राख्नुहोस्।',
+        'घरको मुख्य बिजुली स्विच र ग्यास सिलिन्डर बन्द गर्नुहोस्।'
+      ],
+      smsText: '🚨 [चक्रवात चेतावनी] भीषण चक्रवात आउँदैछ! तुरुन्त पक्की सेल्टरमा जानुहोस्। हेल्पलाइन: 112 / 1070',
+      whatsappHeader: '🚨 *विपद् व्यवस्थापन आपतकालीन चक्रवात बुलेटिन*',
+      emergencyCallout: 'आपतकालीन हेल्पलाइन: 112, 1070',
+      audioAnnouncement: 'ध्यान दिनुहोस्! यो आपतकालीन चेतावनी हो। विनाशकारी चक्रवातको कारण तुरुन्तै सुरक्षित पक्की आश्रयस्थलमा जानुहोस्।'
+    },
+    kok: {
+      hazardLabel: 'भयंकर चक्रीवादळ',
+      title: 'अत्यंत भयंकर चक्रीवादळाची शिटकावणी — तातडीन पक्क्या निवाऱ्यांत वचात',
+      threat: 'दर्यादेगेर भयंकर चक्रीवादळ धडकपाची शक्यता आसा। ताशी १३०–१५० किमी वेगान वारो आनी मुसळधार पावस पडटलो।',
+      actionableSteps: [
+        'तातडीन लागींच्या सरकारी चक्रीवादळ निवाऱ्यांत वचात.',
+        'दर्यादेगेर वचपाक पूर्णपणान आळाबंदा घालात.',
+        '३ दिसां खातीर नितळ उदक, सुको खावद आनी टॉर्च तयार दवरात.',
+        'घरांतलो मुख्य वीज पुरवठो आनी गॅस सिलिंडर बंद करात.'
+      ],
+      smsText: '🚨 [गोंय आपत्ती शिटकावणी] भयंकर चक्रीवादळाची शिटकावणी! रोखडेच सुरक्षित निवाऱ्यांत वचात. मदत: 112 / 1070',
+      whatsappHeader: '🚨 *गोंय राज्य आपत्ती व्यवस्थापन प्राधिकरण*',
+      emergencyCallout: 'आपत्कालीन संपर्क: 112, 1070',
+      audioAnnouncement: 'दक्षता घेयात! भयंकर चक्रीवादळाची शिटकावणी जारी केल्या। सगळ्या नागरिकांनी सुरक्षीत थळांचेर आश्रय घेवचो।'
+    },
+    mai: {
+      hazardLabel: 'अत्यंत गंभीर चक्रवात',
+      title: 'अति भीषण चक्रवाती तूफ़ानक चेतावनी — तुरंत सुरक्षित पक्का आश्रय मे जाऊ',
+      threat: 'तटवर्ती क्षेत्र मे विनाशकारी चक्रवात पहुँचि रहल अछि। १३०–१५० किमी/घंटा सँ तेज हवा आ भारी वर्षाक सम्भावना अछि।',
+      actionableSteps: [
+        'तुरंत नजदीकी पक्का चक्रवात आश्रय स्थल मे शरण लिअ।',
+        'समुद्र तट आ नदी किनार सँ पूर्णतया दूर रहू।',
+        '३ दिनक लेल पीबय बला पानि, सूखा भोजन आ टॉर्च तैयार राखू।',
+        'घरक मुख्य बिजली कनेक्शन आ गैस सिलिंडर बंद कए दिअ।'
+      ],
+      smsText: '🚨 [आपदा चेतावनी] भीषण चक्रवाती तूफ़ान! तुरंत पक्का सेल्टर मे जाऊ। हेल्पलाइन: 112 / 1070',
+      whatsappHeader: '🚨 *राज्य आपदा प्रबंधन — चक्रवात चेतावनी*',
+      emergencyCallout: 'हेल्पलाइन: 112, 1070',
+      audioAnnouncement: 'ध्यान दिअ! ई आपातकालीन चेतावनी अछि। भीषण चक्रवाती तूफ़ानक कारण सभ नागरिक तुरंत सुरक्षित स्थान पर जाऊ।'
+    },
+    sat: {
+      hazardLabel: 'ᱵᱷᱚᱭᱚᱝᱠᱚᱨ ᱦᱩᱰᱩᱨ ᱦᱚᱭ',
+      title: 'ᱟᱹᱰᱤ ᱵᱷᱚᱭᱚᱝᱠᱚᱨ ᱦᱩᱰᱩᱨ ᱦᱚᱭ ᱦᱩᱥᱤᱭᱟᱹᱨ — ᱞᱚᱜᱚᱱ ᱯᱟᱠᱟ ᱚᱲᱟᱜ ᱪᱟᱞᱟᱜ ᱢᱮ',
+      threat: 'ᱫᱚᱨᱭᱟ ᱟᱲᱮ ᱨᱮ ᱟᱹᱰᱤ ᱵᱷᱚᱭᱚᱝᱠᱚᱨ ᱦᱩᱰᱩᱨ ᱦᱚᱭ ᱦᱤᱡᱩᱜ ᱠᱟᱱᱟ᱾ ᱑᱓᱐-᱑᱕᱐ km/h ᱦᱚᱭ ᱟᱨ ᱡᱟᱹᱯᱩᱫ ᱦᱩᱭᱩᱜ-ᱟ᱾',
+      actionableSteps: [
+        'ᱞᱚᱜᱚᱱ ᱥᱩᱨ ᱨᱮᱱᱟᱜ ᱯᱟᱠᱟ ᱥᱮᱞᱴᱟᱨ ᱪᱟᱞᱟᱜ ᱢᱮ᱾',
+        'ᱫᱚᱨᱭᱟ ᱟᱨ ᱜᱟᱰᱟ ᱟᱲᱮ ᱠᱷᱚᱱ ᱯᱷᱟᱨᱟᱠ ᱨᱮ ᱛᱟᱦᱮᱸᱱ ᱢᱮ᱾',
+        '᱓ ᱢᱟᱦᱟᱸ ᱞᱟᱹᱜᱤᱫ ᱫᱟᱜ, ᱨᱚᱦᱚᱲ ᱡᱚᱢᱟᱜ ᱟᱨ ᱴᱚᱨᱪ ᱥᱟᱯᱲᱟᱣ ᱫᱚᱦᱚᱭ ᱢᱮ᱾',
+        'ᱚᱲᱟᱜ ᱨᱮᱭᱟᱜ ᱢᱮᱱ ᱵᱤᱡᱽᱞᱤ ᱟᱨ ᱜᱮᱥ ᱵᱚᱸᱫᱽ ᱠᱟᱜ ᱢᱮ᱾'
+      ],
+      smsText: '🚨 [ᱦᱩᱰᱩᱨ ᱦᱚᱭ ᱦᱩᱥᱤᱭᱟᱹᱨ] ᱞᱚᱜᱚᱱ ᱥᱮᱞᱴᱟᱨ ᱪᱟᱞᱟᱜ ᱢᱮ᱾ ᱜᱚᱲᱚ: 112',
+      whatsappHeader: '🚨 *ᱟᱯᱚᱛ ᱵᱮᱵᱚᱥᱛᱷᱟ ᱦᱩᱰᱩᱨ ᱦᱚᱭ ᱵᱩᱞᱮᱴᱤᱱ*',
+      emergencyCallout: 'ᱟᱯᱚᱛ ᱜᱚᱲᱚ: 112, 1070',
+      audioAnnouncement: 'ᱦᱩᱥᱤᱭᱟᱹᱨ! ᱟᱹᱰᱤ ᱵᱷᱚᱭᱚᱝᱠᱚᱨ ᱦᱩᱰᱩᱨ ᱦᱚᱭ ᱦᱤᱡᱩᱜ ᱠᱟᱱᱟ᱾ ᱡᱚᱛᱚ ᱦᱚᱲ ᱞᱚᱜᱚᱱ ᱯᱟᱠᱟ ᱚᱲᱟᱜ ᱪᱟᱞᱟᱜ ᱯᱮ᱾'
+    },
+    brx: {
+      hazardLabel: 'गोब्राब बारहुंखा-चक्रवात',
+      title: 'गोब्राब चक्रवातनि सांग्रांथि — थाबैनो पक्का आश्रय मिरुआव थां',
+      threat: 'सिमा ओनसोलफोराव गोब्राब चक्रवात फैगासिनो दं। घन्टायाव 130–150 किमी बार आरो जोबोद गोब्राब अखा हानायनि गिनां थासारि।',
+      actionableSteps: [
+        'थाबैनो खाथिनि पक्का चक्रवात सेल्टाराव थां।',
+        'लैथो आरो दैमा सेरनिफ्राय जोबोद जान्थायाव था।',
+        '3 साननि थाखाय लोंनाय दै, गोरान जामुं आरो टर्स लाफा।',
+        'न\'नि गाहाय मोब्लिब आरो गेस बन्द खालाम।'
+      ],
+      smsText: '🚨 [चक्रवात सांग्रांथि] गोब्राब चक्रवात फैगासिनो दं! पक्का सेल्टाराव थां। अनजिमा: 112',
+      whatsappHeader: '🚨 *आपत सामलायनाय चक्रवात खौरां*',
+      emergencyCallout: 'हेफाजाब अनजिमा: 112, 1070',
+      audioAnnouncement: 'सांग्रां जा! गोब्राब चक्रवातनि सांग्रांथि। गासैबो सुबुंआ थाबैनो पक्का सेल्टाराव थां।'
+    },
+    mni: {
+      hazardLabel: 'য়াম্না কনবা নোংলৈ-নুংশিৎ',
+      title: 'য়াম্না কনবা সাইক্লোনগী চেকশিন-ৱাফম — থুনা কঙ্ক্রীট শেব-হৌদা চৎলু',
+      threat: 'সমুদ্র মপালদা য়াম্না কনবা সাইক্লোন লাকপগী খুদোংথিবা লৈরে। পুংদা ১৩০–১৫০ কিমি খোংজেলদা নুংশিৎ অমসুং অকনবা নোং চুবা য়ারি।',
+      actionableSteps: [
+        'থুনা নক্নবা কঙ্ক্রীট সাইক্লোন শেল্টর্দা চৎলু।',
+        'সমুদ্র অমসুং তুরেল মপালদগী লাপ্না লৈবীয়ু।',
+        'নুমিৎ ৩গী থক্নবা ঈশিং, অকাংবা চীঞ্জাক অমসুং টর্চ সেমদুনা থম্বীয়ু।',
+        'য়ুমগী মেন ইলেক্ত্রিক অমসুং গ্যাস সিলিন্দর্ থুনা থিংবীয়ু।'
+      ],
+      smsText: '🚨 [সাইক্লোন ৱার্নিং] কনবা সাইক্লোন লাক্লে! কঙ্ক্রীট শেল্টর্দা চৎলু। মতেং: 112',
+      whatsappHeader: '🚨 *মণিপুর সাইক্লোন ইমর্জেন্সী বুলেতিন*',
+      emergencyCallout: 'ইমর্জেন্সী হেল্পলাইন: 112, 1070',
+      audioAnnouncement: 'চেকশিনবীয়ু! য়াম্না কনবা সাইক্লোন লাকপগী চেকশিন-ৱাফম। মীয়াম থুনা কঙ্ক্রীট শেব-হৌদা চৎপীয়ু।'
+    },
+    doi: {
+      hazardLabel: 'अत्यंत गंभीर चक्रवाती तूफ़ान',
+      title: 'बड्डे चक्रवात दी चेतावनी — झटपट पक्के शेल्टर च पुज्जो',
+      threat: 'तटीय इलाके च बिनाशकारी चक्रवात पुज्जी गेआ ऐ। 130–150 किमी/घंटा दी रफ्तार कन्नै तेज हवा ते भारी झड़ी दी संभावना ऐ।',
+      actionableSteps: [
+        'झटपट नेड़े दे पक्के चक्रवात शेल्टर च पनाह लैओ।',
+        'समुद्र ते दरिया दे कंडे शा दूर रओ।',
+        '3 दिने लेई पीने दा पानी, सुक्खा राशन ते टार्च त्यार रक्खो।',
+        'घर दा मेन बिजली स्विच ते गैस सिलिंडर बंद करी देओ।'
+      ],
+      smsText: '🚨 [चक्रवात चेतावनी] गंभीर चक्रवाती तूफ़ान! पक्के शेल्टर च पुज्जो। हेल्पलाइन: 112',
+      whatsappHeader: '🚨 *डोगरी आपदा प्रबंधन — चक्रवात बुलेटिन*',
+      emergencyCallout: 'हेल्पलाइन: 112, 1070',
+      audioAnnouncement: 'ध्यान देओ! गंभीर चक्रवात दी चेतावनी। सारे लोक झटपट पक्के राहत शेल्टरन च पुज्जो।'
+    },
+    sd: {
+      hazardLabel: 'شديد سامونڊي طوفان',
+      title: 'خطرناڪ سامونڊي طوفان جي چتاءُ — فوري پڪن شيلٽرن ڏانهن وڃو',
+      threat: 'سامونڊي ڪناري تي شديد طوفان اچڻ جو انديشو آهي. 130 کان 150 ڪلوميٽر في ڪلاڪ جي رفتار سان تباهي واريون هوائون هلنديون.',
+      actionableSteps: [
+        'تڪڙو ويجهي پڪي شيلٽر ۾ پهچو.',
+        'سامونڊي ڪناري کان پري رهو.',
+        '3 ڏينهن لاءِ پيئڻ جو پاڻي، سڪل خوراڪ ۽ ٽارچ تيار رکو.',
+        'گهر جي مکيه بجلي ۽ گئس ڪنيڪشن بند ڪريو.'
+      ],
+      smsText: '🚨 [سنڌي طوفان الرٽ] شديد طوفان اچي رهيو آهي! پڪي شيلٽر ڏانهن وڃو. مدد: 112',
+      whatsappHeader: '🚨 *طوفان هنگامي پڌرنامو*',
+      emergencyCallout: 'فون: 112, 1070',
+      audioAnnouncement: 'ڌيان ڏيو! خطرناڪ سامونڊي طوفان جي چتاءُ. شهري فوري محفوظ شيلٽرن ۾ پناهه وٺن.'
+    },
+    sa: {
+      hazardLabel: 'अतिभीषणः चक्रवातः',
+      title: 'अतिभीषण-चक्रवात-चेतावनी — शीघ्रमेव दृढाश्रयस्थलं गच्छन्तु',
+      threat: 'समुद्रतटे विनाशकारी चक्रवातः समायाति। प्रतिघण्टां १३०–१५० कि.मी. वेगेन प्रचण्डवायवः अतिवृष्टिश्च भविष्यति।',
+      actionableSteps: [
+        'शीघ्रमेव निकटवर्तिनं पक्क-चक्रवाताश्रयं प्रविशन्तु।',
+        'समुद्रतटं नदीतीरं च सर्वथा त्यजन्तु।',
+        'दिनत्रयस्य कृते पानजलं, शुष्काहारं, प्रकाशदीपं च सज्जीकुर्वन्तु।',
+        'गृहस्य मुख्य-विद्युत्सम्बन्धं वाष्पकुपीं च पिदधतु।'
+      ],
+      smsText: '🚨 [चक्रवात-चेतावनी] अतिभीषणः चक्रवातः! सुरक्षित-आश्रयं गच्छन्तु। साहाय्यम्: 112',
+      whatsappHeader: '🚨 *आपद्प्रबन्धन-चक्रवात-वार्ता*',
+      emergencyCallout: 'दूरभाषसंख्या: 112, 1070',
+      audioAnnouncement: 'सावधानाः भवन्तु! अतिभीषणः चक्रवातः आगच्छति। सर्वे नागरिकाः शीघ्रं दृढाश्रयं प्रविशन्तु।'
+    },
+    bho: {
+      hazardLabel: 'बिपत्ति वाला चक्रवात',
+      title: 'अति गंभीर चक्रवाती तूफ़ान के चेतावनी — तुरंत पक्का आश्रय में जाईं',
+      threat: 'किनार पर भयंकर चक्रवात आ रहल बा। 130–150 किमी/घंटा के रफ्तार से तबाही वाला हवा आ मूसलाधार बारिश के अंदेशा बा।',
+      actionableSteps: [
+        'तुरंत नजदीकी पक्का चक्रवात शेल्टर में शरण लीं।',
+        'समुद्र तट आ नदी से दूर रहीं, बहरी जिन घूमीं।',
+        '3 दिन खातिर पिए वाला पानी, सूखा खाना आ टार्च तइयार राखीं।',
+        'घर के मेन बिजली स्विच आ गैस सिलिंडर बंद क दीं।'
+      ],
+      smsText: '🚨 [भोजपुरी अलर्ट] भयंकर चक्रवात! तुरंत पक्का शेल्टर में जाईं। हेल्पलाइन: 112',
+      whatsappHeader: '🚨 *आपदा प्रबंधन — चक्रवाती तूफ़ान चेतावनी*',
+      emergencyCallout: 'मदद: 112, 1070',
+      audioAnnouncement: 'ध्यान दीं! भारी चक्रवात के चेतावनी जारी कइल गइल बा। सभे लोग तुरंत सुरक्षित पक्का जगह पर जाईं।'
+    },
+    mwr: {
+      hazardLabel: 'विनाशकारी चक्रवाती तूफ़ान',
+      title: 'अति भीषण तूफ़ान री चेतावनी — तुरंत पक्के शेल्टर मांय जावो',
+      threat: 'तट माथे विनाशकारी तूफ़ान आवै है। 130–150 किमी/घंटा री रफ्तार सू तेज हवा अर मूसलाधार बिरखा होसी।',
+      actionableSteps: [
+        'तुरंत नगीच रै पक्के चक्रवात शेल्टर मांय सरण लो।',
+        'समुद्र अर नदियां सू पूरो दूर रेवो।',
+        '3 दिनां खातर पीवण रो पाणी अर सूखो खाणो त्यार राखो।',
+        'घर रो मेन बिजली स्विच अर गैस सिलिंडर बंद करो।'
+      ],
+      smsText: '🚨 [मारवाड़ी अलर्ट] भयंकर तूफ़ान! तुरंत पक्के शेल्टर जावो। मदद: 112',
+      whatsappHeader: '🚨 *राजस्थान आपदा प्रबंधन — तूफ़ान बुलेटिन*',
+      emergencyCallout: 'हेल्पलाइन: 112, 1070',
+      audioAnnouncement: 'ध्यान दीज्यो! भयंकर चक्रवाती तूफ़ान री चेतावनी। सगळा भाई-बहन तुरंत पक्के मकान मांय सरण लेवो।'
+    },
+    lus: {
+      hazardLabel: 'Thlipui Hrang Tak',
+      title: 'THLIPUI HRANG HLAUHAWM — Hmun him concrete shelter pan nghal rawh',
+      threat: 'Tuifinriat kamah thlipui na tak a thleng dawn. 130–150 km/h a chak thli leh ruahpui vanawn a sur dawn.',
+      actionableSteps: [
+        'I bul hnaia concrete shelter himah kal nghal rawh.',
+        'Tuifinriat kam leh luipui hnaih reng reng suh.',
+        'Ni 3 atan tui thianghlim, chawro leh torch keng rawh.',
+        'In electric main switch leh gas cylinder off vek rawh.'
+      ],
+      smsText: '🚨 [Thlipui Alert] Thlipui na tak a lo thleng! Hmun himah insawn rawh. Helpline: 112',
+      whatsappHeader: '🚨 *Disaster Management Cyclone Bulletin*',
+      emergencyCallout: 'Helpline: 112, 1070',
+      audioAnnouncement: 'Ngaihtuah rawh! Thlipui hrang hlauhawm a lo thleng dawn. Hmun himah insawn vat rawh u.'
+    },
+    kha: {
+      hazardLabel: 'Ka Eriong Kaba Khraw',
+      title: 'KA JINGMAHAM ERIONG — Leit noh sha ki jaka kiba shngain kyrkieh',
+      threat: 'Ka eriong kaba jur bha ka wan ban sha rud duriaw. Ka lyer kaba 130–150 km/h bad u slap uba jur bha un wan.',
+      actionableSteps: [
+        'Leit noh mardor sha ki jaka shong basa kiba skhem.',
+        'Wat leit hajan ka rud duriaw lane ki wah.',
+        'Kynshew umdih, bam tyrkhong bad torch na ka bynta 3 sngi.',
+        'Plip noh ia ka bording bad u gas cylinder jong ka iing.'
+      ],
+      smsText: '🚨 [Eriong Maham] Ka eriong kaba khraw ka wan! Leit sha jaka shngain. Helpline: 112',
+      whatsappHeader: '🚨 *Meghalaya Emergency Cyclone Bulletin*',
+      emergencyCallout: 'Helpline: 112, 1070',
+      audioAnnouncement: 'Sngewbha shahshkor! Ka jingmaham na ka bynta ka eriong kaba jur. Khie leit noh sha ki jaka kiba shngain.'
     },
     en: {
       hazardLabel: 'Severe Cyclonic Storm',
@@ -723,6 +994,231 @@ const VERNACULAR_LIVE_TERMS = {
     whatsappHeader: '🌤️ *ਪੰਜਾਬ ਰਾਜ ਆਫ਼ਤ ਪ੍ਰਬੰਧਨ ਅਥਾਰਟੀ — ਲਾਈਵ ਬੁਲੇਟਿਨ*',
     emergencyCallout: 'ਐਮਰਜੈਂਸੀ ਹੈਲਪਲਾਈਨ: 112, 1070 (ਕੰਟਰੋਲ ਰੂਮ)',
     audioAnnouncement: (city, temp, desc, wind) => `ਧਿਆਨ ਦਿਓ, ਇਹ ਲਾਈਵ ਮੌਸਮ ਬੁਲੇਟਿਨ ਹੈ। ${city} ਵਿੱਚ ਮੌਜੂਦਾ ਤਾਪਮਾਨ ${temp} ਡਿਗਰੀ ਸੈਲਸੀਅਸ ਅਤੇ ${desc} ਹੈ। ਹਵਾ ਦੀ ਰਫ਼ਤਾਰ ${wind} ਕਿਲੋਮੀਟਰ ਪ੍ਰਤੀ ਘੰਟਾ ਹੈ।`
+  },
+  ur: {
+    station: 'محکمہ موسمیات لائیو سینسر ڈیٹا',
+    title: (city, temp, cond) => `${city} لائیو موسم الرٹ — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `محکمہ موسمیات کے لائیو سینسر کے مطابق، ${city} میں موجودہ درجہ حرارت ${temp}°C اور کیفیت '${desc}' ہے۔ ہوا کی رفتار ${wind} کلومیٹر فی گھنٹہ اور ہوا میں نمی کا تناسب ${hum}% ہے۔${rain > 0 ? ` پچھلے ایک گھنٹے میں ${rain} ملی میٹر بارش ریکارڈ کی گئی ہے۔` : ' فی الحال موسمی حالات مستحکم ہیں۔'}`,
+    steps: [
+      'حکومتی موسمیاتی الرٹس اور خبروں سے باخبر رہیں۔',
+      'تیز بارش یا طوفان کے دوران محفوظ عمارتوں میں پناہ لیں۔',
+      'آسمانی بجلی کے دوران درختوں اور بجلی کے کھمبوں سے دور رہیں۔',
+      'ہنگامی صورت حال میں قومی ایمرجنسی ہیلپ لائن 112 / 1070 پر رابطہ کریں۔'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [موسمیاتی الرٹ] ${city}: درجہ حرارت ${temp}°C، ${desc}، ہوا: ${wind} km/h، نمی: ${hum}%۔ ہیلپ لائن: 112۔`,
+    whatsappHeader: '🌤️ *محکمہ موسمیات و قدرتی آفات اتھارٹی — لائیو بلیٹن*',
+    emergencyCallout: 'ہنگامی ہیلپ لائن: 112 (قومی)، 1070 (اسٹیٹ کنٹرول روم)',
+    audioAnnouncement: (city, temp, desc, wind) => `توجہ فرمائیں، یہ لائیو موسمیاتی بلیٹن ہے۔ ${city} میں موجودہ درجہ حرارت ${temp} ڈگری سینٹی گریڈ اور ${desc} ہے۔ ہوا کی رفتار ${wind} کلومیٹر فی گھنٹہ ہے۔`
+  },
+  ks: {
+    station: 'محکمہ موسمیات کِس لائیو سینسرٕچ رپورٹ',
+    title: (city, temp, cond) => `${city} حٲلتی موسمی رِپورٹ — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `محکمہ موسمیات کِس براہ راست اعداد و شمارس مُطٲبق چھُ ${city} منٛز اَز تامپتھ ${temp}°C تہٕ موسم چھُ '${desc}'۔ واوہٕچ رفتار چھِ ${wind} کلومیٹر فی گھنٹہ تہٕ نمِی چھِ ${hum}%۔`,
+    steps: [
+      'محکمہ موسمیات کین تازہ ترین انتباہن پؠٹھ تھٲوو نظر۔',
+      'طوفان یا شدِید رُدَس دوران روزیو محفوظ جاین پؠٹھ۔',
+      'بجلی پؠنہٕ وِزِ روٗزیو کُلؠن تہٕ کھمبن نِش دوٗر۔',
+      'ہنگامی مدَد خٲطرٕ کریو 112 / 1070 یَس پؠٹھ رابطہ۔'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [کشمیر الرٹ] ${city}: تامپتھ ${temp}°C، ${desc}، واو: ${wind} km/h। مدَد: 112۔`,
+    whatsappHeader: '🌤️ *جموں و کشمیر ڈیزاسٹر مینجمنٹ — لائیو بلیٹن*',
+    emergencyCallout: 'ہنگامی رابطہ: 112، 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `دھیان دِیو، یہِ چھُ لائیو موسمی بلیٹن۔ ${city} منٛز چھُ تامپتھ ${temp} ڈگری تہٕ ${desc}۔ واوہٕچ رفتار چھِ ${wind} کلومیٹر۔`
+  },
+  ne: {
+    station: 'मौसम विज्ञान केन्द्र प्रत्यक्ष सेन्सर डेटा',
+    title: (city, temp, cond) => `${city} प्रत्यक्ष मौसम स्थिति — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `मौसम विज्ञान केन्द्रको प्रत्यक्ष तथ्याङ्क अनुसार, ${city} मा हालको तापक्रम ${temp}°C र अवस्था '${desc}' छ। हावाको गति ${wind} किमी/घण्टा र आर्द्रता ${hum}% छ।${rain > 0 ? ` गएको एक घण्टामा ${rain} मिमी वर्षा मापन गरिएको छ।` : ' मौसमी अवस्था हाल सामान्य छ।'}`,
+    steps: [
+      'आधिकारिक मौसम सूचना तथा चेतावनीहरू नियमित रूपमा सुन्नुहोस्।',
+      'चर्को वर्षा वा आँधीबेहरीको समयमा पक्की घरहरूमा सुरक्षित रहनुहोस्।',
+      'चट्याङ पर्ने बेला रुख वा बिजुलीको पोलमुनि नबस्नुहोस्।',
+      'आपतकालीन उद्धारको लागि हेल्पलाइन ११२ / १०७० मा सम्पर्क गर्नुहोस्।'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [मौसम अपडेट] ${city}: तापक्रम ${temp}°C, ${desc}, हावा: ${wind} km/h, आर्द्रता: ${hum}%। हेल्पलाइन: 112।`,
+    whatsappHeader: '🌤️ *विपद् व्यवस्थापन प्राधिकरण — प्रत्यक्ष मौसम बुलेटिन*',
+    emergencyCallout: 'आपतकालीन हेल्पलाइन: 112 (राष्ट्रिय), 1070 (राज्य नियन्त्रण कक्ष)',
+    audioAnnouncement: (city, temp, desc, wind) => `ध्यान दिनुहोस्, यो प्रत्यक्ष मौसम बुलेटिन हो। ${city} मा हालको तापक्रम ${temp} डिग्री सेल्सियस र ${desc} छ। हावाको गति ${wind} किलोमिटर प्रति घण्टा छ।`
+  },
+  kok: {
+    station: 'हवामान विभाग थेट सेन्सर डेटा',
+    title: (city, temp, cond) => `${city} थेट हवामान बुलेटिन — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `हवामान विभागाच्या ताज्या नोंदी प्रमाणे, ${city} त सध्याचें तापमान ${temp}°C आनी स्थिती '${desc}' आसा। वाऱ्याचो वेग ताशी ${wind} किमी आनी हवेतलें उश्णताय ${hum}% आसा।`,
+    steps: [
+      'हवामानाच्या ताज्या सुचनांचेर बारिकसाण दवरात.',
+      'वादळाच्या वा पावसाच्या वेळांत सुरक्षित जाग्यार रावात.',
+      'वीज पडपाच्या संकटांत झाडां वा खांब्यां सकयल उबे रावूं नाकात.',
+      'आपत्कालीन मदती खातीर 112 / 1070 ह्या नंबरार फोन करात.'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [हवामान थेट] ${city}: तापमान ${temp}°C, ${desc}, वारो: ${wind} km/h। मदत: 112।`,
+    whatsappHeader: '🌤️ *गोंय राज्य आपत्ती व्यवस्थापन — थेट बुलेटिन*',
+    emergencyCallout: 'आपत्कालीन संपर्क: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `लक्ष दियात, हें थेट हवामान बुलेटिन आसा। ${city} त सध्याचें तापमान ${temp} अंश सेल्सियस आनी ${desc} आसा।`
+  },
+  mai: {
+    station: 'मौसम विज्ञान केंद्र लाइव आँकड़ा',
+    title: (city, temp, cond) => `${city} लाइव मौसम चेतावनी — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `मौसम विज्ञान केंद्रक सीधा आँकड़ा अनुसार, ${city} मे एखनुक तापमान ${temp}°C आ मौसम '${desc}' अछि। हवाक गति ${wind} किमी/घंटा आ आर्द्रता ${hum}% दर्ज कएल गेल अछि।`,
+    steps: [
+      'मौसम विभागक अधिकारिक सूचना पर ध्यान राखू।',
+      'बरसात वा आँधीक समय सुरक्षित पक्का घर मे रहू।',
+      'ठनका गिरबाक समय गाछ आ बिजली खंभा सँ दूर रहू।',
+      'आपातकालीन सहायता लेल 112 / 1070 पर संपर्क करू।'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [मौसम लाइव] ${city}: तापमान ${temp}°C, ${desc}, हवा: ${wind} km/h। हेल्पलाइन: 112।`,
+    whatsappHeader: '🌤️ *राज्य आपदा प्रबंधन प्राधिकरण — लाइव बुलेटिन*',
+    emergencyCallout: 'आपातकालीन हेल्पलाइन: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `ध्यान दिअ, ई लाइव मौसम बुलेटिन अछि। ${city} मे तापमान ${temp} डिग्री आ ${desc} अछि।`
+  },
+  sat: {
+    station: 'ᱦᱚᱭ-ᱦᱤᱥᱤᱫ ᱵᱤᱵᱷᱟᱜᱽ ᱞᱟᱭᱤᱵᱷ ᱥᱮᱱᱥᱚᱨ',
+    title: (city, temp, cond) => `${city} ᱞᱟᱭᱤᱵᱷ ᱦᱚᱭ-ᱦᱤᱥᱤᱫ ᱵᱩᱞᱮᱴᱤᱱ — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `ᱦᱚᱭ-ᱦᱤᱥᱤᱫ ᱵᱤᱵᱷᱟᱜᱽ ᱨᱮᱭᱟᱜ ᱞᱟᱭᱤᱵᱷ ᱥᱮᱱᱥᱚᱨ ᱞᱮᱠᱟᱛᱮ, ${city} ᱨᱮ ᱱᱤᱛᱚᱜ ᱞᱚᱞᱚᱥᱚᱝ ${temp}°C ᱟᱨ ᱦᱟᱞᱚᱛ '${desc}' ᱢᱮᱱᱟᱜ-ᱟ᱾ ᱦᱚᱭ ᱨᱮᱭᱟᱜ ᱜᱟᱹᱰᱤ ${wind} km/h ᱢᱮᱱᱟᱜ-ᱟ᱾`,
+    steps: [
+      'ᱥᱚᱨᱠᱟᱨᱤ ᱦᱚᱭ-ᱦᱤᱥᱤᱫ ᱠᱷᱚᱵᱚᱨ ᱨᱮ ᱱᱚᱡᱚᱨ ᱫᱚᱦᱚᱭ ᱢᱮ᱾',
+      'ᱡᱟᱹᱯᱩᱫ ᱟᱨ ᱦᱩᱰᱩᱨ ᱚᱠᱛᱚ ᱨᱮ ᱯᱟᱠᱟ ᱚᱲᱟᱜ ᱨᱮ ᱛᱟᱦᱮᱸᱱ ᱢᱮ᱾',
+      'ᱵᱤᱡᱽᱞᱤ ᱧᱩᱨᱩᱜ ᱚᱠᱛᱚ ᱫᱟᱨᱮ ᱟᱨ ᱠᱷᱩᱱᱴᱤ ᱠᱷᱚᱱ ᱯᱷᱟᱨᱟᱠ ᱨᱮ ᱛᱟᱦᱮᱸᱱ ᱢᱮ᱾',
+      'ᱡᱟᱦᱟᱸᱱ ᱟᱯᱚᱛ ᱚᱠᱛᱚ ᱨᱮ ᱑᱑᱒ ᱱᱚᱢᱵᱚᱨ ᱨᱮ ᱯᱷᱚᱱ ᱢᱮ᱾'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [ᱥᱟᱱᱛᱟᱲᱤ ᱮᱞᱟᱨᱴ] ${city}: ᱞᱚᱞᱚᱥᱚᱝ ${temp}°C, ${desc}, ᱦᱚᱭ: ${wind} km/h। ᱜᱚᱲᱚ: 112।`,
+    whatsappHeader: '🌤️ *ᱟᱯᱚᱛ ᱵᱮᱵᱚᱥᱛᱷᱟ ᱯᱨᱟᱫᱷᱤᱠᱚᱨᱚᱱ — ᱞᱟᱭᱤᱵᱷ ᱵᱩᱞᱮᱴᱤᱱ*',
+    emergencyCallout: 'ᱟᱯᱚᱛ ᱜᱚᱲᱚ ᱱᱚᱢᱵᱚᱨ: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `ᱱᱚᱡᱚᱨ ᱮᱢ ᱢᱮ, ᱱᱚᱣᱟ ᱫᱚ ᱞᱟᱭᱤᱵᱷ ᱦᱚᱭ-ᱦᱤᱥᱤᱫ ᱵᱩᱞᱮᱴᱤᱱ ᱠᱟᱱᱟ᱾ ${city} ᱨᱮ ᱱᱤᱛᱚᱜ ᱞᱚᱞᱚᱥᱚᱝ ${temp} ᱰᱤᱜᱽᱨᱤ ᱟᱨ ${desc} ᱢᱮᱱᱟᱜ-ᱟ᱾`
+  },
+  brx: {
+    station: 'बोथोर बिगियान मिरु लाइभ खारिथि',
+    title: (city, temp, cond) => `${city} लाइभ अखा-बोथोर बुलेटिन — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `बोथोर बिगियान मिरुनि लाइभ खारिथि बादियै, ${city} आव दा सानदुंनि दुंथाइया ${temp}°C आरो थासारिया '${desc}'। बारनि खौरांआ घन्टायाव ${wind} किमी।`,
+    steps: [
+      'बोथोर बिगियाननि गोदान खौरांफोरखौ खोनासं।',
+      'बारहुंखा आरो अखा हानाय समाव सांग्रां महरै था।',
+      'अखा-हाफायाव अख्रां गोब्राब समाव बिफां आरो थान्दा खाम्फानि सायाव थाङानाङा।',
+      'जायखिजाया आपत समाव 112 / 1070 आव फोन हर।'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [बोथोर एंगारथि] ${city}: दुंथाइ ${temp}°C, ${desc}, बार: ${wind} km/h। हेफाजाब: 112।`,
+    whatsappHeader: '🌤️ *आसाम आपत सामलायनाय — लाइभ बुलेटिन*',
+    emergencyCallout: 'हेफाजाब अनजिमा: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `खोनासं, बेयो लाइभ बोथोर बुलेटिन। ${city} आव दा दुंथाइया ${temp} दिग्रि आरो ${desc}।`
+  },
+  mni: {
+    station: 'ৱেদর্ দিপার্টমেন্ট লাইভ সেন্সর্ পাউ',
+    title: (city, temp, cond) => `${city} লাইভ নুংশিৎ-নোংগী পাউ — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `ৱেদর্ দিপার্টমেন্টগী লাইভ সেন্সর্ পাউগী মতুং ইন্না, ${city} দা হৌজিক লৈরিবা অইং-অসাগী চাং ${temp}°C অমসুং ফীভম '${desc}' ওইরি। নুংশিৎকী খোংজেল পুং অমদা ${wind} কিমি ওইরি।`,
+    steps: [
+      'অফিসিয়েল ওইবা ৱেদর্ ৱার্নিং অমসুং পাউশিং য়েংশিনবীয়ু।',
+      'অকনবা নোং অমসুং নুংশিৎ লাকপা মতমদা কান্নবা শেব-হৌশিংদা লৈবীয়ু।',
+      'নোংচুপ-নোংথাং খোংবা মতমদা উ অমসুং পোলশিংদগী লাপ্না লৈবীয়ু।',
+      'ইমর্জেন্সী ৱাফমগীদমক ১১২ / ১০৭০ দা পাউ পীবীয়ু।'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [মণিপুর ৱার্নিং] ${city}: অইং-অসা ${temp}°C, ${desc}, নুংশিৎ: ${wind} km/h। মতেং: 112।`,
+    whatsappHeader: '🌤️ *মণিপুর দিজাষ্টর মেনেজমেন্ত — লাইভ বুলেতিন*',
+    emergencyCallout: 'ইমর্জেন্সী হেল্পলাইন: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `তৌবীদুনা য়াথং তাবা পীয়ু, মসি লাইভ ৱেদর্ বুলেতিননি। ${city} দা হৌজিক অইং-অসা ${temp} দিগ্রী সেলসিয়স ওইরি।`
+  },
+  doi: {
+    station: 'मौसम विभाग सीधे सेंसर आंकड़े',
+    title: (city, temp, cond) => `${city} मौसमी चेतावनी — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `मौसम विभाग दे सीधे आंकड़े मताबक, ${city} च इसलै दा तापमान ${temp}°C ते हालत '${desc}' ऐ। हवा दी रफ्तार ${wind} किमी/घंटा दर्ज होई ऐ।`,
+    steps: [
+      'मौसम विभाग दे अह्मे बुलेटिनें उप्पर नजर रक्खो।',
+      'झड़ी ते तेज हवा बेल्लै पक्के मकाने च ओट लैओ।',
+      'बिजली कड़कने बेल्लै रुखें थल्लै मत खड़ोओ।',
+      'आपातकालीन सहायता लेई 112 / 1070 पर फोन करो।'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [डोगरी अलर्ट] ${city}: तापमान ${temp}°C, ${desc}, हवा: ${wind} km/h। मदद: 112।`,
+    whatsappHeader: '🌤️ *आपदा प्रबंधन जम्मू — लाइव बुलेटिन*',
+    emergencyCallout: 'हेल्पलाइन: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `ध्यान देओ, एह् लाइव मौसम बुलेटिन ऐ। ${city} च तापमान ${temp} डिग्री ते ${desc} ऐ।`
+  },
+  sd: {
+    station: 'موسميات کاتي جا سڌا سينسر تفصيل',
+    title: (city, temp, cond) => `${city} سڌو سنئون موسمي پڌرنامو — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `موسميات کاتي موجب، ${city} ۾ هن وقت گرمي پد ${temp}°C ۽ صورتحال '${desc}' آهي. هوا جي رفتار ${wind} ڪلوميٽر في ڪلاڪ رڪارڊ ڪئي وئي آهي.`,
+    steps: [
+      'سرڪاري موسمي الرٽ تي نظر رکو.',
+      'تيز برسات يا طوفان دوران محفوظ پڪن جاين ۾ رهو.',
+      'آسماني وڄ وقت وڻن ۽ بجلي جي ٿنڀن کان پري رهو.',
+      'ايمرجنسي مدد لاءِ 112 / 1070 تي رابطو ڪريو.'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [سنڌي الرٽ] ${city}: گرمي پد ${temp}°C، ${desc}، هوا: ${wind} km/h। مدد: 112۔`,
+    whatsappHeader: '🌤️ *ڊزاسٽر مئنيجمينٽ اٿارٽي — لائيو بليٽن*',
+    emergencyCallout: 'ايمرجنسي فون: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `ڌيان ڏيو، هي سڌو سنئون موسمي بليٽن آهي. ${city} ۾ گرمي پد ${temp} ڊگري ۽ ${desc} آهي.`
+  },
+  sa: {
+    station: 'ऋतुविज्ञानकेन्द्रस्य प्रत्यक्षविवरणम्',
+    title: (city, temp, cond) => `${city} प्रत्यक्ष-ऋतुमान-सूचना — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `ऋतुविज्ञानकेन्द्रस्य प्रत्यक्षविवरणानुसारम्, ${city} नगरे अधुना तापमानं ${temp}°C तथा च वातावरणं '${desc}' वर्तते। वायोः गतिः प्रतिघण्टां ${wind} कि.मी. अस्ति।`,
+    steps: [
+      'प्रामाणिक-ऋतुसूचनां सावधानतया शृण्वन्तु।',
+      'अतिवृष्टौ अथवा झञ्झावाते दृढभवनेषु आश्रयं गृह्णन्तु।',
+      'विद्युत्पातसमये वृक्षाणां समीपे न तिष्ठन्तु।',
+      'आपत्कालीन-साहाय्यार्थं 112 / 1070 इति दूरभाषसंख्यां योजयन्तु।'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [संस्कृत-ऋतुसूचना] ${city}: तापमानम् ${temp}°C, ${desc}, वायुः: ${wind} km/h। साहाय्यम्: 112।`,
+    whatsappHeader: '🌤️ *राष्ट्रीय-आपद्प्रबन्धन-प्राधिकरणम् — ऋतुवार्ता*',
+    emergencyCallout: 'आपत्कालीन-सम्पर्कः: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `सावधानाः भवन्तु, एषा ऋतुमानसूचना। ${city} नगरे तापमानं ${temp} अंशप्रमाणं ${desc} च अस्ति।`
+  },
+  bho: {
+    station: 'मौसम बिभाग के लाइव सेंसर डेटा',
+    title: (city, temp, cond) => `${city} रियल-टाइम मौसम बुलेटिन — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `मौसम बिभाग के ताजा जानकारी के मोताबिक, ${city} में अभिन के तापमान ${temp}°C आ स्थिति '${desc}' बा। हवा के रफ्तार ${wind} किमी/घंटा आ नमी ${hum}% दर्ज कइल गइल बा।`,
+    steps: [
+      'मौसम बिभाग के हर एगो सूचना पर नजर बनाईं राखीं।',
+      'भारी बारिश चाहे आंधी के बेरा पक्का घर में सरन लीं।',
+      'बिजुरी चमके के समय पेड़ भा बिजली के खंभा से दूर रहीं।',
+      'कवनो आफत आवे पर तुरंत 112 / 1070 पर फोन घुमाईं।'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [भोजपुरी मौसम] ${city}: तापमान ${temp}°C, ${desc}, हवा: ${wind} km/h। मदद: 112।`,
+    whatsappHeader: '🌤️ *राज्य आपदा प्रबंधन — लाइव मौसम बुलेटिन*',
+    emergencyCallout: 'आपदा हेल्पलाइन: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `ध्यान दीं, ई लाइव मौसम बुलेटिन ह। ${city} में अभिन तापमान ${temp} डिग्री सेल्सियस आ ${desc} बा।`
+  },
+  mwr: {
+    station: 'मौसम विभाग रा ताजा लाइव आंकड़ा',
+    title: (city, temp, cond) => `${city} लाइव मौसम चेतावनी — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `मौसम विभाग रा ताजा आंकड़ा मुजब, ${city} मांय हाल रो तापमान ${temp}°C अर हाल '${desc}' है। हवा री रफ्तार ${wind} किमी/घंटा दर्ज करीजी है।`,
+    steps: [
+      'मौसम री सरकारी सूचनावां माथे ध्यान राखो।',
+      'तेज आंधी अर बिरखा मांय पक्के मकान मांय सरण लो।',
+      'बिजली कड़कबा रै वगत रूखां अर खंभां सू दूर रेवो।',
+      'आपातकालीन सहायता खातर 112 / 1070 माथे संपर्क करो।'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [मारवाड़ी मौसम] ${city}: तापमान ${temp}°C, ${desc}, हवा: ${wind} km/h। मदद: 112।`,
+    whatsappHeader: '🌤️ *राजस्थान आपदा प्रबंधन — लाइव बुलेटिन*',
+    emergencyCallout: 'हेल्पलाइन: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `ध्यान दीज्यो, आ लाइव मौसम बुलेटिन है। ${city} मांय हाल रो तापमान ${temp} डिग्री अर ${desc} है।`
+  },
+  lus: {
+    station: 'Meteorological Live Sensor Record',
+    title: (city, temp, cond) => `${city} Sik leh Sa Thu Chhuah — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `Meteorological department record angin, ${city} ah hian tunah lum lam ${temp}°C leh boruak dinhmun '${desc}' a ni. Thli chak zawng hi ${wind} km/h a ni.`,
+    steps: [
+      'Sorkar sik leh sa thu chhuah ngaichang reng rawh.',
+      'Ruahtui tam leh thlipui lakah hmun himah awm rawh.',
+      'Tek tlak laiin thingkung bulah ding suh.',
+      'Tanpuina mamawh tan Helpline 112 / 1070 be pawh rawh.'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [Mizo Alert] ${city}: Lum lam ${temp}°C, ${desc}, Thli: ${wind} km/h. Helpline: 112.`,
+    whatsappHeader: '🌤️ *Disaster Management Authority — Live Bulletin*',
+    emergencyCallout: 'Helpline: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `Ngaihtuah rawh, hei hi live weather bulletin a ni. ${city} ah lum lam ${temp} degree leh ${desc} a ni.`
+  },
+  kha: {
+    station: 'Meteorological Live Sensor Observation',
+    title: (city, temp, cond) => `${city} Ka Khubor Ka Suinbneng — ${temp}°C (${cond})`,
+    threat: (city, temp, desc, wind, hum, rain) => `Katkum ka jinglap jong ka Meteorological department, ha ${city} ka jingkhluit ka long ${temp}°C bad ka suinbneng ka long '${desc}'. Ka jingstet ka lyer ka long ${wind} km/h.`,
+    steps: [
+      'Shahshkor ia ki jingmaham ka suinbneng barabor.',
+      'Ha ka por slap jur lane eriong, shong ha ki jaka kiba shngain.',
+      'Haba pyrthat lane leit phira, wat leit hajan ki dieng.',
+      'Ia ki jingiarap kyrkieh, phone sha 112 / 1070.'
+    ],
+    smsText: (city, temp, desc, wind, hum) => `🚨 [Khasi Alert] ${city}: Temp ${temp}°C, ${desc}, Lyer: ${wind} km/h. Helpline: 112.`,
+    whatsappHeader: '🌤️ *Meghalaya Disaster Management — Live Bulletin*',
+    emergencyCallout: 'Emergency Helpline: 112, 1070',
+    audioAnnouncement: (city, temp, desc, wind) => `Sngewbha shahshkor, kane ka dei ka live weather bulletin. Ha ${city} ka jingkhluit ka long ${temp} degree bad ${desc}.`
   },
   en: {
     station: 'OpenWeather Sensor Network Live Feed',

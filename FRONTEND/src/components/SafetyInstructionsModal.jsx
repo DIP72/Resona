@@ -11,7 +11,8 @@ import {
   Radio, 
   Volume2, 
   Download,
-  Info
+  Info,
+  MessageSquare
 } from 'lucide-react';
 import { sound } from '../utils/audioSynth';
 
@@ -119,16 +120,16 @@ export default function SafetyInstructionsModal({ isOpen, onClose }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-white tracking-wide font-display">
-                  EMERGENCY PROTOCOLS & SAFETY INSTRUCTIONS
+                <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal font-sans">
+                  Safety guidance & disaster preparedness
                 </h2>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-rose-900/80 text-rose-200 border border-rose-500/40">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 live-pulse-dot-red"></span>
-                  RED ALERT ACTIVE
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-sans bg-teal-500/15 text-teal-200 border border-teal-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                  Verified guidance
                 </span>
               </div>
-              <p className="text-xs text-rose-200/80 mt-0.5">
-                Official NDMA & Odisha Disaster Management Guidelines
+              <p className="text-xs text-slate-300 mt-0.5">
+                Official NDMA & Odisha Disaster Management Authority advice
               </p>
             </div>
           </div>
@@ -148,46 +149,46 @@ export default function SafetyInstructionsModal({ isOpen, onClose }) {
         <div className="flex items-center gap-1 px-4 sm:px-6 pt-3 border-b border-slate-800 bg-[#0B1327] overflow-x-auto">
           <button
             onClick={() => setActiveTab('instructions')}
-            className={`pb-2.5 px-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 ${
+            className={`pb-2.5 px-3 text-xs font-medium whitespace-nowrap transition-all border-b-2 cursor-pointer ${
               activeTab === 'instructions'
-                ? 'border-rose-500 text-rose-400'
+                ? 'border-teal-400 text-teal-300'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            Safety Instructions
+            Safety steps
           </button>
 
           <button
             onClick={() => setActiveTab('shelters')}
-            className={`pb-2.5 px-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 ${
+            className={`pb-2.5 px-3 text-xs font-medium whitespace-nowrap transition-all border-b-2 cursor-pointer ${
               activeTab === 'shelters'
-                ? 'border-rose-500 text-rose-400'
+                ? 'border-teal-400 text-teal-300'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            Nearest Shelters (3)
+            Nearby shelters (3)
           </button>
 
           <button
             onClick={() => setActiveTab('contacts')}
-            className={`pb-2.5 px-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 ${
+            className={`pb-2.5 px-3 text-xs font-medium whitespace-nowrap transition-all border-b-2 cursor-pointer ${
               activeTab === 'contacts'
-                ? 'border-rose-500 text-rose-400'
+                ? 'border-teal-400 text-teal-300'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            Emergency Contacts
+            Emergency helplines
           </button>
 
           <button
             onClick={() => setActiveTab('kit')}
-            className={`pb-2.5 px-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 ${
+            className={`pb-2.5 px-3 text-xs font-medium whitespace-nowrap transition-all border-b-2 cursor-pointer ${
               activeTab === 'kit'
-                ? 'border-rose-500 text-rose-400'
+                ? 'border-teal-400 text-teal-300'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            Disaster Kit Checklist
+            Family emergency kit
           </button>
         </div>
 
@@ -309,13 +310,33 @@ export default function SafetyInstructionsModal({ isOpen, onClose }) {
                       <h4 className="text-xs font-bold text-white">{c.label}</h4>
                       <p className="text-[10px] text-slate-400 mt-0.5">{c.note}</p>
                     </div>
-                    <a
-                      href={`tel:${c.number.replace(/[^0-9]/g, '')}`}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold text-sm font-mono flex items-center gap-1.5 transition-colors shrink-0"
-                    >
-                      <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>{c.number}</span>
-                    </a>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          window.dispatchEvent(new CustomEvent('resona-open-contact-modal', {
+                            detail: {
+                              contact: { name: c.label, phone: c.number, role: c.note },
+                              defaultMessage: `EMERGENCY SOS: Cyclone alert in effect. Immediate assistance required. Target helpline: ${c.number}`
+                            }
+                          }));
+                        }}
+                        className="px-2.5 py-1.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                        title="Send Emergency SMS / SOS"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>SMS</span>
+                      </button>
+
+                      <a
+                        href={`tel:${c.number.replace(/[^0-9]/g, '')}`}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold text-sm font-mono flex items-center gap-1.5 transition-colors shrink-0"
+                        title="Call helpline"
+                      >
+                        <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{c.number}</span>
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>

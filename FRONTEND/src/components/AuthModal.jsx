@@ -20,11 +20,16 @@ import {
   ChevronRight,
   Shield,
   Zap,
-  ArrowRight
+  ArrowRight,
+  MessageSquare,
+  PhoneCall,
+  Smartphone
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useAuth } from '../context/AuthContext';
 import { sound } from '../utils/audioSynth';
+import { openDeviceSms, openWhatsAppChat, openEmailClient } from '../utils/directDispatch';
+import ContactActionModal from './ContactActionModal';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const { login, register, quickLogin, mongoUsers, usersCount, mongoUri, currentUser } = useAuth();
@@ -34,6 +39,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [selectedContactForAction, setSelectedContactForAction] = useState(null);
 
   // Form states
   const [loginForm, setLoginForm] = useState({
@@ -581,27 +587,96 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 </span>
               </div>
 
-              <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                 {mongoUsers && mongoUsers.length > 0 ? (
                   mongoUsers.map((u, i) => (
                     <div 
                       key={u._id || u.id || i}
-                      className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-between text-xs hover:bg-white/[0.06] transition-colors"
+                      className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs hover:bg-white/[0.06] transition-colors"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-[11px] font-bold text-slate-300 shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
                           {u.name ? u.name.charAt(0).toUpperCase() : 'U'}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-white truncate">{u.name}</p>
-                          <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-white truncate">{u.name}</p>
+                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/[0.06] text-slate-300">
+                              {u.role || 'Member'}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400 flex-wrap">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedContactForAction({ name: u.name, email: u.email, phone: u.phone, role: u.role })}
+                              className="hover:text-cyan-300 hover:underline flex items-center gap-1 cursor-pointer"
+                              title="Click to send email"
+                            >
+                              <Mail className="w-3 h-3 text-cyan-400" />
+                              <span>{u.email}</span>
+                            </button>
+
+                            {u.phone && (
+                              <>
+                                <span>•</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedContactForAction({ name: u.name, email: u.email, phone: u.phone, role: u.role })}
+                                  className="hover:text-emerald-300 hover:underline flex items-center gap-1 cursor-pointer font-mono"
+                                  title="Click to send message or call"
+                                >
+                                  <Phone className="w-3 h-3 text-emerald-400" />
+                                  <span>{u.phone}</span>
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] text-slate-300">
-                          {u.role || 'Member'}
-                        </span>
+                      {/* 1-Click Action Buttons */}
+                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        {u.phone && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sound.playBlip();
+                                openDeviceSms(u.phone, `🚨 [RESONA EMERGENCY ADVISORY] Cyclone warning active in coastal sector. Seek shelter. Dial 1070 for rescue.`);
+                              }}
+                              className="px-2 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 text-[10px] font-medium border border-emerald-500/30 flex items-center gap-1 transition-colors cursor-pointer"
+                              title="Send SMS to phone"
+                            >
+                              <Smartphone className="w-3 h-3" />
+                              <span>SMS</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                sound.playBlip();
+                                openWhatsAppChat(u.phone, `🚨 [RESONA EMERGENCY ADVISORY] Cyclone warning active in coastal sector. Seek shelter. Dial 1070 for rescue.`);
+                              }}
+                              className="px-2 py-1 rounded-lg bg-teal-600/20 hover:bg-teal-600/40 text-teal-300 text-[10px] font-medium border border-teal-500/30 flex items-center gap-1 transition-colors cursor-pointer"
+                              title="Send WhatsApp message"
+                            >
+                              <MessageSquare className="w-3 h-3" />
+                              <span>WhatsApp</span>
+                            </button>
+                          </>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            sound.playBlip();
+                            setSelectedContactForAction({ name: u.name, email: u.email, phone: u.phone, role: u.role });
+                          }}
+                          className="px-2 py-1 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 text-[10px] font-medium border border-cyan-500/30 flex items-center gap-1 transition-colors cursor-pointer"
+                          title="Open full dispatch options"
+                        >
+                          <Send className="w-3 h-3" />
+                          <span>Dispatch</span>
+                        </button>
                       </div>
                     </div>
                   ))
@@ -625,6 +700,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
         </div>
 
       </div>
+
+      {/* Interactive Contact Dispatch Modal */}
+      <ContactActionModal
+        isOpen={!!selectedContactForAction}
+        contact={selectedContactForAction}
+        onClose={() => setSelectedContactForAction(null)}
+      />
 
     </div>
   );

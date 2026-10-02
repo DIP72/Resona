@@ -153,6 +153,21 @@ class SoundFX {
       ml: 'ml-IN',
       as: 'as-IN',
       pa: 'pa-IN',
+      ur: 'ur-IN',
+      ks: 'ks-IN',
+      ne: 'ne-NP',
+      kok: 'kok-IN',
+      mai: 'mai-IN',
+      sat: 'sat-IN',
+      brx: 'brx-IN',
+      mni: 'mni-IN',
+      doi: 'doi-IN',
+      sd: 'sd-IN',
+      sa: 'sa-IN',
+      bho: 'bho-IN',
+      mwr: 'mwr-IN',
+      lus: 'lus-IN',
+      kha: 'kha-IN',
       es: 'es-ES',
       en: 'en-IN',
     };
@@ -160,11 +175,35 @@ class SoundFX {
     const targetCode = langMap[langCode] || 'hi-IN';
     utterance.lang = targetCode;
 
-    // Try finding matching voice
+    // Try finding matching voice with hierarchical regional fallbacks
     const voices = window.speechSynthesis.getVoices();
-    const match = voices.find(v => v.lang === targetCode || v.lang.startsWith(langCode)) ||
-                  voices.find(v => v.lang === 'hi-IN') ||
-                  voices.find(v => v.lang.startsWith('en'));
+    let match = voices.find(v => v.lang === targetCode || v.lang.startsWith(langCode));
+
+    if (!match) {
+      // Specialized regional fallbacks
+      if (langCode === 'ur') {
+        match = voices.find(v => v.lang.startsWith('ur') || v.lang === 'hi-IN');
+      } else if (langCode === 'ne') {
+        match = voices.find(v => v.lang.startsWith('ne') || v.lang === 'hi-IN');
+      } else if (langCode === 'kok') {
+        match = voices.find(v => v.lang === 'mr-IN' || v.lang === 'hi-IN');
+      } else if (langCode === 'mai' || langCode === 'bho' || langCode === 'mwr' || langCode === 'sa' || langCode === 'doi') {
+        match = voices.find(v => v.lang === 'hi-IN');
+      } else if (langCode === 'sat' || langCode === 'or') {
+        match = voices.find(v => v.lang === 'or-IN' || v.lang === 'bn-IN' || v.lang === 'hi-IN');
+      } else if (langCode === 'mni' || langCode === 'brx' || langCode === 'as') {
+        match = voices.find(v => v.lang === 'as-IN' || v.lang === 'bn-IN' || v.lang === 'hi-IN');
+      } else if (langCode === 'ks') {
+        match = voices.find(v => v.lang.startsWith('ur') || v.lang === 'hi-IN');
+      } else if (langCode === 'sd') {
+        match = voices.find(v => v.lang.startsWith('sd') || v.lang === 'gu-IN' || v.lang === 'hi-IN');
+      }
+    }
+
+    if (!match) {
+      match = voices.find(v => v.lang === 'hi-IN') || voices.find(v => v.lang.startsWith('en'));
+    }
+
     if (match) utterance.voice = match;
 
     window.speechSynthesis.speak(utterance);

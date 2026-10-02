@@ -42,11 +42,47 @@ import {
   getCachedFallbackWallpaper 
 } from './services/pexelsService';
 import { sound } from './utils/audioSynth';
+import ContactActionModal from './components/ContactActionModal';
+import { notificationService } from './utils/notificationService';
+import { openDeviceSms, openWhatsAppChat } from './utils/directDispatch';
+import { MessageSquare, X as CloseIcon, Smartphone, BellRing } from 'lucide-react';
 
 export default function App() {
   const [currentLocation, setCurrentLocation] = useState(INDIAN_LOCATIONS[0]); // Bhubaneswar, Odisha
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'multilingual' | 'map' | 'alerts' | 'forecast' | 'reports' | 'resources' | 'settings'
   const [activeHazardFilter, setActiveHazardFilter] = useState(null); // 'cyclone' | 'flood' | etc.
+
+  const [contactModalState, setContactModalState] = useState({
+    isOpen: false,
+    contact: null,
+    defaultMessage: ''
+  });
+  const [activeBroadcastToast, setActiveBroadcastToast] = useState(null);
+
+  useEffect(() => {
+    const handleOpenContact = (e) => {
+      if (e.detail?.contact) {
+        setContactModalState({
+          isOpen: true,
+          contact: e.detail.contact,
+          defaultMessage: e.detail.defaultMessage || ''
+        });
+      }
+    };
+
+    const handleBroadcastEvent = (e) => {
+      if (e.detail) {
+        setActiveBroadcastToast(e.detail);
+      }
+    };
+
+    window.addEventListener('resona-open-contact-modal', handleOpenContact);
+    window.addEventListener('resona-emergency-broadcast', handleBroadcastEvent);
+    return () => {
+      window.removeEventListener('resona-open-contact-modal', handleOpenContact);
+      window.removeEventListener('resona-emergency-broadcast', handleBroadcastEvent);
+    };
+  }, []);
   
   // Dynamic Pexels Auto-Refresh State
   const [isAutoRefresh, setIsAutoRefresh] = useState(isPexelsAutoRefreshEnabled);
@@ -197,9 +233,12 @@ export default function App() {
           />
         )}
 
-        {/* Ambient Highlights for Glassmorphism Depth */}
-        <div className="fixed top-24 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none z-0" />
-        <div className="fixed bottom-24 right-1/4 w-[32rem] h-[32rem] bg-rose-500/5 rounded-full blur-3xl pointer-events-none z-0" />
+        {/* Ambient Aurora Gradient Mesh Motion Behind All Panels */}
+        <div className="aurora-mesh-bg">
+          <div className="aurora-orb-cyan" />
+          <div className="aurora-orb-indigo" />
+          <div className="aurora-orb-rose" />
+        </div>
 
         {/* Interactive App Content Layer (z-10 on top of wallpaper) */}
         <div className="relative z-10 flex flex-col min-h-screen">
@@ -249,6 +288,7 @@ export default function App() {
                 {/* Top Hazard Alert Banner (Hero Card for Active Emergency + Slim Status Strip for Inactive) */}
                 <section>
                   <AlertBannerRow
+                    currentLocation={currentLocation}
                     activeFilter={activeHazardFilter}
                     onSelectFilter={(cat) => {
                       sound.playBlip();
@@ -263,6 +303,7 @@ export default function App() {
                   {/* Dominant Mapbox Web-GIS Centerpiece */}
                   <div className="lg:col-span-12 xl:col-span-8">
                     <IndiaDisasterMap
+                      currentLocation={currentLocation}
                       onSelectAlertZone={(zone) => sound.playBlip()}
                       onSelectLocation={(loc) => {
                         sound.playBlip();
@@ -275,8 +316,11 @@ export default function App() {
                   <div className="lg:col-span-12 xl:col-span-4 flex flex-col">
                     {/* Live Hazard Feed */}
                     <ActiveAlertsList
+                      currentLocation={currentLocation}
                       activeFilter={activeHazardFilter}
                       onSelectAlert={(alert) => handleOpenSafety()}
+                      onOpenSafety={handleOpenSafety}
+                      onExplainInLanguage={() => setActiveTab('multilingual')}
                     />
                   </div>
 
@@ -292,10 +336,10 @@ export default function App() {
                   <div>
                     <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
                       <Globe className="w-5 h-5 text-cyan-400 stroke-[1.8]" />
-                      <span>Vernacular AI alert engine</span>
+                      <span>Multilingual Voice & Community Safety</span>
                     </h2>
                     <p className="text-xs text-slate-300 mt-0.5 font-sans">
-                      Multi-tier language translation, audio synthesis, visual infographic cards, and simulated citizen dispatch.
+                      Live weather advisories and spoken audio in 27 Indian mother tongues — helping families, elders, and neighbors stay safe together.
                     </p>
                   </div>
                   <button
@@ -322,11 +366,11 @@ export default function App() {
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
                     <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
-                      <Map className="w-5 h-5 text-cyan-400 stroke-[1.8]" />
-                      <span>Geospatial disaster map</span>
+                      <Map className="w-5 h-5 text-teal-400 stroke-[1.8]" />
+                      <span>Live interactive map</span>
                     </h2>
                     <p className="text-xs text-slate-300 mt-0.5 font-sans">
-                      Full-viewport interactive Web-GIS with NASA EONET events and Doppler precipitation layers.
+                      Live weather observations, rain zones, and monitored oceanic storm tracks across India.
                     </p>
                   </div>
                   <button
@@ -339,6 +383,7 @@ export default function App() {
 
                 <div className="w-full h-[720px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
                   <IndiaDisasterMap
+                    currentLocation={currentLocation}
                     onSelectAlertZone={(zone) => sound.playBlip()}
                     onSelectLocation={(loc) => {
                       sound.playBlip();
@@ -355,11 +400,11 @@ export default function App() {
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
                     <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
-                      <Bell className="w-5 h-5 text-rose-400 stroke-[1.8]" />
-                      <span>Alerts & threat assessment</span>
+                      <Bell className="w-5 h-5 text-amber-400 stroke-[1.8]" />
+                      <span>Alerts & regional safety</span>
                     </h2>
                     <p className="text-xs text-slate-300 mt-0.5 font-sans">
-                      Real-time NASA satellite events, IMD warnings, and composite danger index gauges.
+                      Verified weather warnings, oceanic storm tracking, and plain-language community guidance.
                     </p>
                   </div>
                   <button
@@ -373,8 +418,11 @@ export default function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                   <div className="lg:col-span-7">
                     <ActiveAlertsList
+                      currentLocation={currentLocation}
                       activeFilter={activeHazardFilter}
                       onSelectAlert={(alert) => handleOpenSafety()}
+                      onOpenSafety={handleOpenSafety}
+                      onExplainInLanguage={() => setActiveTab('multilingual')}
                     />
                   </div>
                   <div className="lg:col-span-5 flex flex-col gap-4">
@@ -391,11 +439,11 @@ export default function App() {
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
                     <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
-                      <CloudRain className="w-5 h-5 text-cyan-400 stroke-[1.8]" />
-                      <span>Atmospheric telemetry & 5-day outlook</span>
+                      <CloudRain className="w-5 h-5 text-teal-400 stroke-[1.8]" />
+                      <span>Weather & 5-day forecast</span>
                     </h2>
                     <p className="text-xs text-slate-300 mt-0.5 font-sans">
-                      Live ground station sensor measurements and 5-day predictive weather forecasting for {currentLocation.city}, {currentLocation.state}.
+                      Live weather observations and 5-day forecast for {currentLocation.city}, {currentLocation.state}.
                     </p>
                   </div>
                   <button
@@ -419,11 +467,11 @@ export default function App() {
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
                     <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
-                      <FileText className="w-5 h-5 text-amber-400 stroke-[1.8]" />
-                      <span>Disaster incident reports & logs</span>
+                      <FileText className="w-5 h-5 text-teal-400 stroke-[1.8]" />
+                      <span>Citizen reports & community help</span>
                     </h2>
                     <p className="text-xs text-slate-300 mt-0.5 font-sans">
-                      File citizen SOS reports, inspect emergency logs, or download PDF bulletins for administrative record.
+                      Report road blockages or power cuts, ask for assistance, or download safety bulletins.
                     </p>
                   </div>
                   <button
@@ -437,35 +485,35 @@ export default function App() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="weather-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                      <div className="w-10 h-10 rounded-xl bg-rose-600/15 border border-rose-500/30 text-rose-400 flex items-center justify-center mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mb-3">
                         <AlertTriangle className="w-5 h-5 stroke-[1.8]" />
                       </div>
-                      <h3 className="font-semibold text-white text-sm font-sans">Citizen incident & SOS</h3>
+                      <h3 className="font-semibold text-white text-sm font-sans">Report an issue or ask help</h3>
                       <p className="text-xs text-slate-300 mt-1 leading-relaxed font-sans">
-                        Submit real-time ground observations, road blockages, flash floods, or power outages directly to emergency dispatch.
+                        Share ground observations such as waterlogged roads, fallen trees, or elder assistance needs with response teams.
                       </p>
                     </div>
                     <button
                       onClick={handleOpenReport}
-                      className="mt-4 py-2.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-medium text-xs rounded-xl transition-all shadow-md shadow-rose-950/40 cursor-pointer"
+                      className="mt-4 py-2.5 px-4 bg-teal-600 hover:bg-teal-500 text-white font-medium text-xs rounded-xl transition-all shadow-md cursor-pointer"
                     >
-                      Report incident now
+                      Report issue now
                     </button>
                   </div>
 
                   <div className="weather-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                      <div className="w-10 h-10 rounded-xl bg-cyan-600/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-teal-600/15 border border-teal-500/30 text-teal-400 flex items-center justify-center mb-3">
                         <Download className="w-5 h-5 stroke-[1.8]" />
                       </div>
                       <h3 className="font-semibold text-white text-sm font-sans">Download bulletin</h3>
                       <p className="text-xs text-slate-300 mt-1 leading-relaxed font-sans">
-                        Generate and download a formatted PDF summary of all active warnings for offline transmission.
+                        Save a formatted PDF summary of all active warnings to keep on hand offline.
                       </p>
                     </div>
                     <button
                       onClick={handleDownloadAlerts}
-                      className="mt-4 py-2.5 px-4 bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs rounded-xl transition-all shadow-md shadow-cyan-950/40 flex items-center justify-center gap-2 cursor-pointer"
+                      className="mt-4 py-2.5 px-4 bg-white/10 hover:bg-white/15 text-white font-medium text-xs rounded-xl transition-all border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Download className="w-4 h-4 stroke-[1.8]" /> Download summary
                     </button>
@@ -476,14 +524,14 @@ export default function App() {
                       <div className="w-10 h-10 rounded-xl bg-emerald-600/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-3">
                         <ShieldAlert className="w-5 h-5 stroke-[1.8]" />
                       </div>
-                      <h3 className="font-semibold text-white text-sm font-sans">Emergency safety protocols</h3>
+                      <h3 className="font-semibold text-white text-sm font-sans">Emergency safety guide</h3>
                       <p className="text-xs text-slate-300 mt-1 leading-relaxed font-sans">
-                        Review NDMA and Odisha Disaster Management Authority safety guidelines, evacuation procedures, and shelter maps.
+                        Review NDMA and Odisha Disaster Management safety guidelines, evacuation steps, and shelter maps.
                       </p>
                     </div>
                     <button
                       onClick={handleOpenSafety}
-                      className="mt-4 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs rounded-xl transition-all shadow-md shadow-emerald-950/40 cursor-pointer"
+                      className="mt-4 py-2.5 px-4 bg-teal-600 hover:bg-teal-500 text-white font-medium text-xs rounded-xl transition-all shadow-md cursor-pointer"
                     >
                       View instructions
                     </button>
@@ -498,11 +546,11 @@ export default function App() {
                 <div className="flex items-center justify-between pb-3 border-b border-[#1E2C4F]/80 flex-wrap gap-2">
                   <div>
                     <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
-                      <Layers className="w-5 h-5 text-indigo-400 stroke-[1.8]" />
-                      <span>Emergency resources & safe shelters</span>
+                      <Layers className="w-5 h-5 text-teal-400 stroke-[1.8]" />
+                      <span>Shelters & emergency helplines</span>
                     </h2>
                     <p className="text-xs text-slate-300 mt-0.5 font-sans">
-                      Nearest certified cyclone shelters, medical response contacts, and survival supplies checklist.
+                      Nearby certified cyclone shelters, medical response contacts, and essential supplies checklist.
                     </p>
                   </div>
                   <button
@@ -533,7 +581,7 @@ export default function App() {
                             <span className="font-medium text-white block">{h.label}</span>
                             <span className="text-[11px] text-slate-400">{h.desc}</span>
                           </div>
-                          <a href={`tel:${h.num}`} className="font-mono text-cyan-300 font-semibold text-sm hover:underline bg-cyan-950/60 px-2.5 py-1 rounded-lg border border-cyan-500/20">
+                          <a href={`tel:${h.num}`} className="text-teal-300 font-semibold text-sm hover:underline bg-teal-950/60 px-2.5 py-1 rounded-lg border border-teal-500/20">
                             {h.num}
                           </a>
                         </div>
@@ -544,7 +592,7 @@ export default function App() {
                   {/* Multipurpose Cyclone Shelters Directory */}
                   <div className="weather-card p-5 rounded-2xl space-y-3">
                     <h3 className="text-xs font-semibold text-white font-sans flex items-center gap-2">
-                      <ShieldAlert className="w-4 h-4 text-cyan-400 stroke-[1.8]" />
+                      <ShieldAlert className="w-4 h-4 text-teal-400 stroke-[1.8]" />
                       <span>Certified coastal cyclone shelters</span>
                     </h3>
                     <div className="space-y-2 text-xs font-sans">
@@ -577,10 +625,10 @@ export default function App() {
                   <div>
                     <h2 className="text-base sm:text-lg font-semibold text-white tracking-normal flex items-center gap-2 font-sans">
                       <Settings className="w-5 h-5 text-slate-400 stroke-[1.8]" />
-                      <span>System settings & data connection</span>
+                      <span>Settings & preferences</span>
                     </h2>
                     <p className="text-xs text-slate-300 mt-0.5 font-sans">
-                      Configure telemetry ingest sources, MongoDB backend connections, and audio alerts.
+                      Preferences, data sync status, and audio notifications.
                     </p>
                   </div>
                   <button
@@ -682,6 +730,67 @@ export default function App() {
           onShufflePexels={handleShuffleWallpaper}
           isAutoRefresh={isAutoRefresh}
           onToggleAutoRefresh={handleToggleAutoRefresh}
+        />
+
+        {/* Global Floating Emergency Broadcast Notification Toast */}
+        {activeBroadcastToast && (
+          <div className="fixed top-4 right-4 z-50 max-w-md w-full p-4 rounded-2xl bg-[#0b1022]/95 border-2 border-rose-500 shadow-[0_0_40px_rgba(244,63,94,0.4)] backdrop-blur-xl animate-in slide-in-from-top-4 duration-300">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
+                  <BellRing className="w-4 h-4 animate-bounce" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-rose-400 uppercase tracking-wider font-mono">
+                      EMERGENCY BROADCAST
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                  </div>
+                  <h4 className="text-sm font-bold text-white leading-tight">
+                    {activeBroadcastToast.title}
+                  </h4>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setActiveBroadcastToast(null)}
+                className="w-6 h-6 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <CloseIcon className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-200 mt-2 leading-relaxed bg-black/40 p-2.5 rounded-xl border border-white/5">
+              {activeBroadcastToast.body}
+            </p>
+
+            <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-white/10">
+              <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                Dispatched to cellular phones
+              </span>
+
+              <button
+                onClick={() => {
+                  sound.playBlip();
+                  setActiveTab('multilingual');
+                  setActiveBroadcastToast(null);
+                }}
+                className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs transition-colors cursor-pointer"
+              >
+                View Broadcast Hub
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Global Interactive Contact Dispatch Modal */}
+        <ContactActionModal
+          isOpen={contactModalState.isOpen}
+          contact={contactModalState.contact}
+          defaultMessage={contactModalState.defaultMessage}
+          onClose={() => setContactModalState({ isOpen: false, contact: null, defaultMessage: '' })}
         />
 
         </div>

@@ -191,7 +191,7 @@ export default function Header({
                 <div className="absolute right-0 mt-2 w-72 bg-[#0A122C] border border-cyan-500/30 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.6)] p-3 text-xs font-mono z-50 animate-fadeIn">
                   <div className="border-b border-slate-800 pb-2.5 mb-2">
                     <p className="text-white font-bold">{currentUser.name}</p>
-                    <p className="text-slate-400 text-[11px]">{currentUser.email}</p>
+                    <a href={`mailto:${currentUser.email}`} className="text-slate-400 text-[11px] block hover:text-cyan-400 hover:underline">{currentUser.email}</a>
                     <span className="mt-1 inline-block text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
                       {currentUser.role}
                     </span>

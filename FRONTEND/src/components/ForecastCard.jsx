@@ -4,15 +4,15 @@ import {
   Sun, 
   CloudSun, 
   Cloud, 
-  CloudLightning,
-  CloudSnow,
-  CloudDrizzle,
-  CloudFog,
-  Wind,
-  Loader2,
-  CloudOff,
-  RefreshCw,
-  Droplets
+  CloudLightning, 
+  CloudSnow, 
+  CloudDrizzle, 
+  CloudFog, 
+  Wind, 
+  CloudOff, 
+  RefreshCw, 
+  Droplets,
+  Calendar
 } from 'lucide-react';
 import { useWeather } from '../context/WeatherContext';
 import AnimatedCounter from './AnimatedCounter';
@@ -36,10 +36,10 @@ function getForecastIcon(condition) {
 
 function getForecastColor(condition) {
   const map = {
-    'Thunderstorm': 'text-yellow-400',
-    'Drizzle': 'text-blue-300',
-    'Rain': 'text-sky-400',
-    'Snow': 'text-white',
+    'Thunderstorm': 'text-amber-400',
+    'Drizzle': 'text-teal-300',
+    'Rain': 'text-teal-400',
+    'Snow': 'text-slate-100',
     'Clear': 'text-amber-400',
     'Clouds': 'text-slate-300',
     'Mist': 'text-slate-400',
@@ -51,12 +51,19 @@ function getForecastColor(condition) {
 export default function ForecastCard() {
   const { forecast, loading, error, refresh } = useWeather();
 
-  // Loading state
+  // Skeleton Loading state (replaces spinner)
   if (loading && !forecast) {
     return (
-      <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 p-6 flex flex-col items-center justify-center min-h-[260px] shadow-xl">
-        <Loader2 className="w-8 h-8 text-sky-400 animate-spin mb-3" />
-        <p className="text-sm text-slate-300 font-bold tracking-wide">Loading outlook...</p>
+      <div className="weather-card p-5 flex flex-col justify-between min-h-[260px] animate-pulse">
+        <div className="flex items-center justify-between pb-3 border-b border-white/5">
+          <div className="h-4 w-36 bg-white/10 rounded-lg"></div>
+          <div className="h-6 w-6 bg-white/10 rounded-lg"></div>
+        </div>
+        <div className="space-y-2 py-2">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="h-10 bg-white/5 rounded-xl"></div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -64,14 +71,15 @@ export default function ForecastCard() {
   // Error state
   if (error && !forecast) {
     return (
-      <div className="bg-rose-950/30 backdrop-blur-2xl rounded-2xl border border-rose-500/20 p-6 flex flex-col items-center justify-center min-h-[260px] shadow-xl">
-        <CloudOff className="w-8 h-8 text-rose-400 mb-3" />
-        <p className="text-sm text-rose-300 font-bold tracking-wide">Forecast unavailable</p>
+      <div className="weather-card p-6 flex flex-col items-center justify-center min-h-[260px] text-center space-y-2">
+        <CloudOff className="w-8 h-8 text-amber-400 mb-1" />
+        <p className="text-sm font-medium text-slate-200">5-day forecast temporarily unavailable</p>
         <button
           onClick={refresh}
-          className="mt-4 px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg text-xs text-rose-300 flex items-center gap-2 font-bold transition-colors"
+          className="mt-3 px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs text-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
         >
-          <RefreshCw className="w-3.5 h-3.5" /> Retry
+          <RefreshCw className="w-3.5 h-3.5 text-teal-400" />
+          <span>Check again</span>
         </button>
       </div>
     );
@@ -80,71 +88,65 @@ export default function ForecastCard() {
   const days = forecast?.days || [];
 
   return (
-    <div className="bg-slate-900/60 backdrop-blur-2xl rounded-2xl border border-white/10 p-5 flex flex-col justify-between shadow-xl relative overflow-hidden group">
+    <div className="weather-card p-5 flex flex-col justify-between shadow-xl relative overflow-hidden group">
       
-      {/* Decorative ambient background */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-amber-500/10 transition-colors duration-500"></div>
-
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3 relative z-10">
-        <div className="flex items-center gap-3">
-          <h3 className="text-sm font-bold text-white tracking-widest uppercase">
-            5-Day Outlook
+        <div className="flex items-center gap-2.5">
+          <h3 className="text-sm font-semibold text-white tracking-normal font-sans">
+            5-day weather forecast
           </h3>
           {forecast?.city && (
-            <span className="text-[10px] text-amber-400 font-mono font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+            <span className="text-[11px] text-teal-300 font-medium bg-teal-500/10 px-2 py-0.5 rounded-lg border border-teal-500/20">
               {forecast.city}
             </span>
           )}
         </div>
         <button
           onClick={refresh}
-          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all shadow-sm"
+          className="w-7 h-7 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all shadow-sm cursor-pointer"
           title="Refresh forecast"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
-      {/* 5-Day List with Micro-Motion Hover Lift */}
+      {/* 5-Day List */}
       <div className="space-y-2 relative z-10 flex-1 overflow-y-auto no-scrollbar">
         {days.length === 0 ? (
-          <div className="h-full flex items-center justify-center">
-            <p className="text-xs text-slate-500 font-mono font-bold uppercase tracking-widest">No forecast telemetry</p>
+          <div className="h-full flex items-center justify-center py-6">
+            <p className="text-xs text-slate-400 font-sans">Upcoming forecast will appear here soon.</p>
           </div>
         ) : (
-          days.map((d, idx) => {
+          days.map((d) => {
             const Icon = getForecastIcon(d.condition);
             const color = getForecastColor(d.condition);
             return (
               <div 
                 key={d.day + d.date}
-                className="flex items-center justify-between p-3 rounded-xl bg-slate-800/30 hover:bg-slate-700/50 border border-white/5 hover:border-white/10 transition-all duration-300 text-xs group/item cursor-default"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 transition-all duration-200 text-xs cursor-default"
               >
                 <div className="w-24 flex flex-col">
-                  <span className="font-bold text-slate-200 group-hover/item:text-white tracking-wide transition-colors">{d.day}</span>
-                  <span className="text-[10px] text-slate-500 font-mono mt-0.5 group-hover/item:text-slate-400 transition-colors">{d.date}</span>
+                  <span className="font-medium text-slate-100">{d.day}</span>
+                  <span className="text-[11px] text-slate-400 mt-0.5">{d.date}</span>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-slate-800/80 border border-white/5 flex items-center justify-center transition-transform duration-300 group-hover/item:scale-110 shadow-inner">
+                <div className="flex items-center gap-2.5 flex-1 justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center">
                     <Icon className={`w-4 h-4 ${color}`} />
                   </div>
-                  <span className="text-xs text-white font-mono font-bold tracking-tight">
-                    <AnimatedCounter value={d.high} suffix="°" /> <span className="text-slate-500 font-normal">/</span> <AnimatedCounter value={d.low} suffix="°" />
+                  <span className="text-slate-300 capitalize font-sans truncate max-w-[120px] text-left">
+                    {d.description || d.condition}
                   </span>
                 </div>
 
-                <div className="flex flex-col items-end w-28 gap-1">
-                  <span className="text-[11px] font-bold text-slate-300 capitalize truncate w-full text-right">
-                    {d.condition}
+                <div className="flex items-center gap-2 text-right">
+                  <span className="text-white font-medium text-sm">
+                    <AnimatedCounter value={d.temp_max ?? d.temp} />°
                   </span>
-                  {d.rain_mm > 0 && (
-                    <span className="flex items-center gap-1 text-[9px] font-bold tracking-widest text-blue-400 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded-md border border-blue-500/20" title="Expected rainfall">
-                      <Droplets className="w-2.5 h-2.5" />
-                      {d.rain_mm}mm
-                    </span>
-                  )}
+                  <span className="text-slate-400 text-xs">
+                    {d.temp_min ?? d.temp - 3}°
+                  </span>
                 </div>
               </div>
             );

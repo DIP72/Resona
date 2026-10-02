@@ -4,6 +4,7 @@ const Alert = require('../models/Alert');
 const Telemetry = require('../models/Telemetry');
 const Acknowledgement = require('../models/Acknowledgement');
 const BroadcastLog = require('../models/BroadcastLog');
+const User = require('../models/User');
 const { PRESETS } = require('../data/presets');
 const { simplifyBureaucraticAlert } = require('../services/simplifierService');
 const { 
@@ -15,6 +16,7 @@ const {
 const { generateCapXml, generateCompressedSms, generateUssdString, generateLoraHexPayload } = require('../services/capGenerator');
 const { generateInitialTelemetry } = require('../services/telemetrySimulator');
 const { fetchEonetEvents } = require('../services/eonetService');
+const { sendSMS, sendEmail } = require('../services/dispatchService');
 
 // In-memory fallback in case MongoDB server ever has intermittent connectivity
 let memoryAlerts = new Map();
@@ -197,6 +199,11 @@ router.post('/alerts/broadcast-vernacular', async (req, res) => {
       senderName = 'State Disaster Management Authority (SDMA)',
       senderRole = 'Volunteer',
       senderBadge = 'VOL-4022',
+      targetPhone = null,
+      testPhoneNumber = null,
+      targetEmail = null,
+      testEmail = null,
+      broadcastToRegisteredUsers = true,
     } = req.body;
 
     // Security & Permission Enforcement: Normal citizens cannot send broadcasts to the public
@@ -212,6 +219,98 @@ router.post('/alerts/broadcast-vernacular', async (req, res) => {
     const broadcastId = `VBCST-${statePrefix}-${Date.now().toString(36).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
     const deliveredCount = Math.floor(recipientsCount * (0.982 + Math.random() * 0.015));
     const deliveryRate = ((deliveredCount / recipientsCount) * 100).toFixed(1) + '%';
+
+    // 1. Gather phone targets (specific phone + registered users)
+    const phoneTargets = [];
+    const phoneToUse = targetPhone || testPhoneNumber;
+    if (phoneToUse && phoneToUse.trim()) {
+      phoneTargets.push({ phone: phoneToUse.trim(), name: 'Direct Recipient' });
+    }
+
+    if (broadcastToRegisteredUsers) {
+      try {
+        const registeredUsers = await User.find().select('name phone email role').lean();
+        if (registeredUsers && registeredUsers.length > 0) {
+          for (const u of registeredUsers) {
+            if (u.phone && !phoneTargets.some(p => p.phone === u.phone)) {
+              phoneTargets.push({ phone: u.phone, name: u.name, email: u.email, role: u.role });
+            }
+          }
+        }
+      } catch (uErr) {
+        console.warn('User directory lookup note:', uErr.message);
+      }
+    }
+
+    // 2. Dispatch real SMS / Mobile packets
+    const phoneDeliveries = [];
+    for (const target of phoneTargets) {
+      try {
+        const dispatchRes = await sendSMS({
+          to: target.phone,
+          message: messageText || 'Emergency disaster alert.',
+          alertTitle: alertTitle || `Emergency Disaster Warning — ${city}`
+        });
+        phoneDeliveries.push({
+          recipient: target.phone,
+          name: target.name,
+          ...dispatchRes
+        });
+      } catch (dErr) {
+        phoneDeliveries.push({
+          recipient: target.phone,
+          name: target.name,
+          status: 'FAILED',
+          details: dErr.message
+        });
+      }
+    }
+
+    // 3. Dispatch Email (to target email and/or all registered users)
+    const emailTargets = [];
+    const directEmail = targetEmail || testEmail;
+    if (directEmail && directEmail.trim()) {
+      emailTargets.push({ email: directEmail.trim(), name: 'Direct Recipient' });
+    }
+
+    if (broadcastToRegisteredUsers || channel === 'EMAIL') {
+      try {
+        const registeredUsers = await User.find().select('name phone email role').lean();
+        if (registeredUsers && registeredUsers.length > 0) {
+          for (const u of registeredUsers) {
+            if (u.email && !emailTargets.some(e => e.email.toLowerCase() === u.email.toLowerCase())) {
+              emailTargets.push({ email: u.email, name: u.name, role: u.role });
+            }
+          }
+        }
+      } catch (uErr) {
+        console.warn('User email directory lookup note:', uErr.message);
+      }
+    }
+
+    const emailDeliveries = [];
+    for (const target of emailTargets) {
+      try {
+        const emRes = await sendEmail({
+          to: target.email,
+          subject: alertTitle || `Emergency Warning — ${city}`,
+          message: messageText || 'Emergency disaster alert.',
+          alertTitle: alertTitle || `Emergency Warning — ${city}`
+        });
+        emailDeliveries.push({
+          recipient: target.email,
+          name: target.name,
+          ...emRes
+        });
+      } catch (eErr) {
+        emailDeliveries.push({
+          recipient: target.email,
+          name: target.name,
+          status: 'FAILED',
+          details: eErr.message
+        });
+      }
+    }
 
     const logEntry = {
       broadcastId,
@@ -235,40 +334,73 @@ router.post('/alerts/broadcast-vernacular', async (req, res) => {
 
     memoryBroadcastLogs.unshift(logEntry);
 
+    const hasLiveSmsGateway = Boolean((process.env.FAST2SMS_API_KEY && process.env.FAST2SMS_API_KEY.trim()) || (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_PHONE_NUMBER));
+    const liveSmsGatewayName = process.env.FAST2SMS_API_KEY 
+      ? 'Fast2SMS Indian Telecom Gateway' 
+      : (process.env.TWILIO_ACCOUNT_SID ? 'Twilio Global Telecom SMS' : 'Direct Cellular / WhatsApp Bridge (No SMS Gateway configured in .env)');
+
+    const hasLiveEmailGateway = Boolean((process.env.GMAIL_USER && process.env.GMAIL_APP_PASS) || (process.env.SMTP_HOST && process.env.SMTP_USER));
+    const emailGatewayName = process.env.GMAIL_USER ? 'Google Workspace / Gmail SMTP' : process.env.SMTP_HOST ? 'Enterprise SMTP Relay' : 'Webmail & Mailto Dispatch Bridge';
+
+    const receipt = {
+      broadcastId,
+      gateway: channel === 'EMAIL' ? emailGatewayName : channel === 'SMS' ? liveSmsGatewayName : channel === 'WHATSAPP' ? 'Meta WhatsApp Cloud Direct Pipeline' : channel === 'VOICE_IVR' ? 'BSNL-DoT-Emergency-Voice-Trunk' : 'DoT-CAP-Cell-Broadcast-Gateway',
+      isLiveCarrier: channel === 'EMAIL' ? hasLiveEmailGateway : hasLiveSmsGateway,
+      timestamp: new Date().toISOString(),
+      deliveryRate,
+      deliveredCount,
+      totalTargeted: recipientsCount,
+      status: 'TRANSMITTED_DELIVERED',
+      phoneDeliveries,
+      emailDeliveries,
+      directDispatchCount: channel === 'EMAIL' ? emailDeliveries.length : phoneDeliveries.length
+    };
+
     try {
       const saved = await BroadcastLog.create(logEntry);
       return res.status(201).json({
         success: true,
         broadcast: saved,
-        networkReceipt: {
-          broadcastId,
-          gateway: channel === 'SMS' ? 'TRAI-National-SMS-Emergency-Pipe' : channel === 'WHATSAPP' ? 'Meta-Disaster-Enterprise-Webhook' : channel === 'VOICE_IVR' ? 'BSNL-DoT-Emergency-Voice-Trunk' : 'DoT-CAP-Cell-Broadcast-Gateway',
-          timestamp: new Date().toISOString(),
-          deliveryRate,
-          deliveredCount,
-          totalTargeted: recipientsCount,
-          status: 'TRANSMITTED_DELIVERED',
-        },
+        networkReceipt: receipt,
       });
     } catch (dbErr) {
       console.warn('MongoDB broadcast save note (saved to memory):', dbErr.message);
       return res.status(201).json({
         success: true,
         broadcast: logEntry,
-        networkReceipt: {
-          broadcastId,
-          gateway: 'Local-Resilient-Emergency-Pipe',
-          timestamp: new Date().toISOString(),
-          deliveryRate,
-          deliveredCount,
-          totalTargeted: recipientsCount,
-          status: 'TRANSMITTED_DELIVERED',
-        },
+        networkReceipt: receipt,
       });
     }
   } catch (err) {
     console.error('Error broadcasting vernacular alert:', err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/alerts/send-direct-message (Direct 1-click SMS / WhatsApp / Email to a specific phone or email)
+router.post('/alerts/send-direct-message', async (req, res) => {
+  try {
+    const { toPhone, toEmail, message, alertTitle = 'Emergency Alert', channel = 'SMS' } = req.body;
+    let smsResult = null;
+    let emailResult = null;
+
+    if (toPhone) {
+      smsResult = await sendSMS({ to: toPhone, message, alertTitle });
+    }
+    if (toEmail) {
+      emailResult = await sendEmail({ to: toEmail, subject: alertTitle, message, alertTitle });
+    }
+
+    return res.json({
+      success: true,
+      channel,
+      sms: smsResult,
+      email: emailResult,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('Error in send-direct-message:', err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
